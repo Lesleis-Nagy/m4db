@@ -1,0 +1,172 @@
+#!python
+
+import sys
+import re
+
+from argparse import ArgumentParser
+
+from subprocess import Popen, PIPE
+
+from sqlalchemy import and_
+
+from m4db_database.orm import Software
+from m4db_database.sessions import get_session
+
+from m4db_database.configuration import read_config_from_environ
+from m4db_database.configuration import write_config_to_environ
+
+
+def merrill_version(merrill_exe):
+    r"""
+    Retrieve the version from the supplied merrill executable.
+
+    :param merrill_exe: the merrill executable.
+    :return: a dictionary of the form
+                {
+                    "version": <string>,
+                    "error_message": <string>,
+                    "success": <boolean>
+                }
+              if "success" is False then parsing failed for the reason given in "error_message", otherwise
+              "error_message" is None and "version" contains the merrill version.
+
+    """
+    try:
+        proc = Popen(
+            "echo 'Version' | {}".format(merrill_exe),
+            stdout=PIPE,
+            stderr=PIPE,
+            universal_newlines=True,
+            text=True,
+            shell=True
+        )
+    except FileNotFoundError as e:
+        print(e)
+        return {
+            "version": None,
+            "error_message": "The proposed MERRILL executable '{}' could not be found".format(merrill_exe),
+            "success": False
+        }
+
+    stdout, stderr = proc.communicate()
+    match_version = re.match(r"^\s*MERRILL\s*([0-9]+\.([0-9]+\.([0-9]+)?)?)", stdout)
+    if match_version:
+        return {
+            "version": match_version.group(1),
+            "error_message": None,
+            "success": True
+        }
+    else:
+        return {
+            "version": None,
+            "error_message": "Could not parse MERRILL version.",
+            "success": False
+        }
+
+
+def check_merrill_version(version, args, add_if_missing=False):
+    r"""
+    Adds a new merrill metadata to the m4db database.
+    :param version: the version of merrill to look for.
+    :param args: command line argument data to add to the database.
+    :param add_if_missing: if True then attempt to add the MERRILL version if it cannot be found.
+
+    Returns: True if the version of MERRILL could be found in the database or it was added otherwise False.
+
+    """
+    session = get_session()
+    software = session.query(Software).filter(and_(Software.name == "MERRILL", Software.version == version)).one_or_none()
+    if software is not None:
+        session.close()
+        return True
+    else:
+        if not add_if_missing:
+            return False
+        else:
+            software = Software(
+                name="MERRILL",
+                version=version,
+                description=args.description,
+                citation=args.citation
+            )
+            session.add(software)
+            session.commit()
+            session.close()
+            return True
+
+
+def add_merrill_to_config(args, version):
+    r"""
+    Update the configuration with our version of MERRILL.
+    :param args: command line argument data to add to the configuration.
+    :param version: the version of MERRILL found.
+    :returns: None
+
+    """
+    config = read_config_from_environ()
+    config["mm_type"] = "MERRILL"
+    config["mm_binary"] = args.executable
+    config["mm_binary_version"] = version
+    write_config_to_environ(config)
+
+
+def command_line_parser():
+    r"""
+    Creates a command line parser.
+    Returns: a command line parser.
+
+    """
+    parser = ArgumentParser()
+
+    subparsers = parser.add_subparsers(dest="command")
+
+    merrill_parser = subparsers.add_parser(
+        "merrill",
+        help="Set up the new m4db instance to work with merrill")
+    merrill_parser.add_argument(
+        "--executable",
+        default="merrill", help="The MERRILL executable")
+    merrill_parser.add_argument(
+        "--description",
+        default="Micromagnetic earth related robust interpreted language laboratory",
+        help="The description for MERRILL")
+    merrill_parser.add_argument(
+        "--citation",
+        default="@article{doi:10.1002/2017GC007279, author = {Ó Conbhuí Pádraig and Williams Wyn and Fabian Karl and "
+                "Ridley Phil and Nagy Lesleis and Muxworthy Adrian R.}, title = {MERRILL: Micromagnetic Earth Related "
+                "Robust Interpreted Language Laboratory}, journal = {Geochemistry, Geophysics, Geosystems}, "
+                "volume = {19}, number = {4}, pages = {1080-1106},keywords = {micromagnetism, micromagnetic modeling, "
+                "rock magnetism, mineral magnetism, paleomagnetism}}",
+        help="The citation for MERRILL"
+    )
+
+    return parser
+
+
+def main():
+    parser = command_line_parser()
+    args = parser.parse_args()
+
+    if args.command == "merrill":
+        version = merrill_version(args.executable)
+        # If trying to retrieve the MERRILL version has failed ...
+        if not version["success"]:
+            # ... inform the user and exit.
+            print(version["error_message"])
+            sys.exit(1)
+        else:
+            # ... otherwise
+            # add/check the version in the database
+            in_db = check_merrill_version(version["version"], args, True)
+            # update the config yaml file (if the MERRILL metadata could be found).
+            if in_db:
+                add_merrill_to_config(args, version["version"])
+            else:
+                print("Failed to add requested merrill.")
+        print("Set MERRILL (version: '{}') to m4db micromagnetics package (exe: '{}')".format(
+            version["version"], args.executable
+        ))
+
+
+if __name__ == "__main__":
+    main()

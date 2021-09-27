@@ -1,0 +1,40 @@
+#!python
+
+from argparse import ArgumentParser
+
+from m4db_database.export_json_utilities import export_running_status
+from m4db_database.sessions import get_session
+
+
+def get_command_line_parser():
+    r"""
+    Retrieve a command line parser object for this script.
+
+    Returns:
+        A command line parser object for this script.
+
+    """
+    parser = ArgumentParser()
+
+    parser.add_argument("dir_path",
+                        help="output directory, will produce a file called 'running_status.json'")
+    parser.add_argument("-l", "--list", action="append",
+                        help="a list of running status names")
+    parser.add_argument("-f", "--formatted", action="store_true",
+                        help="flag to indicate whether the output should be formatted")
+    return parser
+
+
+def main():
+    parser = get_command_line_parser()
+    args = parser.parse_args()
+
+    print("Exporting running statuses to '{}'...".format(args.dir_path))
+    session = get_session()
+    export_running_status(args.dir_path, session, args.list, args.formatted)
+    session.close()
+    print("done!")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,592 @@
+#!python
+
+from decimal import Decimal
+
+from argparse import ArgumentParser
+
+from tqdm import tqdm
+
+import m4db_database.orm.version2.v2_schema as new
+import m4db_database.orm.version1.v1_schema as old
+
+from m4db_database.sessions import get_session_from_args
+
+from m4db_database import global_vars
+
+
+def copy_users(old_session, new_session):
+    r"""
+    Copy the users.
+    Args:
+        old_session: the old session containing users.
+        new_session: the new session where users will be copied.
+
+    Returns: None
+    """
+    desc = global_vars.BAR_MESSAGE_FORMAT.format("Copying users")
+
+    default_ticket_length = 3600  # 1hr in seconds
+    default_access_level = global_vars.ACCESS_READ
+
+    print("Retrieving users ...", end="")
+    old_users = old_session.query(old.DBUser).all()
+
+    for old_user in tqdm(old_users, desc=desc, position=global_vars.TQDM_POSITION):
+        new_user = new.DBUser(
+            user_name=old_user.user_name,
+            first_name=old_user.first_name,
+            initials=old_user.initials,
+            surname=old_user.surname,
+            email=old_user.email,
+            telephone=old_user.telephone,
+            created=old_user.created,
+            ticket_length=default_ticket_length,
+            access_level=default_access_level
+        )
+        new_session.add(new_user)
+    new_session.commit()
+
+
+def copy_software(old_session, new_session):
+    r"""
+    Copy software.
+    Args:
+        old_session: the old session containing users.
+        new_session: the new session where users will be copied.
+
+    Returns: None
+    """
+    desc = global_vars.BAR_MESSAGE_FORMAT.format("Copying software")
+
+    print("Retrieving software ...", end="")
+    old_softwares = old_session.query(old.Software).all()
+
+    for old_software in tqdm(old_softwares, desc=desc, position=global_vars.TQDM_POSITION):
+        new_software = new.Software(
+            name=old_software.name,
+            version=old_software.version,
+            description=old_software.description,
+            url=old_software.url,
+            citation=old_software.citation,
+            created=old_software.created
+        )
+        new_session.add(new_software)
+    new_session.commit()
+
+
+def copy_unit(old_session, new_session):
+    r"""
+    Copy units.
+    Args:
+        old_session: the old session containing users.
+        new_session: the new session where users will be copied.
+
+    Returns: None
+    """
+    desc = global_vars.BAR_MESSAGE_FORMAT.format("Copying units")
+
+    print("Retrieving units ...", end="")
+    old_units = old_session.query(old.Unit).all()
+
+    for old_unit in tqdm(old_units, desc=desc, position=global_vars.TQDM_POSITION):
+        new_unit = new.Unit(
+            symbol=old_unit.symbol,
+            name=old_unit.name,
+            power=old_unit.power,
+            created=old_unit.created
+        )
+        new_session.add(new_unit)
+    new_session.commit()
+
+
+def copy_physical_constant(old_session, new_session):
+    r"""
+    Copy physical constants.
+    Args:
+        old_session: the old session containing users.
+        new_session: the new session where users will be copied.
+
+    Returns: None
+    """
+    desc = global_vars.BAR_MESSAGE_FORMAT.format("Copying physical constants")
+
+    print("Retrieving constants ...", end="")
+    old_constants = old_session.query(old.PhysicalConstant).all()
+
+    for old_constant in tqdm(old_constants, desc=desc, position=global_vars.TQDM_POSITION):
+        new_constant = new.PhysicalConstant(
+            symbol=old_constant.symbol,
+            name=old_constant.name,
+            value=old_constant.value,
+            unit=old_constant.unit,
+            created=old_constant.created
+        )
+        new_session.add(new_constant)
+    new_session.commit()
+
+
+def copy_size_convention(old_session, new_session):
+    r"""
+    Copy size conventions.
+    Args:
+        old_session: the old session containing users.
+        new_session: the new session where users will be copied.
+
+    Returns: None
+    """
+    desc = global_vars.BAR_MESSAGE_FORMAT.format("Copying size conventions")
+
+    print("Retrieving size conventions ...", end="")
+    old_size_conventions = old_session.query(old.SizeConvention).all()
+
+    for old_size_convention in tqdm(old_size_conventions, desc=desc, position=global_vars.TQDM_POSITION):
+        new_size_convention = new.SizeConvention(
+            symbol=old_size_convention.symbol,
+            description=old_size_convention.description,
+            created=old_size_convention.created
+        )
+        new_session.add(new_size_convention)
+    new_session.commit()
+
+
+def copy_anisotropy_form(old_session, new_session):
+    r"""
+    Copy anisotropy forms.
+    Args:
+        old_session: the old session containing users.
+        new_session: the new session where users will be copied.
+
+    Returns: None
+    """
+    desc = global_vars.BAR_MESSAGE_FORMAT.format("Copying anisotropy forms")
+
+    print("Retrieving anisotropy forms ...", end="")
+    old_anisotropy_forms = old_session.query(old.AnisotropyForm).all()
+
+    for old_anisotropy_form in tqdm(old_anisotropy_forms, desc=desc, position=global_vars.TQDM_POSITION):
+        new_anisotropy_from = new.AnisotropyForm(
+            name=old_anisotropy_form.name,
+            description=old_anisotropy_form.description,
+            created=old_anisotropy_form.created
+        )
+        new_session.add(new_anisotropy_from)
+    new_session.commit()
+
+
+def copy_geometry(old_session, new_session):
+    r"""
+    Copy geometries.
+    Args:
+        old_session: the old session containing users.
+        new_session: the new session where users will be copied.
+    Returns: None
+    """
+    desc = global_vars.BAR_MESSAGE_FORMAT.format("Copying geometries")
+
+    print("Retrieving geometries ...", end="")
+    old_geometries = old_session.query(old.Geometry).all()
+
+    for old_geometry in tqdm(old_geometries, desc=desc, position=global_vars.TQDM_POSITION):
+        new_size_unit = new_session.query(new.Unit).\
+            filter(new.Unit.symbol == old_geometry.size_unit.symbol).\
+            one()
+
+        if old_geometry.element_size_unit is not None:
+            new_element_size_unit = new_session.query(new.Unit).\
+                filter(new.Unit.symbol == old_geometry.element_size_unit.symbol).\
+                one()
+        else:
+            new_element_size_unit = None
+
+        new_size_convention = new_session.query(new.SizeConvention).\
+            filter(new.SizeConvention.symbol == old_geometry.size_convention.symbol).\
+            one()
+
+        if old_geometry.software is not None:
+            new_software = new_session.query(new.Software).\
+                filter(new.Software.name == old_geometry.software.name).\
+                filter(new.Software.version == old_geometry.software.version).\
+                one()
+        else:
+            new_software = None
+
+        new_geometry = new.Geometry(
+            unique_id = old_geometry.unique_id,
+            name=old_geometry.name,
+            size=Decimal(old_geometry.size),
+            element_size=old_geometry.element_size,
+            description=old_geometry.description,
+            nelements=old_geometry.nelements,
+            nvertices=old_geometry.nvertices,
+            nsubmeshes=old_geometry.nsubmeshes,
+            volume_total=old_geometry.volume_total,
+            has_patran=old_geometry.has_patran,
+            has_exodus=old_geometry.has_exodus,
+            has_mesh_gen_script=old_geometry.has_mesh_gen_script,
+            has_mesh_gen_output=old_geometry.has_mesh_gen_output,
+            created=old_geometry.created,
+            size_unit=new_size_unit,
+            element_size_unit=new_element_size_unit,
+            size_convention=new_size_convention,
+            software=new_software,
+        )
+        new_session.add(new_geometry)
+    new_session.commit()
+
+
+def copy_material(old_session, new_session):
+    r"""
+    Copy materials.
+    Args:
+        old_session: the old session containing users.
+        new_session: the new session where users will be copied.
+    Returns: None
+    """
+    desc = global_vars.BAR_MESSAGE_FORMAT.format("Copying materials")
+
+    print("Retrieving materials ...", end="")
+    old_materials = old_session.query(old.Material).all()
+
+    for old_material in tqdm(old_materials, desc=desc, position=global_vars.TQDM_POSITION):
+        new_anisotropy_form = new_session.query(new.AnisotropyForm).\
+            filter(new.AnisotropyForm.name == old_material.anisotropy_form.name).\
+            one()
+
+        new_material = new.Material(
+            name=old_material.name,
+            temperature=Decimal(old_material.temperature),
+            k1=old_material.k1,
+            aex=old_material.aex,
+            ms=old_material.ms,
+            kd=old_material.kd,
+            lambda_ex=old_material.lambda_ex,
+            q_hardness=old_material.q_hardness,
+            axis_theta=old_material.axis_theta,
+            axis_phi=old_material.axis_phi,
+            created=old_material.created,
+            anisotropy_form=new_anisotropy_form
+        )
+        new_session.add(new_material)
+    new_session.commit()
+
+
+def copy_running_status(old_session, new_session):
+    r"""
+    Copy running statuses.
+    Args:
+        old_session: the old session containing users.
+        new_session: the new session where users will be copied.
+    Returns: None
+    """
+    desc = global_vars.BAR_MESSAGE_FORMAT.format("Copying running statuses")
+
+    print("Retrieving statuses ...", end="")
+    old_statuses = old_session.query(old.RunningStatus).all()
+
+    for old_status in tqdm(old_statuses, desc=desc, position=global_vars.TQDM_POSITION):
+        new_status = new.RunningStatus(
+            name=old_status.name,
+            description=old_status.description,
+            created=old_status.created
+        )
+        new_session.add(new_status)
+    new_session.commit()
+
+
+def copy_project(old_session, new_session):
+    r"""
+    Copy projects.
+    Args:
+        old_session: the old session containing users.
+        new_session: the new session where users will be copied.
+    Returns: None
+    """
+    desc = global_vars.BAR_MESSAGE_FORMAT.format("Copying projects")
+
+    print("Retrieving projects ...", end="")
+    old_projects = old_session.query(old.Project).all()
+
+    for old_project in tqdm(old_projects, desc=desc, position=global_vars.TQDM_POSITION):
+        new_project = new.Project(
+            name=old_project.name,
+            description=old_project.description
+        )
+        new_session.add(new_project)
+    new_session.commit()
+
+
+def copy_metadata(old_session, new_session):
+    r"""
+    Copy metadata items.
+    Args:
+        old_session: the old session containing users.
+        new_session: the new session where users will be copied.
+    Returns: None
+    """
+    desc = global_vars.BAR_MESSAGE_FORMAT.format("Copying metadata")
+
+    print("Retrieving metadata ...", end="")
+    old_metadatas = old_session.query(old.Metadata).all()
+
+    for old_metadata in tqdm(old_metadatas, desc=desc, position=global_vars.TQDM_POSITION):
+        new_software = new_session.query(new.Software).\
+            filter(new.Software.name == old_metadata.software.name).\
+            filter(new.Software.version == old_metadata.software.version).\
+            one()
+        new_db_user = new_session.query(new.DBUser).\
+            filter(new.DBUser.user_name == old_metadata.db_user.user_name).\
+            one()
+        new_project = new_session.query(new.Project).\
+            filter(new.Project.name == old_metadata.project.name).\
+            one()
+        new_metadata = new.Metadata(
+            created=old_metadata.created,
+            project=new_project,
+            db_user=new_db_user,
+            software=new_software
+        )
+        new_session.add(new_metadata)
+    new_session.commit()
+
+
+def copy_model(old_session, new_session):
+    r"""
+    Copy models.
+    Args:
+        old_session: the old session containing users.
+        new_session: the new session where users will be copied.
+    Returns: None
+    """
+
+    desc = global_vars.BAR_MESSAGE_FORMAT.format("Copying models")
+
+    print("Retrieving models ...", end="")
+    old_model_unique_ids = [p[0] for p in old_session.query(old.Model.unique_id).all()]
+
+    for old_model_unique_id in tqdm(old_model_unique_ids, desc=desc, position=global_vars.TQDM_POSITION):
+        old_model = old_session.query(old.Model).filter(old.Model.unique_id == old_model_unique_id).one()
+
+        new_geometry = new_session.query(new.Geometry).\
+            filter(new.Geometry.unique_id == old_model.geometry.unique_id).\
+            one()
+
+        # Start magnetization.
+        if isinstance(old_model.start_magnetization, old.RandomField):
+            new_start_magnetization = new.RandomField(seed=old_model.start_magnetization.seed)
+        elif isinstance(old_model.start_magnetization, old.ModelField):
+            child_model = new_session.query(new.Model).\
+                query(new.Model.unique_id == old_model.unique_id).\
+                one()
+            new_start_magnetization = new.ModelField(model=child_model)
+        elif isinstance(old_model.start_magnetization, old.UniformField):
+            new_start_magnetization = new.UniformField(
+                dir_x=old_model.start_magnetization.dir_x,
+                dir_y=old_model.start_magnetization.dir_y,
+                dir_z=old_model.start_magnetization.dir_z
+            )
+        else:
+            raise ValueError("Unknown start magnetization data db_type.")
+
+        # External field.
+        if old_model.external_field is not None:
+            if isinstance(old_model.external_field, old.UniformField):
+                new_external_field = new.UniformField(
+                    dir_x=old_model.external_field.dir_x,
+                    dir_y=old_model.external_field.dir_y,
+                    dir_z=old_model.external_field.dir_z
+                )
+            else:
+                raise ValueError("Invalid external field db_type.")
+        else:
+            new_external_field = None
+
+        # Running status.
+        new_running_status = new_session.query(new.RunningStatus).\
+            filter(new.RunningStatus.name == old_model.running_status.name).\
+            one()
+
+        # Metadata.
+        mdata = new_session.query(new.Metadata).\
+            join(new.Software, new.Metadata.software_id == new.Software.id).\
+            join(new.DBUser, new.Metadata.db_user_id == new.DBUser.id).\
+            join(new.Project, new.Metadata.project_id == new.Project.id).\
+            filter(new.Software.name == old_model.mdata.software.name).\
+            filter(new.Software.version == old_model.mdata.software.version).\
+            filter(new.DBUser.user_name == old_model.mdata.db_user.user_name).\
+            filter(new.Project.name == old_model.mdata.project.name).\
+            one()
+
+        # Legacy model info.
+        if old_model.legacy_model_info is not None:
+            legacy_model_info = new.LegacyModelInfo(
+                legacy_model_id=old_model.legacy_model_info.legacy_model_id,
+                created=old_model.legacy_model_info.created
+            )
+        else:
+            legacy_model_info = None
+
+        model = new.Model(
+            unique_id=old_model.unique_id,
+            mx_tot=old_model.mx_tot,
+            my_tot=old_model.my_tot,
+            mz_tot=old_model.mz_tot,
+            vx_tot=old_model.vx_tot,
+            vy_tot=old_model.vy_tot,
+            vz_tot=old_model.vz_tot,
+            h_tot=old_model.h_tot,
+            adm_tot=old_model.adm_tot,
+            e_typical=old_model.e_typical,
+            e_anis=old_model.e_anis,
+            e_ext=old_model.e_ext,
+            e_demag=old_model.e_demag,
+            e_exch1=old_model.e_exch1,
+            e_exch2=old_model.e_exch2,
+            e_exch3=old_model.e_exch3,
+            e_exch4=old_model.e_exch4,
+            e_tot=old_model.e_tot,
+            max_energy_evaluations=old_model.max_energy_evaluations,
+            created=old_model.created,
+            geometry=new_geometry,
+            start_magnetization=new_start_magnetization,
+            external_field=new_external_field,
+            running_status=new_running_status,
+            model_run_data=new.ModelRunData(
+                has_script=old_model.model_run_data.has_script,
+                has_stdout=old_model.model_run_data.has_stdout,
+                has_stderr=old_model.model_run_data.has_stderr,
+                has_energy_log=old_model.model_run_data.has_energy_log,
+                has_tecplot=old_model.model_run_data.has_tecplot,
+                has_json=old_model.model_run_data.has_json,
+                has_dat=old_model.model_run_data.has_dat,
+                has_helicity_dat=old_model.model_run_data.has_helicity_dat,
+                has_vorticity_dat=old_model.model_run_data.has_vorticity_dat,
+                has_adm_dat=old_model.model_run_data.has_adm_dat,
+                created=old_model.model_run_data.created
+            ),
+            model_report_data=new.ModelReportData(
+                has_xy_thumb_png=old_model.model_report_data.has_xy_thumb_png,
+                has_yz_thumb_png=old_model.model_report_data.has_yz_thumb_png,
+                has_xz_thumb_png=old_model.model_report_data.has_xz_thumb_png,
+                has_xy_png=old_model.model_report_data.has_xy_png,
+                has_yz_png=old_model.model_report_data.has_yz_png,
+                has_xz_png=old_model.model_report_data.has_xz_png
+            ),
+            mdata=mdata,
+            legacy_model_info=legacy_model_info
+        )
+
+        # Materials processed here
+        materials_text_list = []
+        materials_submeshidx_text_list = []
+        materials_submeshidx_text_temperature_list = []
+
+        for old_mma in old_model.materials:
+            material = new_session.query(new.Material).\
+                filter(new.Material.name == old_mma.material.name).\
+                filter(new.Material.temperature == old_mma.material.temperature).\
+                one()
+
+            new_mma = new.ModelMaterialAssociation(
+                submesh_id=old_mma.submesh_id,
+                material=material
+            )
+
+            model.materials.append(new_mma)
+
+            materials_text_list.append(material.name)
+            materials_submeshidx_text_list.append("{}:{}".format(old_mma.submesh_id, material.name))
+            materials_submeshidx_text_temperature_list.append(
+                "{}:{}:{}".format(old_mma.submesh_id, material.name, material.temperature)
+            )
+
+        model.model_materials_text = new.ModelMaterialsText(
+            materials=",".join(sorted(materials_text_list)),
+            submeshidxs_materials=",".join(materials_submeshidx_text_list),
+            submeshidxs_materials_temperatures=",".join(materials_submeshidx_text_temperature_list)
+        )
+
+        new_session.add(model)
+    new_session.commit()
+
+
+def get_sessions(args):
+    r"""
+    Retreive a connection object for our old & new databases.
+    :param args: command line arguments.
+    :return: and old session and a new session
+    """
+
+    if args.old_db_type == "postgres":
+        if args.old_db_host is not None:
+            old_uri = global_vars.POSTGRES_DATABASE_HOST_URI.format(database=args.old_db, host=args.host)
+        else:
+            old_uri = global_vars.POSTGRES_DATABASE_URI.format(database=args.old_db)
+        old_engine = create_engine(old_uri, poolclass=NullPool)
+        OldSession = sessionmaker(
+            bind=old_engine,
+            autoflush=True,
+            autocommit=False
+        )
+    else:
+        raise ValueError("Database '{}' not currently supported for updates".format(args.old_db_type))
+
+
+
+
+def copy_action(args):
+    r"""
+    Update an old postgres m4db database to a new one.
+    """
+    old_session = get_session_from_args(
+        args.old_db, args.old_db_type,
+        user=args.old_db_user, host=args.old_db_host,
+        nullpool=True, autoflush=True, autocommit=False
+    )
+
+    new_session = get_session_from_args(
+        args.new_db, args.new_db_type,
+        user=args.new_db_user, host=args.new_db_host,
+        nullpool=True, autoflush=True, autocommit=False
+    )
+
+    try:
+        copy_users(old_session, new_session)
+        copy_software(old_session, new_session)
+        copy_unit(old_session, new_session)
+        copy_physical_constant(old_session, new_session)
+        copy_size_convention(old_session, new_session)
+        copy_anisotropy_form(old_session, new_session)
+        copy_geometry(old_session, new_session)
+        copy_material(old_session, new_session)
+        copy_running_status(old_session, new_session)
+        copy_project(old_session, new_session)
+        copy_metadata(old_session, new_session)
+        copy_model(old_session, new_session)
+    finally:
+        old_session.close()
+        new_session.close()
+
+
+def command_line_parser():
+    parser = ArgumentParser()
+
+    parser.add_argument("old_db", help="old database name/file")
+    parser.add_argument("old_db_type", choices=["postgres", "sqlite"], help="the old database db_type")
+    parser.add_argument("--old-db-user", default=None, help="old database user")
+    parser.add_argument("--old-db-host", default=None, help="old database host")
+    parser.add_argument("new_db", help="new database name/file")
+    parser.add_argument("new_db_type", choices=["postgres", "sqlite"], help="the new database db_type")
+    parser.add_argument("--new-db-user", default=None, help="new database user")
+    parser.add_argument("--new-db_host", default=None, help="new database host")
+
+    return parser
+
+
+def main():
+    parser = command_line_parser()
+    args = parser.parse_args()
+    copy_action(args)
+
+
+if __name__ == "__main__":
+    main()

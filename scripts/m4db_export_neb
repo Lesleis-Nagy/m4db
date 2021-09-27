@@ -1,0 +1,46 @@
+#!python
+
+from argparse import ArgumentParser
+
+from m4db_database.export_json_utilities import export_neb_by_unique_id
+from m4db_database.export_data_files_utilities import export_neb_data_files_by_unique_id
+from m4db_database.sessions import get_session
+
+
+def get_command_line_parser():
+    r"""
+    Retrieve a command line parser object for this script.
+
+    Returns:
+        A command line parser object for this script.
+
+    """
+    parser = ArgumentParser()
+
+    parser.add_argument("dir_path",
+                        help="output directory, will produce a file called 'neb.json' and a directory 'neb'")
+    parser.add_argument("-l", "--list", action="append",
+                        help="a list of neb unique ids")
+    parser.add_argument("-f", "--formatted", action="store_true",
+                        help="flag to indicate whether the output should be formatted")
+    parser.add_argument("-z", "--zipped", action="store_true",
+                        help="flag to indicate whether a zipped version of the neb data directory should be made")
+    parser.add_argument("-d", "--delete_dir_path", action="store_true",
+                        help="flag to indicate whether the original '<dir_path>/neb' directory should be removed")
+    return parser
+
+
+def main():
+    parser = get_command_line_parser()
+    args = parser.parse_args()
+
+    print("Exporting NEB paths to '{}'...".format(args.dir_path))
+    session = get_session()
+    export_neb_by_unique_id(args.dir_path, session, args.list, args.formatted)
+    session.close()
+    export_neb_data_files_by_unique_id(args.dir_path, args.list, args.zipped, args.delete_dir_path)
+    print("done!")
+
+
+if __name__ == "__main__":
+    main()

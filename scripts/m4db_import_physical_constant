@@ -1,0 +1,33 @@
+#!python
+
+from argparse import ArgumentParser
+
+from m4db_database.sessions import get_session
+
+from m4db_database.import_json_utilities import import_physical_constant
+
+
+def get_command_line_parser():
+    parser = ArgumentParser()
+
+    parser.add_argument("json_file",
+                        help="The file containing physical constant information in JSON format.")
+    parser.add_argument("-d", "--original_dates", action="store_true",
+                        help="Flag indicating that the original dates in the JSON file should be used when importing")
+
+    return parser
+
+
+def main():
+    parser = get_command_line_parser()
+    args = parser.parse_args()
+
+    print("Importing physical constants...")
+    session = get_session()
+    import_physical_constant(args.json_file, session, args.original_dates)
+    session.close()
+    print("Done!")
+
+
+if __name__ == "__main__":
+    main()
