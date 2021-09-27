@@ -231,7 +231,7 @@ def drop_primary_key_constraints(new_session):
     new_session.execute("alter table project drop constraint if exists project_pkey")
 
     # random_field
-    print("Dropping primary key from table ''")
+    print("Dropping primary key from table 'random_field'")
     new_session.execute("alter table random_field drop constraint if exists random_field_pkey")
 
     # running_status
@@ -535,7 +535,7 @@ def copy_anisotropy_form(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'anisotropy_form'")
+    #print("Copying data for table 'anisotropy_form'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -574,7 +574,7 @@ def copy_db_user(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'db_user'")
+    #print("Copying data for table 'db_user'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -626,12 +626,12 @@ def copy_field(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'field'")
+    #print("Copying data for table 'field'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
         select 
-            id, db_type, last_modified, created
+            id, type, last_modified, created
         from field
         limit 10
     """)
@@ -639,7 +639,7 @@ def copy_field(old_session, new_session):
     # Construct new data and insert it in to new database.
     insert_items = [
         {"id": record[0],
-         "db_type": record[1],
+         "type": record[1],
          "last_modified": record[2],
          "created": record[3]} for record in records
     ]
@@ -648,9 +648,9 @@ def copy_field(old_session, new_session):
 
     insert_statement = text("""
         insert into field
-            (id, db_type, last_modified, created)
+            (id, type, last_modified, created)
         values
-            (:id, :db_type, :last_modified, :created)
+            (:id, :type, :last_modified, :created)
     """)
 
     for insert_item in tqdm(insert_items, desc="Fields"):
@@ -666,7 +666,7 @@ def copy_geometry(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'geometry'")
+    #print("Copying data for table 'geometry'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -729,7 +729,7 @@ def copy_legacy_model_info(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'legacy_model_info'")
+    #print("Copying data for table 'legacy_model_info'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -770,7 +770,7 @@ def copy_material(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'material'")
+    #print("Copying data for table 'material'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -823,7 +823,7 @@ def copy_metadata(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'metadata'")
+    #print("Copying data for table 'metadata'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -852,7 +852,7 @@ def copy_metadata(old_session, new_session):
             (:id, :last_modified, :created, :project_id, :db_user_id, :software_id)
     """)
 
-    for insert_item in tqdm(insert_items):
+    for insert_item in tqdm(insert_items, desc="Metadata"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -865,7 +865,7 @@ def copy_model(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'geometry'")
+    #print("Copying data for table 'geometry'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -985,7 +985,7 @@ def copy_model_field(old_session, new_session):
     :param new_session: a connection to the v2 (old) database.
     :return: None
     """
-    print("Copying data for table 'model_field'")
+    #print("Copying data for table 'model_field'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1025,7 +1025,7 @@ def copy_model_material_association(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'model_material_association'")
+    #print("Copying data for table 'model_material_association'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1033,6 +1033,7 @@ def copy_model_material_association(old_session, new_session):
             model_id, material_id, submesh_id
         from
             model_material_association
+        limit 10
     """)
 
     # Construct new data and insert in to new database.
@@ -1051,7 +1052,7 @@ def copy_model_material_association(old_session, new_session):
             (:model_id, :material_id, :submesh_id)
     """)
 
-    for insert_item in tqdm(insert_items, desc="Model material association items"):
+    for insert_item in tqdm(insert_items, desc="Model material associations"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1064,7 +1065,7 @@ def copy_model_report_data(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'model_report_data'")
+    #print("Copying data for table 'model_report_data'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1072,6 +1073,7 @@ def copy_model_report_data(old_session, new_session):
             id, has_xy_thumb_png, has_yz_thumb_png, has_xz_thumb_png, has_xy_png, has_yz_png, has_xz_png
         from
             model_report_data
+        limit 10
     """)
 
     # Construct new data and insert into new database.
@@ -1092,7 +1094,7 @@ def copy_model_report_data(old_session, new_session):
             (:id, :has_xy_thumb_png, :has_yz_thumb_png, :has_xz_thumb_png, :has_xy_png, :has_yz_png, :has_xz_png)
     """)
 
-    for insert_item in tqdm(insert_items, desc="Model report data items"):
+    for insert_item in tqdm(insert_items, desc="Model reports"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1105,7 +1107,7 @@ def copy_model_run_data(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'model_run_data'")
+    #print("Copying data for table 'model_run_data'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1114,6 +1116,7 @@ def copy_model_run_data(old_session, new_session):
             has_vorticity_dat, has_adm_dat, last_modified, created
         from
             model_run_data
+        limit 10
     """)
 
     # Construct new data and insert into new database.
@@ -1142,7 +1145,7 @@ def copy_model_run_data(old_session, new_session):
              :has_helicity_dat, :has_vorticity_dat, :has_adm_dat, :last_modified, :created)
     """)
 
-    for insert_item in tqdm(insert_items, desc="Model report data items"):
+    for insert_item in tqdm(insert_items, desc="Model run"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1155,16 +1158,30 @@ def copy_neb(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying over data for table 'neb'")
+    #print("Copying over data for table 'neb'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
-        select 
-             id, unique_id, spring_constant, curvature_weight, no_of_points, max_energy_evaluations, 
-             max_path_evaluations, energy_barrier, last_modified, created, external_field_id, start_model_id,
-             end_model_id, parent_neb_id, neb_calculation_type_id, neb_run_data_id, neb_report_data_id,
-             running_status_id, mdata_id
+        select id, 
+               unique_id, 
+               spring_constant, 
+               curvature_weight, 
+               no_of_points,
+               max_energy_evaluations,
+               max_path_evaluations, 
+               last_modified, 
+               created, 
+               start_model_id, 
+               end_model_id, 
+               parent_neb_id, 
+               neb_calculation_type_id, 
+               neb_run_data_id, 
+               neb_report_data_id, 
+               running_status_id, 
+               mdata_id, 
+               external_field_id 
         from neb
+        limit 10
     """)
 
     # Construct new data and insert into new databse.
@@ -1176,18 +1193,18 @@ def copy_neb(old_session, new_session):
          "no_of_points": record[4],
          "max_energy_evaluations": record[5],
          "max_path_evaluations": record[6],
-         "energy_barrier": record[7],
-         "last_modified": record[8],
-         "created": record[9],
-         "external_field_id": record[10],
-         "start_model_id": record[11],
-         "end_model_id": record[12],
-         "parent_neb_id": record[13],
-         "neb_calculation_type_id": record[14],
-         "neb_run_data_id": record[15],
-         "neb_report_data_id": record[16],
-         "running_status_id": record[17],
-         "mdata_id": record[18]} for record in records
+         "energy_barrier": 0.0,
+         "last_modified": record[7],
+         "created": record[8],
+         "external_field_id": record[17],
+         "start_model_id": record[9],
+         "end_model_id": record[10],
+         "parent_neb_id": record[11],
+         "neb_calculation_type_id": record[12],
+         "neb_run_data_id": record[13],
+         "neb_report_data_id": record[14],
+         "running_status_id": record[15],
+         "mdata_id":record[16]} for record in records
     ]
 
     new_session.execute("delete from neb")
@@ -1205,7 +1222,7 @@ def copy_neb(old_session, new_session):
              :running_status_id, :mdata_id)
     """)
 
-    for insert_item in tqdm(insert_items, desc="NEB items"):
+    for insert_item in tqdm(insert_items, desc="NEBs"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1218,7 +1235,7 @@ def copy_neb_calculation_type(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'neb_calculation_type'")
+    #print("Copying data for table 'neb_calculation_type'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1246,7 +1263,7 @@ def copy_neb_calculation_type(old_session, new_session):
             (:id, :name, :description, :last_modified, :created)
     """)
 
-    for insert_item in tqdm(insert_items, desc="NEB calculation db_type items"):
+    for insert_item in tqdm(insert_items, desc="NEB calculation types"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1259,25 +1276,27 @@ def copy_neb_model_split(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'neb_model_split'")
+    #print("Copying data for table 'neb_model_split'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
         select
-            id, image_number, last_modified, created, neb_id, model_id
+            image_number, last_modified, created, neb_id, model_id
         from
             neb_model_split
     """)
 
     # Construct new data and insert into new database.
-    insert_items = [
-        {"id": record[0],
-         "image_number": record[1],
-         "last_modified": record[2],
-         "created": record[3],
-         "neb_id": record[4],
-         "model_id": record[5]} for record in records
-    ]
+    id = 0
+    insert_items = []
+    for record in records:
+        insert_items.append({"id": id,
+                             "image_number": record[0],
+                             "last_modified": record[1],
+                             "created": record[2],
+                             "neb_id": record[3],
+                             "model_id": record[4]})
+        id = id + 1
 
     new_session.execute("delete from neb_model_split")
 
@@ -1288,7 +1307,7 @@ def copy_neb_model_split(old_session, new_session):
             (:id, :image_number, :last_modified, :created, :neb_id, :model_id)
     """)
 
-    for insert_item in tqdm(insert_items, desc="NEB model split items"):
+    for insert_item in tqdm(insert_items, desc="NEB model split"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1301,7 +1320,7 @@ def copy_neb_report_data(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'neb_report_data'")
+    #print("Copying data for table 'neb_report_data'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1310,6 +1329,7 @@ def copy_neb_report_data(old_session, new_session):
             created
         from
             neb_report_data
+        limit 10
     """)
 
     # Construct new data and insert into new database.
@@ -1349,7 +1369,7 @@ def copy_neb_run_data(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'neb_run_data'")
+    #print("Copying data for table 'neb_run_data'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1358,6 +1378,7 @@ def copy_neb_run_data(old_session, new_session):
              created
         from
             neb_run_data
+        limit 10
     """)
 
     # Construct new data and insert into new database.
@@ -1384,7 +1405,7 @@ def copy_neb_run_data(old_session, new_session):
              :last_modified, :created)
     """)
 
-    for insert_item in tqdm(insert_items, desc="NEB run data items"):
+    for insert_item in tqdm(insert_items, desc="NEB run data"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1397,7 +1418,7 @@ def copy_physical_constant(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'physical_constant'")
+    #print("Copying data for table 'physical_constant'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1418,7 +1439,7 @@ def copy_physical_constant(old_session, new_session):
          "created": record[6]} for record in records
     ]
 
-    new_session.execute("delete from ")
+    new_session.execute("delete from physical_constant")
 
     insert_statement = text("""
         insert into physical_constant
@@ -1427,7 +1448,7 @@ def copy_physical_constant(old_session, new_session):
             (:id, :symbol, :name, :value, :unit, :last_modified, :created)
     """)
 
-    for insert_item in tqdm(insert_items, desc="Physical constant items"):
+    for insert_item in tqdm(insert_items, desc="Physical constants"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1440,23 +1461,24 @@ def copy_project(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'project'")
+    #print("Copying data for table 'project'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
         select
-            id, name, description, last_modified, created
+            id, name, description
         from
             project
     """)
 
     # Construct new data and insert into new database.
+    now = datetime.datetime.now(datetime.timezone.utc)
     insert_items = [
         {"id": record[0],
          "name": record[1],
          "description": record[2],
-         "last_modified": record[3],
-         "created": record[4]} for record in records
+         "last_modified": now,
+         "created": now} for record in records
     ]
 
     new_session.execute("delete from project")
@@ -1481,7 +1503,7 @@ def copy_random_field(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'random_field'")
+    #print("Copying data for table 'random_field'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1489,6 +1511,7 @@ def copy_random_field(old_session, new_session):
             id, seed, last_modified, created
         from
             random_field
+        limit 10
     """)
 
     # Construct new data and insert into new database.
@@ -1508,7 +1531,7 @@ def copy_random_field(old_session, new_session):
             (:id, :seed, :last_modified, :created)
     """)
 
-    for insert_item in tqdm(insert_items, desc="Random field items"):
+    for insert_item in tqdm(insert_items, desc="Random fields"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1521,7 +1544,7 @@ def copy_running_status(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'running_status'")
+    #print("Copying data for table 'running_status'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1549,7 +1572,7 @@ def copy_running_status(old_session, new_session):
             (:id, :name, :description, :last_modified, :created)
     """)
 
-    for insert_item in tqdm(insert_items, desc="Running status items"):
+    for insert_item in tqdm(insert_items, desc="Running statuses"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1562,7 +1585,7 @@ def copy_size_convention(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'size_convention'")
+    #print("Copying data for table 'size_convention'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1590,7 +1613,7 @@ def copy_size_convention(old_session, new_session):
             (:id, :symbol, :description, :last_modified, :created)
     """)
 
-    for insert_item in tqdm(insert_items, desc="Size convention items"):
+    for insert_item in tqdm(insert_items, desc="Size conventions"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1603,7 +1626,7 @@ def copy_software(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'software'")
+    #print("Copying data for table 'software'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1634,7 +1657,7 @@ def copy_software(old_session, new_session):
             (:id, :name, :version, :description, :url, :citation, :last_modified, :created)
     """)
 
-    for insert_item in tqdm(insert_items, desc="Software items"):
+    for insert_item in tqdm(insert_items, desc="Softwares"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1647,7 +1670,7 @@ def copy_uniform_field(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'uniform_field'")
+    #print("Copying data for table 'uniform_field'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1680,7 +1703,7 @@ def copy_uniform_field(old_session, new_session):
             (:id, :theta, :phi, :dir_x, :dir_y, :dir_z, :magnitude, :last_modified, :created, :unit_id)
     """)
 
-    for insert_item in tqdm(insert_items, desc="Uniform field items"):
+    for insert_item in tqdm(insert_items, desc="Uniform fields"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1693,7 +1716,7 @@ def copy_unit(old_session, new_session):
     :param new_session: a connection to the v2 (new) database.
     :return: None
     """
-    print("Copying data for table 'unit'")
+    #print("Copying data for table 'unit'")
 
     # Retrieve data from old database.
     records = old_session.execute("""
@@ -1722,7 +1745,7 @@ def copy_unit(old_session, new_session):
             (:id, :symbol, :name, :power, :last_modified, :created)
     """)
 
-    for insert_item in tqdm(insert_items, desc="Unit items"):
+    for insert_item in tqdm(insert_items, desc="Units"):
         new_session.execute(insert_statement, params=insert_item)
 
     new_session.commit()
@@ -1743,6 +1766,23 @@ def copy_all_tables(old_session, new_session):
     copy_material(old_session, new_session)
     copy_metadata(old_session, new_session)
     copy_model(old_session, new_session)
+    copy_model_field(old_session, new_session)
+    copy_model_material_association(old_session, new_session)
+    copy_model_report_data(old_session, new_session)
+    copy_model_run_data(old_session, new_session)
+    copy_neb(old_session, new_session)
+    copy_neb_calculation_type(old_session, new_session)
+    copy_neb_model_split(old_session, new_session)
+    copy_neb_report_data(old_session, new_session)
+    copy_neb_run_data(old_session, new_session)
+    copy_physical_constant(old_session, new_session)
+    copy_project(old_session, new_session)
+    copy_random_field(old_session, new_session)
+    copy_running_status(old_session, new_session)
+    copy_size_convention(old_session, new_session)
+    copy_software(old_session, new_session)
+    copy_uniform_field(old_session, new_session)
+    copy_unit(old_session, new_session)
 
 
 def command_line_parser():
