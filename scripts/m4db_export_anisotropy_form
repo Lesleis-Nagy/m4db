@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 from m4db_database.export_json_utilities import export_anisotropy_form
 from m4db_database.sessions import get_session
 
+
 def get_command_line_parser():
     r"""
     Retrieve a command line parser object for this script.
