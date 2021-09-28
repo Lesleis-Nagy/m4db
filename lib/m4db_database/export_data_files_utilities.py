@@ -12,9 +12,9 @@ from m4db_database.sessions import get_session
 
 from m4db_database.configuration import read_config_from_environ
 
-from m4db_database.orm.version2.v2_schema import Geometry
-from m4db_database.orm.version2.v2_schema import Model
-from m4db_database.orm.version2.v2_schema import NEB
+from m4db_database.orm.latest import Geometry
+from m4db_database.orm.latest import Model
+from m4db_database.orm.latest import NEB
 
 
 def export_geometry_data_files_by_unique_id(dir_path, unique_ids=None, zipped=False, remove_geometry_dir=False):

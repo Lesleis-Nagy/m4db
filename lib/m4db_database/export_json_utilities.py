@@ -8,17 +8,17 @@ import os
 
 from sqlalchemy import tuple_
 
-from m4db_database.orm.version2.v2_schema import DBUser, Project, RunningStatus
-from m4db_database.orm.version2.v2_schema import Software
-from m4db_database.orm.version2.v2_schema import Unit
-from m4db_database.orm.version2.v2_schema import PhysicalConstant
-from m4db_database.orm.version2.v2_schema import SizeConvention
-from m4db_database.orm.version2.v2_schema import AnisotropyForm
-from m4db_database.orm.version2.v2_schema import Geometry
-from m4db_database.orm.version2.v2_schema import Model
-from m4db_database.orm.version2.v2_schema import NEBCalculationType
-from m4db_database.orm.version2.v2_schema import NEB
-from m4db_database.orm.version2.v2_schema import Material
+from m4db_database.orm.latest import DBUser, Project, RunningStatus
+from m4db_database.orm.latest import Software
+from m4db_database.orm.latest import Unit
+from m4db_database.orm.latest import PhysicalConstant
+from m4db_database.orm.latest import SizeConvention
+from m4db_database.orm.latest import AnisotropyForm
+from m4db_database.orm.latest import Geometry
+from m4db_database.orm.latest import Model
+from m4db_database.orm.latest import NEBCalculationType
+from m4db_database.orm.latest import NEB
+from m4db_database.orm.latest import Material
 
 
 def export_db_user(dir_path, session, user_names=None, format_json=False):

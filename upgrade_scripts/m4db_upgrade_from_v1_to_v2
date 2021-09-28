@@ -6,8 +6,8 @@ from argparse import ArgumentParser
 
 from tqdm import tqdm
 
-import m4db_database.orm.version2.v2_schema as new
-import m4db_database.orm.version1.v1_schema as old
+import m4db_database.orm.v2_schema as new
+import m4db_database.orm.v1_schema as old
 
 from m4db_database.sessions import get_session_from_args
 

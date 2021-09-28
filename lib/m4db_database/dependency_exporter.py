@@ -2,7 +2,7 @@ r"""
 A set of utility functions that are useful when exporting data.
 """
 
-from m4db_database.orm.version2.v2_schema import NEB
+from m4db_database.orm.latest import NEB
 
 import sqlalchemy.orm
 
