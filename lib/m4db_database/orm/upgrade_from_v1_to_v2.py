@@ -896,6 +896,7 @@ def copy_model(old_session, new_session):
          "e_exch3": record[16],
          "e_exch4": record[17],
          "e_tot": record[18],
+         "volume": None,
          "max_energy_evaluations": record[19],
          "last_modified": record[20],
          "created": record[21],
@@ -927,7 +928,7 @@ def copy_model(old_session, new_session):
              :legacy_model_info_id)
     """)
 
-    # For each 'model', we need to create a new 'model_material_association'.
+    # For each 'model', we need to create a new 'model_materials_text'.
 
     model_materials_text_id = 0
     for model_item in tqdm(model_items, desc="Models"):

@@ -1,7 +1,7 @@
 r"""
 Created on Aug, 2018
 
-@file: latest.py
+@file: v2_schema.py
 @author: Nagy, Lesleis
 
 Version 2 - August 2021
@@ -1201,6 +1201,7 @@ class Model(Base):
     e_exch3 = Column(Float, nullable=True)
     e_exch4 = Column(Float, nullable=True)
     e_tot = Column(Float, nullable=True)
+    volume = Column(Float, nullable=True)
     max_energy_evaluations = Column(Integer, default=10000, nullable=False)
     last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
     created = Column(DateTime, default=now, nullable=False)
