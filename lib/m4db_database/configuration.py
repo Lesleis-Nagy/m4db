@@ -15,7 +15,7 @@ M4DB_RUNNER_WEB_ENTRIES = [
 ]
 
 M4DB_SERVERSIDE_ENTRIES = [
-    "default_m4db_user", "default_project"
+    "default_m4db_user", "default_project", "working_dir"
 ]
 
 
@@ -38,7 +38,8 @@ def read_config_from_file(file_name):
             backoff_factor: 1
         m4db_serverside:
             default_m4db_user: "lnagy2",
-            default_project: "elongations"
+            default_project: "elongations",
+            working_dir: "/var/tmp"
 
     Args:
         file_name: the M4DB configuration file.

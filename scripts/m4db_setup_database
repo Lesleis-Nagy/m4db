@@ -80,7 +80,8 @@ def postgres(database, file_root, config_file, user=None, host=None, password=No
         },
         "m4db_serverside": {
             "default_m4db_user": None,
-            "default_m4db_project": None
+            "default_m4db_project": None,
+            "working_dir": "/var/tmp"
         }
     }
 
