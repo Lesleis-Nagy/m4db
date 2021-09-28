@@ -633,7 +633,6 @@ def copy_field(old_session, new_session):
         select 
             id, type, last_modified, created
         from field
-        limit 10
     """)
 
     # Construct new data and insert it in to new database.
@@ -676,7 +675,6 @@ def copy_geometry(old_session, new_session):
             element_size_unit_id, size_convention_id, software_id
         from
             geometry
-        limit 10
     """)
 
     # Construct new data and insert in to new database.
@@ -737,7 +735,6 @@ def copy_legacy_model_info(old_session, new_session):
             id, legacy_model_id, last_modified, created
         from
             legacy_model_info
-        limit 10
     """)
 
     # Construct new data and insert it in to the new database.
@@ -876,7 +873,6 @@ def copy_model(old_session, new_session):
             model_report_data_id, mdata_id, legacy_model_info_id
         from
             model
-        limit 10 
     """)
 
     # Construct new data and insert into new database.
@@ -1033,7 +1029,6 @@ def copy_model_material_association(old_session, new_session):
             model_id, material_id, submesh_id
         from
             model_material_association
-        limit 10
     """)
 
     # Construct new data and insert in to new database.
@@ -1073,7 +1068,6 @@ def copy_model_report_data(old_session, new_session):
             id, has_xy_thumb_png, has_yz_thumb_png, has_xz_thumb_png, has_xy_png, has_yz_png, has_xz_png
         from
             model_report_data
-        limit 10
     """)
 
     # Construct new data and insert into new database.
@@ -1116,7 +1110,6 @@ def copy_model_run_data(old_session, new_session):
             has_vorticity_dat, has_adm_dat, last_modified, created
         from
             model_run_data
-        limit 10
     """)
 
     # Construct new data and insert into new database.
@@ -1181,7 +1174,6 @@ def copy_neb(old_session, new_session):
                mdata_id, 
                external_field_id 
         from neb
-        limit 10
     """)
 
     # Construct new data and insert into new databse.
@@ -1329,7 +1321,6 @@ def copy_neb_report_data(old_session, new_session):
             created
         from
             neb_report_data
-        limit 10
     """)
 
     # Construct new data and insert into new database.
@@ -1378,7 +1369,6 @@ def copy_neb_run_data(old_session, new_session):
              created
         from
             neb_run_data
-        limit 10
     """)
 
     # Construct new data and insert into new database.
@@ -1511,7 +1501,6 @@ def copy_random_field(old_session, new_session):
             id, seed, last_modified, created
         from
             random_field
-        limit 10
     """)
 
     # Construct new data and insert into new database.
@@ -1818,7 +1807,7 @@ def main():
 
     drop_all_constraints(new_conn)
     copy_all_tables(old_conn, new_conn)
-    #enable_all_constraints(new_conn)
+    enable_all_constraints(new_conn)
 
 
 if __name__ == "__main__":
