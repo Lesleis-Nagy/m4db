@@ -57,7 +57,7 @@ def postgres(database, file_root, config_file, user=None, host=None, password=No
         None.
         
     """
-    from m4db_database.orm.version2.v2_schema import setup_postgres_database
+    from m4db_database.orm.v2_schema import setup_postgres_database
 
     create_file_root(file_root)
 
@@ -73,7 +73,15 @@ def postgres(database, file_root, config_file, user=None, host=None, password=No
         "mm_type": None,
         "mm_binary": None,
         "mm_binary_version": None,
-        "authentication_salt": None
+        "authentication_salt": None,
+        "m4db_runner_web": {
+            "no_of_retries": 5,
+            "backoff_factor": 1
+        },
+        "m4db_serverside": {
+            "default_m4db_user": None,
+            "default_m4db_project": None
+        }
     }
 
     write_config_to_file(config_file, config)
@@ -90,7 +98,7 @@ def sqlite(file, file_root, config_file, echo=False):
     Returns:
         None.
     """
-    from m4db_database.orm.version2.v2_schema import setup_sqlite_database
+    from m4db_database.orm.v2_schema import setup_sqlite_database
 
     create_file_root(file_root)
     db_uri = setup_sqlite_database(file, echo)
