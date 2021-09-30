@@ -11,11 +11,13 @@ M4DB_CONFIG_ENTRIES = [
 
 M4DB_RUNNER_WEB_ENTRIES = [
     "no_of_retries",
-    "backoff_factor"
+    "backoff_factor",
+    "host",
+    "port"
 ]
 
 M4DB_SERVERSIDE_ENTRIES = [
-    "default_m4db_user", "default_project", "working_dir"
+    "default_m4db_user", "default_m4db_project", "working_dir"
 ]
 
 
@@ -34,11 +36,13 @@ def read_config_from_file(file_name):
         mm_binary_version: 1.3.5
         authentication_salt: playfair
         m4db_runner_web:
-            no_of_retries: 5
+            no_of_retries: 5,
             backoff_factor: 1
+            host: "localhost"
+            port: 8081
         m4db_serverside:
             default_m4db_user: "lnagy2",
-            default_project: "elongations",
+            default_m4db_project: "elongations",
             working_dir: "/var/tmp"
 
     Args:
