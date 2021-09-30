@@ -1,23 +1,23 @@
-r"""
-Created on Aug, 2018
-
-@file: v2_schema.py
-@author: Nagy, Lesleis
-
-Version 2 - August 2021
-
-Changes from Version 1
-     1) Function to generate random passwords.
-     2) DBUser has support for ticket information.
-     3) Geometry size is now a numeric.
-     4) Material temperature is now a numeric.
-     5) Added new ModelMaterialsText class to.
-     6) More extensive commenting for all classes.
-     7) Each class now has an 'as_dict' function that produces a python native dictionary version of the object.
-     8) Updated last_modified and created fields to use the 'now' function correctly.
-     9) NEB class now has an energy_barrier field.
-    10) Database creation routines are now part of this file.
-"""
+#
+# Created on Aug, 2018
+#
+# file: v2_schema.py
+# author: Nagy, Lesleis
+#
+# Version 2 - August 2021
+#
+# Changes from Version 1
+#      1) Function to generate random passwords.
+#      2) DBUser has support for ticket information.
+#      3) Geometry size is now a numeric.
+#      4) Material temperature is now a numeric.
+#      5) Added new ModelMaterialsText class to.
+#      6) More extensive commenting for all classes.
+#      7) Each class now has an 'as_dict' function that produces a python native dictionary version of the object.
+#      8) Updated last_modified and created fields to use the 'now' function correctly.
+#      9) NEB class now has an energy_barrier field.
+#     10) Database creation routines are now part of this file.
+#
 
 import os
 
@@ -48,7 +48,10 @@ Base = declarative_base()
 
 def new_unique_id():
     r"""
-    Returns: a global unique id.
+    Generates a universal unique identifier.
+
+    Returns:
+        a global unique id.
     """
     return str(uuid.uuid4())
 
@@ -56,29 +59,33 @@ def new_unique_id():
 def new_random_pass():
     r"""
     Generates some random password.
-    :return: a random (unguessable) password.
+
+    Returns:
+        a random (difficult to guess) password.
     """
     return password_hash(new_unique_id())
 
 
 class DBUser(Base):
     """
-    Holds information about who a model belongs to. NOTE: this is not ownership
-    in the sense of permissions but it gives us a useful dimension to
+    Holds information about who a model belongs to.
+
+    NOTE: this is not ownership in the sense of permissions but it gives us a useful dimension to
     differentiate different models.
 
     Attributes:
-        id: a unique internal id for the object
-        user_name: a unique name for the user
-        first_name: the user's first name
-        initials: the user's middle initials
-        surname: the user's surname
-        email: the user's surname
-        telephone: the user's telephone
-        last_modified: the date/time at which this object/record was modified
-        created: the creation date/time of this object/record
+        id (int): a unique internal id for the object.
+        user_name (str): a unique name for the user.
+        first_name (str): the user's first name.
+        initials (str): the user's middle initials.
+        surname (str): the user's surname.
+        email (str): the user's surname.
+        telephone (str): the user's telephone.
+        last_modified (datetime): the date/time at which this object/record was modified.
+        created (datetime): the creation date/time of this object/record.
 
     """
+
     __tablename__ = 'db_user'
 
     id = Column(Integer, primary_key=True)
@@ -315,11 +322,11 @@ class AnisotropyForm(Base):
     Hold different anisotropy forms for example 'cubic' and 'uniaxial'.
 
     Attributes:
-        id: a unique internal id for the object
-        name: anisotropy form's name
-        description: a description for the anisotropy form convention
-        last_modified: the date/time at which this object/record was modified
-        created: the creation date/time of this object/record
+        id (int): a unique internal id for the object.
+        name (str): anisotropy form's name.
+        description (str): a description for the anisotropy form convention.
+        last_modified (datetime): the date/time at which this object/record was modified.
+        created (datetime): the creation date/time of this object/record.
 
     """
     __tablename__ = 'anisotropy_form'
@@ -1191,6 +1198,7 @@ class Model(Base):
     vy_tot = Column(Float, nullable=True)
     vz_tot = Column(Float, nullable=True)
     h_tot = Column(Float, nullable=True)
+    rh_tot = Column(Float, nullable=True)
     adm_tot = Column(Float, nullable=True)
     e_typical = Column(Float, nullable=True)
     e_anis = Column(Float, nullable=True)
