@@ -867,7 +867,7 @@ def copy_model(old_session, new_session):
     # Retrieve data from old database.
     records = old_session.execute("""
         select 
-            id, unique_id, mx_tot, my_tot, mz_tot, vx_tot, vy_tot, vz_tot, h_tot, adm_tot, e_typical, e_anis, e_ext, 
+            id, unique_id, mx_tot, my_tot, mz_tot, vx_tot, vy_tot, vz_tot, h_tot, rh_tot, adm_tot, e_typical, e_anis, e_ext, 
             e_demag, e_exch1, e_exch2, e_exch3, e_exch4, e_tot, max_energy_evaluations, last_modified, created, 
             geometry_id, start_magnetization_id, external_field_id, running_status_id, model_run_data_id,
             model_report_data_id, mdata_id, legacy_model_info_id
@@ -886,6 +886,7 @@ def copy_model(old_session, new_session):
          "vy_tot": record[6],
          "vz_tot": record[7],
          "h_tot": record[8],
+         "rh_tot": None,
          "adm_tot": record[9],
          "e_typical": record[10],
          "e_anis": record[11],
