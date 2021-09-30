@@ -1,68 +1,40 @@
 #!python
-
+import decimal
 import sys
 import os
 import shutil
 import pathlib
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
+
 from argparse import ArgumentParser
 
 from m4db_database.configuration import write_config_to_file
+from m4db_database.orm.latest import Base
+from m4db_database.orm.latest import RunningStatus
+from m4db_database.orm.latest import Unit
+from m4db_database.orm.latest import SizeConvention
+from m4db_database.orm.latest import Material
+from m4db_database.orm.latest import AnisotropyForm
+
+from m4db_database.materials import material_parameters
 
 from m4db_database import global_vars
 
 
-def create_file_root(file_root):
+def default_config(db_uri, file_root):
     r"""
-    Create a new file root directory to hold models, neb paths etc.
+    Create default configuration data.
+
     Args:
-        file_root: the file root directory which will store micromagnetic models.
+        db_uri: database URI
+        file_root: file root directory
 
-    Returns:
-        None.
+    Returns: a default configuration data dictionary.
+
     """
-    print("Attempting to set up M4DB file_root...")
-
-    if os.path.isdir(file_root):
-        response = input(
-            "WARNING: the directory '{}' already exists, should I delete it (y/n)? ".format(file_root)
-        )
-        if response.lower() == "y":
-            shutil.rmtree(file_root)
-            os.mkdir(file_root)
-        elif response.lower() == "n":
-            print("WARNING: The directory '{}' is now managed by multiple databases!".format(file_root))
-        else:
-            print("ERROR: unknown option!")
-            sys.exit(1)
-    else:
-        pathlib.Path(file_root).mkdir(parents=True, exist_ok=True)
-
-    print("Done!")
-
-
-def postgres(database, file_root, config_file, user=None, host=None, password=None, echo=False):
-    r"""
-    Function to handle the postgres option.
-    Args:
-        database: database name
-        file_root: the root directory of all models, neb paths, etc.
-        config_file: the configuration file to write config information to.
-        user: database user name.
-        host: url host of the database.
-        password: the database password.
-        echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
-
-    Returns:
-        None.
-        
-    """
-    from m4db_database.orm.v2_schema import setup_postgres_database
-
-    create_file_root(file_root)
-
-    db_uri = setup_postgres_database(database, user, host, password, echo)
-
     config = {
         "file_root": os.path.abspath(file_root),
         "db_uri": db_uri,
@@ -85,10 +57,305 @@ def postgres(database, file_root, config_file, user=None, host=None, password=No
         }
     }
 
-    write_config_to_file(config_file, config)
+
+def setup_postgres_database(database, user=None, host=None, password=None, echo=False, materials=None):
+    r"""
+    Create tables, indexes and relationships under a new database.
+    Args:
+        database: the name of the database under which to create database objects.
+        user: the database user.
+        host: the host on which the database lives.
+        password: if a password is supplied.
+        echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
+        materials: list of materials
+
+    Returns:
+        The url string to connect to the database.
+
+    """
+    if user is None and host is None and password is None:
+        db_uri = global_vars.POSTGRES_DATABASE_URI.format(
+            database=database
+        )
+    elif password is None:
+        db_uri = global_vars.POSTGRES_DATABASE_USER_HOST_URI.format(
+            user=user, host=host, database=database
+        )
+    else:
+        db_uri = global_vars.POSTGRES_DATABASE_USER_HOST_PASSWORD_URI.format(
+            user=user, host=host, database=database, password=password
+        )
+
+    if echo:
+        print("Postgres uri: '{}'".format(db_uri))
+
+    # Connect to the database
+    engine = create_engine(db_uri, echo=echo, poolclass=NullPool)
+
+    if hasattr(Base, "metadata"):
+        metadata = getattr(Base, "metadata")
+        metadata.create_all(engine)
+    else:
+        raise AssertionError("Fatal, m4db_database.orm.Base has no attribute 'metadata'")
+
+    Session = sessionmaker(
+        bind=engine,
+        autoflush=True,
+        autocommit=False
+    )
+    session = Session()
+
+    create_units(session)
+    create_running_statuses(session)
+    create_size_conventions(session)
+    create_materials(session, materials)
+
+    return db_uri
 
 
-def sqlite(file, file_root, config_file, echo=False):
+def setup_sqlite_database(file, echo=False, materials=None):
+    r"""
+    Create tables, indexes, relationships etc. for an SQLight database.
+
+    Args:
+        file: the file that will contain the database objects.
+        echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
+        materials: list of materials to add
+
+    Returns:
+        The url string to connect to the database.
+    """
+
+    db_uri = global_vars.SQLITE_FILE_URI.format(file=os.path.abspath(file))
+
+    # Connect to the database
+    engine = create_engine(db_uri, echo=echo, poolclass=NullPool)
+
+    if hasattr(Base, "metadata"):
+        metadata = getattr(Base, "metadata")
+        metadata.create_all(engine)
+    else:
+        raise AssertionError("Fatal, m4db_database.orm.Base has no attribute 'metadata'")
+
+    Session = sessionmaker(
+        bind=engine,
+        autoflush=True,
+        autocommit=False
+    )
+    session = Session()
+
+    create_units(session)
+    create_running_statuses(session)
+    create_size_conventions(session)
+    create_materials(session, materials)
+
+    return db_uri
+
+
+def create_units(session):
+    r"""
+    Creates units and stores them in the database.
+    Args:
+        session: the session to the database to which we add units.
+
+    Returns: None
+
+    """
+    session.add(Unit(symbol="1", name="unitless", power=1))
+    session.add(Unit(symbol="m", name="meter", power=1))
+    session.add(Unit(symbol="cm", name="centimeter", power=0.01))
+    session.add(Unit(symbol="mm", name="millimeter", power=0.001))
+    session.add(Unit(symbol="um", name="micrometer", power=1e-06))
+    session.add(Unit(symbol="nm", name="nanometer", power=1e-09))
+    session.add(Unit(symbol="pm", name="picometer", power=1e-12))
+    session.add(Unit(symbol="fm", name="femtometer", power=1e-15))
+    session.add(Unit(symbol="am", name="attometer", power=1e-18))
+    session.add(Unit(symbol="T", name="tesla", power=1))
+    session.add(Unit(symbol="mT", name="millitesla", power=0.001))
+    session.add(Unit(symbol="uT", name="microtesla", power=1e-06))
+    session.add(Unit(symbol="nT", name="nanotesla", power=1e-09))
+    session.add(Unit(symbol="pT", name="picotesla", power=1e-12))
+    session.add(Unit(symbol="fT", name="femtotesla", power=1e-15))
+    session.add(Unit(symbol="aT", name="attotesla", power=1e-18))
+    session.commit()
+
+
+def create_running_statuses(session):
+    r"""
+    Create running statues.
+    Args:
+        session: the session to the database to which we add running statues.
+
+    Returns: None
+
+    """
+    session.add(RunningStatus(name="not-run", description="a model that has not been run yet"))
+    session.add(RunningStatus(name="re-run", description="a model that is scheduled for a re-run"))
+    session.add(RunningStatus(name="running", description="a model that is currently running scheduled to run"))
+    session.add(RunningStatus(name="finished", description="a model that is finished running"))
+    session.add(RunningStatus(name="crashed", description="a model that has crashed"))
+    session.add(RunningStatus(name="scheduled", description="a job that has been scheduled for running"))
+    session.commit()
+
+
+def create_anisotropy_forms(session):
+    r"""
+    Create anisotropy forms.
+
+    Args:
+        session: the session to the database to which we add anisotorpy forms.
+
+    Returns: None
+
+    """
+    session.add(AnisotropyForm(name="cubic", description="Cubic anisotorpy form"))
+    session.add(AnisotropyForm(name="uniaxial", description="Uniaxial anisotropy form"))
+    session.commit()
+
+
+def create_materials(session, materials):
+    r"""
+    Create materials.
+
+    Args:
+        session: the session to the database to which materials are added.
+        materials: a list of materials (currently 'magnetite' and 'iron' are supported).
+
+    Returns: None
+
+    """
+    if materials is None:
+        return
+
+    create_anisotropy_forms(session)
+
+    anisotropy_form = session.query(AnisotropyForm).filter(AnisotropyForm.name == "cubic").one()
+
+    temperature_start = 0.0
+    temperature_step = 1.0
+
+    for material in materials:
+        if material == "iron":
+            temperature_end = 770.0
+        elif material == "magnetite":
+            temperature_end = 570.0
+        else:
+            raise ValueError("Unknown material '{}'".format(material))
+
+        temperature = temperature_start
+        while temperature <= temperature_end:
+            mparams = material_parameters(temperature, material)
+            session.add(Material(
+                name=material,
+                temperature=decimal.Decimal(temperature),
+                aex=mparams["Aex"],
+                ms=mparams["Ms"],
+                k1=mparams["K1"],
+                kd=mparams["Kd"],
+                lambda_ex=mparams["lambda_ex"],
+                q_hardness=mparams["q_hardness"],
+                anisotropy_form=anisotropy_form
+            ))
+            temperature += temperature_step
+    session.commit()
+
+
+def create_size_conventions(session):
+    r"""
+    Create size conventions.
+    Args:
+        session: the session to the database to which we add size conventions.
+
+    Returns: None
+
+    """
+    session.add(SizeConvention(symbol="ESVD", description="Equivalent spherical volume diameter"))
+    session.add(SizeConvention(symbol="ECVL", description="Equivalent cubic volume length"))
+    session.commit()
+
+
+def mkdir_file_root(file_root):
+    r"""
+    Create the file root along with subdirectories.
+    Args:
+        file_root: the file root.
+
+    Returns: None
+
+    """
+    pathlib.Path(file_root).mkdir(parents=True, exist_ok=True)
+
+    # Create all the subdirectories needed.
+    os.mkdir(os.path.join(file_root, global_vars.GEOMETRY_DIRECTORY_NAME))
+    os.mkdir(os.path.join(file_root, global_vars.MODEL_DIRECTORY_NAME))
+    os.mkdir(os.path.join(file_root, global_vars.NEB_DIRECTORY_NAME))
+
+
+def create_file_root(file_root, yes_to_all=False):
+    r"""
+    Create a new file root directory to hold models, neb paths etc.
+    Args:
+        file_root: the file root directory which will store micromagnetic models.
+        yes_to_all: if we're simply accepting all yes/no options.
+
+    Returns:
+        None.
+    """
+    print("Attempting to set up M4DB file_root...")
+
+    if os.path.isdir(file_root):
+        if yes_to_all:
+            msg = "WARNING: the directory '{}' already exists, should I delete it (y/n)? y".format(file_root)
+            print(msg)
+            response = "y"
+        else:
+            msg = "WARNING: the directory '{}' already exists, should I delete it (y/n)? ".format(file_root)
+            response = input(msg)
+
+        if response.lower() == "y":
+            shutil.rmtree(file_root)
+            mkdir_file_root(file_root)
+        elif response.lower() == "n":
+            print("WARNING: The directory '{}' is now managed by multiple databases!".format(file_root))
+        else:
+            print("ERROR: unknown option!")
+            sys.exit(1)
+    else:
+        mkdir_file_root(file_root)
+
+    print("Done!")
+
+
+def postgres(database, file_root, config_file, user=None, host=None, password=None, echo=False, yes_to_all=False, materials=None):
+    r"""
+    Function to handle the postgres option.
+    Args:
+        database: database name
+        file_root: the root directory of all models, neb paths, etc.
+        config_file: the configuration file to write config information to.
+        user: database user name.
+        host: url host of the database.
+        password: the database password.
+        echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
+        yes_to_all: answer yes to all options.
+        materials: a list of materials to add
+
+    Returns:
+        None.
+        
+    """
+    create_file_root(file_root, yes_to_all=yes_to_all)
+
+    db_uri = setup_postgres_database(database, user, host, password, echo, materials)
+
+    if config_file:
+        config = default_config(db_uri, file_root)
+        write_config_to_file(config_file, config)
+    else:
+        print("Warning, no configuration file has been created")
+
+
+def sqlite(file, file_root, config_file, echo=False, yes_to_all=False, materials=None):
     r"""
     Function to handle sqlite option.
     Args:
@@ -96,27 +363,20 @@ def sqlite(file, file_root, config_file, echo=False):
         file_root: the root directory of all models, neb paths, etc.
         config_file: the configuration file to write config information to.
         echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
+        yes_to_all: answer yes to all options.
+        materials: a list of materials to add.
     Returns:
         None.
     """
-    from m4db_database.orm.v2_schema import setup_sqlite_database
+    create_file_root(file_root, yes_to_all=yes_to_all)
 
-    create_file_root(file_root)
-    db_uri = setup_sqlite_database(file, echo)
+    db_uri = setup_sqlite_database(file, echo, materials)
 
-    config = {
-        "file_root": os.path.abspath(file_root),
-        "db_uri": db_uri,
-        "db_type": global_vars.SQLITE_DATABASE_TYPE,
-        "log_destination": "stdout",
-        "log_level": "DEBUG",
-        "log_logger_name": "m4db",
-        "mm_binary": None,
-        "mm_binary_version": None,
-        "authentication_salt": None
-    }
-
-    write_config_to_file(config_file, config)
+    if config_file:
+        config = default_config(db_uri, file_root)
+        write_config_to_file(config_file, config)
+    else:
+        print("Warning, no configuration file has been created")
 
 
 def get_cmd_line_parser():
@@ -139,7 +399,7 @@ def get_cmd_line_parser():
                                  help="the database name in which to create the new database")
     parser_postgres.add_argument("file_root",
                                  help="the root location of models/paths and other data")
-    parser_postgres.add_argument("config_file",
+    parser_postgres.add_argument("--config_file",
                                  help="the configuration file to save values to")
     parser_postgres.add_argument("--user", default=None,
                                  help="the database user name with which to access the database")
@@ -149,6 +409,10 @@ def get_cmd_line_parser():
                                  help="the database password (WARNING: this is stored in clear in the M4DB_CONFIG).")
     parser_postgres.add_argument("-v", "--verbose", action="store_true",
                                  help="produce verbose output when creating the database")
+    parser_postgres.add_argument("--add-materials", default=None,
+                                 help="A comma separated list of materials that will be added (supported: magnetite and iron)")
+    parser_postgres.add_argument("--yes-to-all", action="store_true", help="Answer yes to all questions.")
+
 
     # SqlLite parser
     parser_sqlite = subparsers.add_parser("sqlite",
@@ -161,6 +425,9 @@ def get_cmd_line_parser():
                                help="the configuration file to save values to")
     parser_sqlite.add_argument("-v", "--verbose", action="store_true",
                                help="produce verbose output when creating the database")
+    parser_sqlite.add_argument("--add-materials", default=None,
+                               help="A comma separated list of materials that will be added (supported: magnetite and iron)")
+    parser_sqlite.add_argument("--yes-to-all", action="store_true", help="Answer yes to all questions.")
 
     return parser
 
@@ -177,6 +444,11 @@ def main():
 
     print("Attempting to create M4DB database ...")
 
+    if args.add_materials:
+        materials = [s.strip() for s in args.add_materials.split(",")]
+    else:
+        materials = None
+
     if args.database_type == "postgres":
         postgres(
             args.database,
@@ -185,15 +457,27 @@ def main():
             args.user,
             args.host,
             password=args.password,
-            echo=args.verbose)
+            echo=args.verbose,
+            yes_to_all=args.yes_to_all,
+            materials=materials)
     elif args.database_type == "sqlite":
-        sqlite(args.file, args.file_root, args.config_file, echo=args.verbose)
+        sqlite(
+            args.file,
+            args.file_root,
+            args.config_file,
+            echo=args.verbose,
+            yes_to_all=args.yes_to_all,
+            materials=materials)
     else:
         print("Unknown database db_type: '{}'".format(args.database_type))
         sys.exit(1)
 
     print("Created M4DB database, tables and directories")
-    print("WARNING! make sure to add 'M4DB_CONFIG={}' to your environment!".format(args.config_file))
+
+    if args.config_file:
+        print("WARNING! make sure to add 'M4DB_CONFIG={}' to your environment!".format(args.config_file))
+    else:
+        print("WARNING! make sure to add 'M4DB_CONFIG' to your environment!")
 
 
 if __name__ == "__main__":

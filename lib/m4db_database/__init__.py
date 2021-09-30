@@ -37,3 +37,7 @@ class global_vars:
     # Progress bar offset
     TQDM_POSITION = 0
     BAR_MESSAGE_FORMAT = "{:30s}"
+
+    MODEL_DIRECTORY_NAME = "model"
+    GEOMETRY_DIRECTORY_NAME = "geometry"
+    NEB_DIRECTORY_NAME = "neb"

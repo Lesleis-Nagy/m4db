@@ -5,8 +5,8 @@ import yaml
 from m4db_database.decorators import static
 
 M4DB_CONFIG_ENTRIES = [
-    "db_type", "db_uri", "file_root", "log_destination", "log_level", "log_logger_name", "mm_binary",
-    "mm_binary_version", "mm_type", "authentication_salt", "m4db_runner_web", "m4db_serverside"
+    "db_type", "db_uri", "file_root", "log_destination", "log_level", "log_logger_name",
+    "authentication_salt", "m4db_runner_web", "m4db_serverside"
 ]
 
 M4DB_RUNNER_WEB_ENTRIES = [
@@ -17,7 +17,11 @@ M4DB_RUNNER_WEB_ENTRIES = [
 ]
 
 M4DB_SERVERSIDE_ENTRIES = [
-    "default_m4db_user", "default_m4db_project", "working_dir"
+    "default_m4db_user",
+    "default_m4db_project",
+    "default_micromag_software",
+    "default_micromag_software_version",
+    "working_dir"
 ]
 
 
@@ -31,19 +35,18 @@ def read_config_from_file(file_name):
         log_destination: stdout
         log_level: DEBUG
         log_logger_name: m4db
-        mm_type: MERRILL
-        mm_binary: merrill
-        mm_binary_version: 1.3.5
         authentication_salt: playfair
         m4db_runner_web:
             no_of_retries: 5,
             backoff_factor: 1
-            host: "localhost"
+            host: localhost
             port: 8081
         m4db_serverside:
-            default_m4db_user: "lnagy2",
-            default_m4db_project: "elongations",
-            working_dir: "/var/tmp"
+            default_m4db_user: lnagy2
+            default_m4db_project: elongations
+            default_micromag_software: merrill
+            default_micromag_software_version: 1.4.0
+            working_dir: /var/tmp
 
     Args:
         file_name: the M4DB configuration file.

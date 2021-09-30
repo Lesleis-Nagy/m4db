@@ -16,7 +16,8 @@
 #      7) Each class now has an 'as_dict' function that produces a python native dictionary version of the object.
 #      8) Updated last_modified and created fields to use the 'now' function correctly.
 #      9) NEB class now has an energy_barrier field.
-#     10) Database creation routines are now part of this file.
+#     10) Model has a volume and relative helicity field.
+#     11) Software contains the executable used to run a model.
 #
 
 import os
@@ -26,12 +27,10 @@ from math import sqrt, sin, cos, acos, atan2, pi
 
 import uuid
 
-from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, Float, String, DateTime, Boolean, Numeric
 from sqlalchemy import ForeignKey
 from sqlalchemy import UniqueConstraint, Index
 from sqlalchemy import event
-from sqlalchemy.pool import NullPool
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
@@ -140,6 +139,7 @@ class Software(Base):
         id: a unique internal id for the object
         name: the name of the software package
         version: the version of the software package
+        executable: the executable (if present) on the system that may be called
         description: a description of the software package
         url: a URL for the software package
         citation: a citation for the software package
@@ -152,6 +152,7 @@ class Software(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     version = Column(String, nullable=False)
+    executable = Column(String, nullable=True)
     description = Column(String, nullable=True)
     url = Column(String, nullable=True)
     citation = Column(String, nullable=True)
@@ -174,6 +175,7 @@ class Software(Base):
             "id": self.id,
             "name": self.name,
             "version": self.version,
+            "executable": self.executable,
             "description": self.description,
             "url": self.url,
             "citation": self.citation,
@@ -1267,6 +1269,7 @@ class Model(Base):
             "vy_tot": self.vy_tot,
             "vz_tot": self.vz_tot,
             "h_tot": self.h_tot,
+            "hr_tot": self.rh_tot,
             "adm_tot": self.adm_tot,
             "e_typical": self.e_typical,
             "e_anis": self.e_anis,
@@ -1277,6 +1280,7 @@ class Model(Base):
             "e_exch3": self.e_exch3,
             "e_exch4": self.e_exch4,
             "e_tot": self.e_tot,
+            "volume": self.volume,
             "max_energy_evaluations": self.max_energy_evaluations,
             "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
             "created": self.created.strftime(global_vars.DATE_TIME_FORMAT),
@@ -1627,69 +1631,3 @@ class NEBModelSplit(Base):
     model_id = Column(Integer, ForeignKey('model.id'), primary_key=True, nullable=False)
     model = relationship('Model', back_populates='nebs')
 
-
-def setup_postgres_database(database, user=None, host=None, password=None, echo=False):
-    r"""
-    Create tables, indexes and relationships under a new database.
-    Args:
-        database: the name of the database under which to create database objects.
-        user: the database user.
-        host: the host on which the database lives.
-        password: if a password is supplied.
-        echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
-
-    Returns:
-        The url string to connect to the database.
-
-    """
-    if user is None and host is None and password is None:
-        db_uri = global_vars.POSTGRES_DATABASE_URI.format(
-            database=database
-        )
-    elif password is None:
-        db_uri = global_vars.POSTGRES_DATABASE_USER_HOST_URI.format(
-            user=user, host=host, database=database
-        )
-    else:
-        db_uri = global_vars.POSTGRES_DATABASE_USER_HOST_PASSWORD_URI.format(
-            user=user, host=host, database=database, password=password
-        )
-
-    if echo:
-        print("Postgres uri: '{}'".format(db_uri))
-
-    # Connect to the database
-    engine = create_engine(db_uri, echo=echo, poolclass=NullPool)
-
-    if hasattr(Base, "metadata"):
-        metadata = getattr(Base, "metadata")
-        metadata.create_all(engine)
-    else:
-        raise AssertionError("Fatal, m4db_database.orm.Base has no attribute 'metadata'")
-
-    return db_uri
-
-
-def setup_sqlite_database(file, echo=False):
-    r"""
-    Create tables, indexes, relationships etc. for an SQLight database.
-
-    Args:
-        file: the file that will contain the database objects.
-        echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
-
-    Returns:
-        The url string to connect to the database.
-    """
-
-    db_uri = global_vars.SQLITE_FILE_URI.format(file=os.path.abspath(file))
-
-    engine = create_engine(db_uri, echo=echo, poolclass=NullPool)
-
-    if hasattr(Base, "metadata"):
-        metadata = getattr(Base, "metadata")
-        metadata.create_all(engine)
-    else:
-        raise AssertionError("Fatal, m4db_database.orm.Base has no attribute 'metadata'")
-
-    return db_uri

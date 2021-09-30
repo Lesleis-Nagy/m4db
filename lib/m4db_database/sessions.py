@@ -9,7 +9,6 @@ from m4db_database import global_vars
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
-from sqlalchemy.sql import text
 
 
 def get_session(scoped=False, echo=False, nullpool=False):
