@@ -1,4 +1,4 @@
-#!/usr/scripts/env python
+#!/usr/scripts/envs python
 
 from distutils.core import setup
 
