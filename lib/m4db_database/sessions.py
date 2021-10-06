@@ -10,6 +10,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 
+from m4db_database.orm.latest import Base
+
 
 def get_session(scoped=False, echo=False, nullpool=False):
     r"""
@@ -33,10 +35,9 @@ def get_session(scoped=False, echo=False, nullpool=False):
     raise ValueError("Unsupported db_type in M4DB_CONFIG db_type: {}".format(config["db_type"]))
 
 
-def get_session_from_args(db_name, db_type, **kwargs):
+def get_session_from_args(db_type, **kwargs):
     r"""
     Retrieve an SQLAlchemy open database connection session from the user's input arguments.
-    :param db_name: the database db_name.
     :param db_type: the database type.
     :param kwargs: other keyword arguments.
     :return: a database session.
@@ -45,12 +46,17 @@ def get_session_from_args(db_name, db_type, **kwargs):
     nullpool = kwargs["nullpool"] if "nullpool" in kwargs.keys() else False
     autoflush = kwargs["autoflush"] if "autoflush" in kwargs.keys() else False
     autocommit = kwargs["autocommit"] if "autocommit" in kwargs.keys() else False
-    user = kwargs["user"] if "user" in kwargs.keys() else None
-    host = kwargs["host"] if "host" in kwargs.keys() else None
-    password = kwargs["password"] if "password" in kwargs.keys() else None
 
     uri = None
     if db_type == "postgres":
+        if "db_name" not in kwargs.keys():
+            raise ValueError("When using 'postgres', the parameter 'db_name' is required.")
+
+        db_name = kwargs["db_name"]
+        user = kwargs["user"] if "user" in kwargs.keys() else None
+        host = kwargs["host"] if "host" in kwargs.keys() else None
+        password = kwargs["password"] if "password" in kwargs.keys() else None
+
         if user is not None and host is not None and password is not None:
             uri = global_vars.POSTGRES_DATABASE_USER_HOST_PASSWORD_URI.format(
                 database=db_name, user=user, host=host, password=password
@@ -67,16 +73,30 @@ def get_session_from_args(db_name, db_type, **kwargs):
             uri = global_vars.POSTGRES_DATABASE_URI.format(database=db_name)
         else:
             raise ValueError("Unknown combination of parameters to connect to database.")
+    elif db_type == "sqlite":
+        if "file" not in kwargs.keys():
+            raise ValueError("When using 'sqlite', the parameter 'file' is mandatory")
+        uri = global_vars.SQLITE_FILE_URI.format(file=kwargs["file"])
 
     if nullpool:
-        engine = create_engine(uri, poolclass=NullPool)
+        engine = create_engine(uri, poolclass=NullPool, echo=echo)
     else:
         engine = create_engine(uri)
+
+    if "create" in kwargs.keys():
+        if kwargs["create"]:
+            # Create the database.
+            if hasattr(Base, "metadata"):
+                metadata = getattr(Base, "metadata")
+                metadata.create_all(engine)
+            else:
+                raise AssertionError("Fatal, m4db_database.orm.Base has no attribute 'metadata'")
 
     Session = sessionmaker(
         bind=engine,
         autoflush=autoflush,
         autocommit=autocommit
     )
+
 
     return Session()
