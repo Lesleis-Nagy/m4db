@@ -18,7 +18,6 @@ from m4db_database.sessions import get_session_from_args
 from m4db_database import global_vars
 
 
-
 def drop_unique_constraints(new_session):
     r"""
     Disable/drop all unique constraints on the new database.
