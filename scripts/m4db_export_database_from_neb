@@ -1,7 +1,7 @@
 #!python
 
 r"""
-This is a simple script that will create an export of an m4db database from the NEB path perspective. That means
+This is a simple scripts that will create an export of an m4db database from the NEB path perspective. That means
 that NEB paths with given unique ids (or all NEB paths) are exported along with all dependencies (i.e. parent NEB
 paths, start/end Model objects, DBUser objects etc.) which may then be imported to create a functioning m4db database
 along with data files.
@@ -38,10 +38,10 @@ from m4db_database.export_json_utilities import export_running_status
 
 def get_command_line_parser():
     r"""
-    Retrieve a command line parser object for this script.
+    Retrieve a command line parser object for this scripts.
 
     Returns:
-        A command line parser object for this script.
+        A command line parser object for this scripts.
 
     """
     parser = ArgumentParser()

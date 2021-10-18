@@ -866,7 +866,7 @@ def copy_model(old_session, new_session):
     # Retrieve data from old database.
     records = old_session.execute("""
         select 
-            id, unique_id, mx_tot, my_tot, mz_tot, vx_tot, vy_tot, vz_tot, h_tot, rh_tot, adm_tot, e_typical, e_anis, e_ext, 
+            id, unique_id, mx_tot, my_tot, mz_tot, vx_tot, vy_tot, vz_tot, h_tot, adm_tot, e_typical, e_anis, e_ext, 
             e_demag, e_exch1, e_exch2, e_exch3, e_exch4, e_tot, max_energy_evaluations, last_modified, created, 
             geometry_id, start_magnetization_id, external_field_id, running_status_id, model_run_data_id,
             model_report_data_id, mdata_id, legacy_model_info_id
@@ -940,7 +940,6 @@ def copy_model(old_session, new_session):
                 inner join material on model_material_association.material_id = material.id
             where model_material_association.model_id = {model_id:}
         """.format(model_id=model_item["id"]))
-
 
         materials_text_list = []
         materials_submesh_idx_text_list = []
@@ -1794,15 +1793,13 @@ def main():
     parser = command_line_parser()
     args = parser.parse_args()
 
-    old_conn = get_session_from_args(
-        args.old_db, args.old_db_type,
-        user=args.old_db_user, host=args.old_db_host,
+    old_conn = get_session_from_args(args.old_db_type, db_version="v1",
+        db_name=args.old_db, user=args.old_db_user, host=args.old_db_host,
         nullpool=True, autoflush=True, autocommit=False
     )
 
-    new_conn = get_session_from_args(
-        args.new_db, args.new_db_type,
-        user=args.new_db_user, host=args.new_db_host,
+    new_conn = get_session_from_args(args.new_db_type, db_version="v2",
+        db_name=args.new_db, user=args.new_db_user, host=args.new_db_host,
         nullpool=True, autoflush=True, autocommit=False
     )
 

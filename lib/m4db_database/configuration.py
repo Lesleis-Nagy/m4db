@@ -1,4 +1,5 @@
 import os
+from typing import List
 
 import yaml
 
@@ -21,8 +22,22 @@ M4DB_SERVERSIDE_ENTRIES = [
     "default_m4db_project",
     "default_micromag_software",
     "default_micromag_software_version",
-    "working_dir"
+    "slurm_exe",
+    "working_dir",
+    "module_dir"
 ]
+
+
+def is_list_of_str(obj):
+    r"""
+    Checks that obj is a list of strings
+    Args:
+        obj: an object
+
+    Returns: True if 'obj' is a list of 'str', otherwise False.
+
+    """
+    return isinstance(obj, list) and all(isinstance(elem, str) for elem in obj)
 
 
 @static(config=None)
@@ -46,8 +61,12 @@ def read_config_from_file(file_name):
             default_m4db_project: elongations
             default_micromag_software: merrill
             default_micromag_software_version: 1.4.0
+            slurm_exe: sbatch
             working_dir: /var/tmp
-
+            module_dir: /dir/to/modules
+            module_list:
+                python/3.7.1
+                m4db/1.2.0
     Args:
         file_name: the M4DB configuration file.
 
@@ -68,6 +87,7 @@ def read_config_from_file(file_name):
                             entry
                         )
                     )
+            # m4db_serverside config
             for entry in M4DB_SERVERSIDE_ENTRIES:
                 if entry not in read_config_from_file.config["m4db_serverside"]:
                     raise ValueError(
@@ -75,6 +95,22 @@ def read_config_from_file(file_name):
                             entry
                         )
                     )
+            # .. handle 'm4db_serverside' 'modules'
+            if "modules" in read_config_from_file.config["m4db_serverside"].keys():
+                if isinstance(read_config_from_file.config["m4db_serverside"]["modules"], str):
+                    read_config_from_file.config["m4db_serverside"]["modules"] = [
+                        read_config_from_file.config["m4db_serverside"]["modules"]
+                    ]
+                elif is_list_of_str(read_config_from_file.config["m4db_serverside"]["modules"]):
+                    # Do nothing the object is fine.
+                    pass
+                else:
+                    raise ValueError("'modules' is supplied for 'm4db_serverside' but is not str or list of strs.")
+            else:
+                # There are no modules so use an empty list.
+                read_config_from_file.config["m4db_serverside"]["modules"] = []
+
+
     return read_config_from_file.config
 
 

@@ -259,7 +259,7 @@ class Geometry(Base):
 
         has_exodus               : an exodus file is available for the geometry
 
-        has_mesh_gen_script      : a script to generate the mesh is available
+        has_mesh_gen_script      : a scripts to generate the mesh is available
                                    for the geometry
 
         last_modified            : the date/time at which this object/record
@@ -646,7 +646,7 @@ class ModelRunData(Base):
     Attributes:
         id: a unique internal id for the object
 
-        has_script        : a flag to indicate whether the model has a script
+        has_script        : a flag to indicate whether the model has a scripts
                             (which generated the model) associated with it
 
         has_stdout        : a flag to indicate whether the model has a standard

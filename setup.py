@@ -13,22 +13,6 @@ setup(
     url="https://github.com/Lesleis-Nagy/{name:}".format(name=NAME),
     download_url="https://github.com/Lesleis-Nagy/{name:}/archive/{version:}.zip".format(name=NAME, version=VERSION),
     keywords=["micromagnetics", "database"],
-    install_requires=[
-        "Deprecated>=1.2.13",
-        "PyYAML>=5.4.1",
-        "SQLAlchemy>=1.4.25",
-        "falcon>=3.0.1",
-        "gunicorn>=20.1.0",
-        "numpy>=1.21.2",
-        "pandas>=1.3.3",
-        "psycopg2>=2.9.1",
-        "requests>=2.26.0",
-        "tqdm>=4.62.3",
-        "twine>=3.4.2",
-        "wheel>=0.34.2",
-        "jinja2>=3.0.1",
-        "vtk>=9.0.3"
-    ],
     author="L. Nagy, W. Williams",
     author_email="lnagy2@ed.ac.uk",
     packages=[

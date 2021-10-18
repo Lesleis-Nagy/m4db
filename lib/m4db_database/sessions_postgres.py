@@ -1,5 +1,5 @@
 r"""
-A set of utilities to create/open postgres databases for SQLAlchemy. Note, prior to running this script, an empty
+A set of utilities to create/open postgres databases for SQLAlchemy. Note, prior to running this scripts, an empty
 database should be available. This may be created with the following instructions:
 
     postgres=# create database <db_name> owner=<user>;

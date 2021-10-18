@@ -56,7 +56,7 @@ def default_config(db_uri, file_root):
     }
 
 
-def setup_postgres_database(database, user=None, host=None, password=None, echo=False, materials=None):
+def setup_postgres_database(database, user=None, host=None, password=None, echo=False, materials=None, empty_db=False):
     r"""
     Create tables, indexes and relationships under a new database.
     Args:
@@ -66,6 +66,7 @@ def setup_postgres_database(database, user=None, host=None, password=None, echo=
         password: if a password is supplied.
         echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
         materials: list of materials
+        empty_db: do not add any data to the database.
 
     Returns:
         The url string to connect to the database.
@@ -103,16 +104,17 @@ def setup_postgres_database(database, user=None, host=None, password=None, echo=
     )
     session = Session()
 
-    create_units(session)
-    create_running_statuses(session)
-    create_size_conventions(session)
-    create_anisotropy_forms(session)
-    create_materials(session, materials)
+    if not empty_db:
+        create_units(session)
+        create_running_statuses(session)
+        create_size_conventions(session)
+        create_anisotropy_forms(session)
+        create_materials(session, materials)
 
     return db_uri
 
 
-def setup_sqlite_database(file, echo=False, materials=None):
+def setup_sqlite_database(file, echo=False, materials=None, empty_db=False):
     r"""
     Create tables, indexes, relationships etc. for an SQLight database.
 
@@ -120,6 +122,7 @@ def setup_sqlite_database(file, echo=False, materials=None):
         file: the file that will contain the database objects.
         echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
         materials: list of materials to add
+        empty_db: do not add any data to the database.
 
     Returns:
         The url string to connect to the database.
@@ -143,11 +146,12 @@ def setup_sqlite_database(file, echo=False, materials=None):
     )
     session = Session()
 
-    create_units(session)
-    create_running_statuses(session)
-    create_size_conventions(session)
-    create_anisotropy_forms(session)
-    create_materials(session, materials)
+    if not empty_db:
+        create_units(session)
+        create_running_statuses(session)
+        create_size_conventions(session)
+        create_anisotropy_forms(session)
+        create_materials(session, materials)
 
     return db_uri
 
@@ -204,7 +208,7 @@ def create_file_root(file_root, yes_to_all=False):
     print("Done!")
 
 
-def postgres(database, file_root, config_file, user=None, host=None, password=None, echo=False, yes_to_all=False, materials=None):
+def postgres(database, file_root, config_file, user=None, host=None, password=None, echo=False, yes_to_all=False, materials=None, empty_db=False):
     r"""
     Function to handle the postgres option.
     Args:
@@ -217,6 +221,8 @@ def postgres(database, file_root, config_file, user=None, host=None, password=No
         echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
         yes_to_all: answer yes to all options.
         materials: a list of materials to add
+        empty_db: do not add any data to the database.
+
 
     Returns:
         None.
@@ -224,7 +230,7 @@ def postgres(database, file_root, config_file, user=None, host=None, password=No
     """
     create_file_root(file_root, yes_to_all=yes_to_all)
 
-    db_uri = setup_postgres_database(database, user, host, password, echo, materials)
+    db_uri = setup_postgres_database(database, user, host, password, echo, materials, empty_db)
 
     if config_file:
         config = default_config(db_uri, file_root)
@@ -233,7 +239,7 @@ def postgres(database, file_root, config_file, user=None, host=None, password=No
         print("Warning, no configuration file has been created")
 
 
-def sqlite(file, file_root, config_file, echo=False, yes_to_all=False, materials=None):
+def sqlite(file, file_root, config_file, echo=False, yes_to_all=False, materials=None, empty_db=False):
     r"""
     Function to handle sqlite option.
     Args:
@@ -243,12 +249,13 @@ def sqlite(file, file_root, config_file, echo=False, yes_to_all=False, materials
         echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
         yes_to_all: answer yes to all options.
         materials: a list of materials to add.
+        empty_db: do not add any data to the database.
     Returns:
         None.
     """
     create_file_root(file_root, yes_to_all=yes_to_all)
 
-    db_uri = setup_sqlite_database(file, echo, materials)
+    db_uri = setup_sqlite_database(file, echo, materials, empty_db)
 
     if config_file:
         config = default_config(db_uri, file_root)
@@ -289,6 +296,7 @@ def get_cmd_line_parser():
                                  help="produce verbose output when creating the database")
     parser_postgres.add_argument("--add-materials", default=None,
                                  help="A comma separated list of materials that will be added (supported: magnetite and iron)")
+    parser_postgres.add_argument("--empty-db", action="store_true", help="Do not add any data to the database")
     parser_postgres.add_argument("--yes-to-all", action="store_true", help="Answer yes to all questions.")
 
 
@@ -305,6 +313,7 @@ def get_cmd_line_parser():
                                help="produce verbose output when creating the database")
     parser_sqlite.add_argument("--add-materials", default=None,
                                help="A comma separated list of materials that will be added (supported: magnetite and iron)")
+    parser_sqlite.add_argument("--empty-db", action="store_true", help="Do not add any data to the database")
     parser_sqlite.add_argument("--yes-to-all", action="store_true", help="Answer yes to all questions.")
 
     return parser
@@ -337,7 +346,8 @@ def main():
             password=args.password,
             echo=args.verbose,
             yes_to_all=args.yes_to_all,
-            materials=materials)
+            materials=materials,
+            empty_db=args.empty_db)
     elif args.database_type == "sqlite":
         sqlite(
             args.file,
@@ -345,7 +355,8 @@ def main():
             args.config_file,
             echo=args.verbose,
             yes_to_all=args.yes_to_all,
-            materials=materials)
+            materials=materials,
+            empty_db=args.empty_db)
     else:
         print("Unknown database db_type: '{}'".format(args.database_type))
         sys.exit(1)

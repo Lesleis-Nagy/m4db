@@ -1,7 +1,7 @@
 #!python
 
 r"""
-This is a simple script that will import a complete working subset of M4DB database records from a set of table
+This is a simple scripts that will import a complete working subset of M4DB database records from a set of table
 files (in JSON format) and a collection of zip files containing the actual model / NEB path / geometry data
 held in M4DB.
 
@@ -79,10 +79,10 @@ def verify_files(dir_path):
 
 def get_command_line_parser():
     r"""
-    Retrieve a command line parser object for this script.
+    Retrieve a command line parser object for this scripts.
 
     Returns:
-        A command line parser object for this script.
+        A command line parser object for this scripts.
 
     """
     parser = ArgumentParser()

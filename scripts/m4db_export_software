@@ -10,10 +10,10 @@ from m4db_database.sessions import get_session
 
 def get_command_line_parser():
     r"""
-    Retrieve a command line parser object for this script.
+    Retrieve a command line parser object for this scripts.
 
     Returns:
-        A command line parser object for this script.
+        A command line parser object for this scripts.
 
     """
     parser = ArgumentParser()

@@ -10,7 +10,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 
-from m4db_database.orm.latest import Base
+from m4db_database.orm.latest import Base as BaseLatest
+from m4db_database.orm.v1_schema import Base as BaseV1
+from m4db_database.orm.v2_schema import Base as BaseV2
 
 
 def get_session(scoped=False, echo=False, nullpool=False):
@@ -86,6 +88,16 @@ def get_session_from_args(db_type, **kwargs):
     if "create" in kwargs.keys():
         if kwargs["create"]:
             # Create the database.
+            if "db_version" in kwargs.keys():
+                if kwargs["db_version"] == "v1":
+                    Base = BaseV1
+                elif kwargs["db_version"] == "v2":
+                    Base = BaseV2
+                else:
+                    Base = BaseLatest
+            else:
+                Base = BaseLatest
+
             if hasattr(Base, "metadata"):
                 metadata = getattr(Base, "metadata")
                 metadata.create_all(engine)
