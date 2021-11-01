@@ -273,7 +273,7 @@ class Geometry(Base):
     unique_id = Column(String, default=new_unique_id, nullable=False)
     name = Column(String, nullable=False)
     size = Column(String, nullable=False)
-    element_size = Column(Numeric(10,5), nullable=True)
+    element_size = Column(String, nullable=True)
     description = Column(String, nullable=True)
     nelements = Column(Integer, nullable=False)
     nvertices = Column(Integer, nullable=False)
