@@ -253,7 +253,7 @@ class PhysicalConstant(Base):
     created = Column(DateTime, default=now, nullable=False)
 
     __table_args__ = (
-        UniqueConstraint('symbol', name='uniq_physica_constant_01'),
+        UniqueConstraint('symbol', name='uniq_physical_constant_01'),
     )
 
     def as_dict(self):
