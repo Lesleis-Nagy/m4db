@@ -13,6 +13,7 @@ M4DB_CONFIG_ENTRIES = [
 M4DB_RUNNER_WEB_ENTRIES = [
     "no_of_retries",
     "backoff_factor",
+    "protocol",
     "host",
     "port"
 ]
