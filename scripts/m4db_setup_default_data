@@ -1,0 +1,28 @@
+#!python
+
+r"""
+A basic script to copy over some basic default files in to a new database.
+"""
+
+from m4db_database.data_defaults import create_units
+from m4db_database.data_defaults import create_materials
+from m4db_database.data_defaults import create_anisotropy_forms
+from m4db_database.data_defaults import create_running_statuses
+from m4db_database.data_defaults import create_size_conventions
+
+from m4db_database.sessions import get_session
+
+
+def main():
+    print("Setting up minimum required data for functional m4db database ...")
+    session = get_session(nullpool=True)
+    create_units(session)
+    create_anisotropy_forms(session)
+    create_running_statuses(session)
+    create_size_conventions(session)
+    create_materials(session, ["iron", "magnetite"])
+    print("OK!")
+
+
+if __name__ == "__main__":
+    main()
