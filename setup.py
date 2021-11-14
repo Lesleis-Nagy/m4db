@@ -48,7 +48,8 @@ setup(
         "scripts/m4db_import_software",
         "scripts/m4db_import_unit",
         "scripts/m4db_set_micromagnetics_code",
-        "scripts/m4db_setup_database"
+        "scripts/m4db_setup_database",
+        "scripts/m4db_setup_default_data"
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
