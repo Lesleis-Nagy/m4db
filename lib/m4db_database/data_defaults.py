@@ -91,13 +91,13 @@ def create_materials(session, materials):
     anisotropy_form = session.query(AnisotropyForm).filter(AnisotropyForm.name == "cubic").one()
 
     temperature_start = 0.0
-    temperature_step = 1.0
+    temperature_step = 0.5
 
     for material in materials:
         if material == "iron":
-            temperature_end = 770.0
+            temperature_end = 770.5
         elif material == "magnetite":
-            temperature_end = 570.0
+            temperature_end = 579.5
         else:
             raise ValueError("Unknown material '{}'".format(material))
 
