@@ -376,7 +376,7 @@ def enable_foreign_key_constraints(new_session):
     new_session.execute("alter table neb add constraint neb_neb_calculation_type_id_fkey FOREIGN KEY (neb_calculation_type_id) REFERENCES neb_calculation_type(id)")
     new_session.execute("alter table neb add constraint neb_neb_report_data_id_fkey FOREIGN KEY (neb_report_data_id) REFERENCES neb_report_data(id)")
     new_session.execute("alter table neb add constraint neb_neb_run_data_id_fkey FOREIGN KEY (neb_run_data_id) REFERENCES neb_run_data(id)")
-    new_session.execute("alter table neb add constraint neb_parent_neb_id_fkey FOREIGN KEY (parent_neb_id) REFERENCES neb(id)")
+    new_session.execute("alter table neb add constraint neb_parent_neb_id_fkey FOREIGN KEY (parent_unique_id) REFERENCES neb(id)")
     new_session.execute("alter table neb add constraint neb_running_status_id_fkey FOREIGN KEY (running_status_id) REFERENCES running_status(id)")
     new_session.execute("alter table neb add constraint neb_start_model_id_fkey FOREIGN KEY (start_model_id) REFERENCES model(id)")
 
@@ -1166,7 +1166,7 @@ def copy_neb(old_session, new_session):
                created, 
                start_model_id, 
                end_model_id, 
-               parent_neb_id, 
+               parent_unique_id, 
                neb_calculation_type_id, 
                neb_run_data_id, 
                neb_report_data_id, 
@@ -1191,7 +1191,7 @@ def copy_neb(old_session, new_session):
          "external_field_id": record[17],
          "start_model_id": record[9],
          "end_model_id": record[10],
-         "parent_neb_id": record[11],
+         "parent_unique_id": record[11],
          "neb_calculation_type_id": record[12],
          "neb_run_data_id": record[13],
          "neb_report_data_id": record[14],
@@ -1205,12 +1205,12 @@ def copy_neb(old_session, new_session):
         insert into neb
              (id, unique_id, spring_constant, curvature_weight, no_of_points, max_energy_evaluations, 
               max_path_evaluations, energy_barrier, last_modified, created, external_field_id, start_model_id,
-              end_model_id, parent_neb_id, neb_calculation_type_id, neb_run_data_id, neb_report_data_id,
+              end_model_id, parent_unique_id, neb_calculation_type_id, neb_run_data_id, neb_report_data_id,
               running_status_id, mdata_id)
         values 
             (:id, :unique_id, :spring_constant, :curvature_weight, :no_of_points, :max_energy_evaluations, 
              :max_path_evaluations, :energy_barrier, :last_modified, :created, :external_field_id, :start_model_id,
-             :end_model_id, :parent_neb_id, :neb_calculation_type_id, :neb_run_data_id, :neb_report_data_id,
+             :end_model_id, :parent_unique_id, :neb_calculation_type_id, :neb_run_data_id, :neb_report_data_id,
              :running_status_id, :mdata_id)
     """)
 
