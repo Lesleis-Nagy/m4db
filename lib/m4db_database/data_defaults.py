@@ -9,9 +9,21 @@ from m4db_database.orm.latest import Unit
 from m4db_database.orm.latest import SizeConvention
 from m4db_database.orm.latest import Material
 from m4db_database.orm.latest import AnisotropyForm
+from m4db_database.orm.latest import NEBCalculationType
 
 from m4db_database.materials import material_parameters
 
+def create_neb_calculation_types(session):
+    r"""
+    Creates calculation types and stores them in the database.
+    Args:
+        session: the session to the database.
+    Returns:
+        None
+    """
+    session.add(NEBCalculationType(name="fs_heuristic", description="Fabian & Shcherbakov 2019"))
+    session.add(NEBCalculationType(name="neb", description="Henkelman et al. 2000"))
+    session.commit()
 
 def create_units(session):
     r"""

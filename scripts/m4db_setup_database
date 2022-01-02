@@ -18,6 +18,7 @@ from m4db_database.data_defaults import create_running_statuses
 from m4db_database.data_defaults import create_anisotropy_forms
 from m4db_database.data_defaults import create_size_conventions
 from m4db_database.data_defaults import create_materials
+from m4db_database.data_defaults import create_neb_calculation_types
 
 from m4db_database import global_vars
 
@@ -110,6 +111,7 @@ def setup_postgres_database(database, user=None, host=None, password=None, echo=
         create_size_conventions(session)
         create_anisotropy_forms(session)
         create_materials(session, materials)
+        create_neb_calculation_types(session)
 
     return db_uri
 
@@ -152,6 +154,7 @@ def setup_sqlite_database(file, echo=False, materials=None, empty_db=False):
         create_size_conventions(session)
         create_anisotropy_forms(session)
         create_materials(session, materials)
+        create_neb_calculation_types(session)
 
     return db_uri
 
