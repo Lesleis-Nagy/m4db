@@ -1,7 +1,7 @@
 r"""
 A set of useful utility functions.
 
-@file utilities.py
+@file m4db_utilities_utilities.py
 @author L. Nagy, W. Williams
 """
 
@@ -116,44 +116,4 @@ def string_to_bool(str):
         raise ValueError("Can't interpret '{}' as boolean".format(str))
 
 
-def password_hash(password):
-    r"""
-    Take the password and produce a hash from it.
-    Args:
-        password: the password
-
-    Returns: the hash of the password.
-
-    """
-    from m4db_database.configuration import read_config_from_environ
-    try:
-        config = read_config_from_environ()
-    except ValueError as e:
-        # If we couldn't read a configuration from the environment, then use an empty salt.
-        config = {"authentication_salt": ""}
-    salted_password = SALTED_PASSWORD_FORMAT.format(
-        password=password,
-        salt=config["authentication_salt"]
-    )
-    return md5(salted_password.encode('ascii')).hexdigest()
-
-
-def random_password(length=15, with_specials=True):
-    r"""
-    Generate a random password for a user.
-    :param length: the length of the password.
-    :param with_specials: if True use special characters.
-    :return: None.
-    """
-    chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    specials = "!@#$%^&*()_+=-{}[]"
-
-    if with_specials:
-        choose_chars = [ch for ch in chars + specials]
-    else:
-        choose_chars = [ch for ch in chars]
-
-    random.shuffle(choose_chars)
-
-    return "".join(choose_chars[0:length])
 

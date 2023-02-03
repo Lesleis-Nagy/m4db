@@ -5,12 +5,8 @@ Decorators used in this package.
 
 def static(**kwargs):
     r"""
-
-    Args:
-        **kwargs: key value pairs to add as static variables.
-
-    Returns:
-
+    :params **kwargs: key value pairs to add as static variables.
+    :return: None
     """
     def wrap(func):
         for key, value in kwargs.items():

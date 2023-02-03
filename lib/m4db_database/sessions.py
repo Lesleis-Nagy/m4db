@@ -27,14 +27,14 @@ def get_session(scoped=False, echo=False, nullpool=False):
     """
     config = read_config_from_environ()
 
-    if config["db_type"] == global_vars.POSTGRES_DATABASE_TYPE:
+    if config.database.type == global_vars.POSTGRES_DATABASE_TYPE:
         from m4db_database.sessions_postgres import get_session
         return get_session(scoped=scoped, echo=echo, nullpool=nullpool)
-    if config["db_type"] == global_vars.SQLITE_DATABASE_TYPE:
+    if config.database.type == global_vars.SQLITE_DATABASE_TYPE:
         from m4db_database.sessions_sqlite import get_session
         return get_session(scoped=scoped, echo=echo)
 
-    raise ValueError("Unsupported db_type in M4DB_CONFIG db_type: {}".format(config["db_type"]))
+    raise ValueError(f"Unsupported database in configuration.")
 
 
 def get_session_from_args(db_type, **kwargs):
@@ -109,6 +109,5 @@ def get_session_from_args(db_type, **kwargs):
         autoflush=autoflush,
         autocommit=autocommit
     )
-
 
     return Session()

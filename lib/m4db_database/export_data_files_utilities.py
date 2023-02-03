@@ -6,7 +6,7 @@ A collection of functions that export data files held in the 'file_store' direct
 import os
 import shutil
 
-from m4db_database.utilities import uid_to_dir
+from m4db_database.m4db_utilities_utilities import uid_to_dir
 
 from m4db_database.sessions import get_session
 

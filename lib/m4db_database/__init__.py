@@ -41,3 +41,7 @@ class global_vars:
     MODEL_DIRECTORY_NAME = "model"
     GEOMETRY_DIRECTORY_NAME = "geometry"
     NEB_DIRECTORY_NAME = "neb"
+
+    M4DB_DATABASE_CONFIG_ENV_VAR = "M4DB_DATABASE_CONFIG"
+
+    SALTED_PASSWORD_FORMAT = "{password}{salt}"

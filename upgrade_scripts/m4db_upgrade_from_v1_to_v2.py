@@ -10,8 +10,8 @@ from sqlalchemy.sql import text
 
 from tqdm import tqdm
 
-from m4db_database.utilities import password_hash
-from m4db_database.utilities import random_password
+from m4db_database.m4db_utilities_utilities import password_hash
+from m4db_database.m4db_utilities_utilities import random_password
 
 from m4db_database.sessions import get_session_from_args
 

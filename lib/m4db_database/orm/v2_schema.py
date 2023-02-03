@@ -36,7 +36,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 from sqlalchemy.orm import relationship
 
-from m4db_database.utilities import password_hash
+from m4db_database.utilities.password import password_hash
 
 from m4db_database import global_vars
 
