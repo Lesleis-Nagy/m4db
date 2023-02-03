@@ -16,7 +16,10 @@ setup(
         "sqlalchemy",
         "pyyaml",
         "gunicorn",
+<<<<<<< HEAD
         "Cerberus"
+=======
+>>>>>>> master
     ],
     include_package_data=True,
     entry_points="""
