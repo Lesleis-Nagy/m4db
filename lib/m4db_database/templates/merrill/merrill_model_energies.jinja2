@@ -1,0 +1,23 @@
+Set MaxMeshNumber 1
+
+ReadMesh 1 {{ model.mesh_file }}
+
+{{ model.minimizer }}
+
+Set ExchangeCalculator {{ model.exchange_calculator }}
+
+External Field Strength {{ model.external_field.strength }} {{ model.external_field.unit }}
+External Field Direction {{ model.external_field.x }} {{ model.external_field.y }} {{ model.external_field.z }}
+
+{% for material in model.materials %}
+! Subdomain {{ material.submesh_id }}, {{ material.name }} at {{ material.temperature }}
+setsubdomain {{ material.submesh_id }} MS {{ material.ms }}
+setsubdomain {{ material.submesh_id }} K1 {{ material.k1 }}
+setsubdomain {{ material.submesh_id }} AEX {{ material.aex }}
+{% endfor %}
+
+ReadMagnetization {{ model.field.dat_file }}
+
+ReportEnergy
+
+End

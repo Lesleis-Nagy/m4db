@@ -7,9 +7,6 @@ A set of useful utility functions.
 
 import re
 import os
-import random
-
-from hashlib import md5
 
 HEX_RE_STR = r'[0-9A-Fa-f]'
 
@@ -114,6 +111,3 @@ def string_to_bool(str):
         return False
     else:
         raise ValueError("Can't interpret '{}' as boolean".format(str))
-
-
-

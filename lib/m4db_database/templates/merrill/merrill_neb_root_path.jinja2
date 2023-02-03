@@ -1,0 +1,38 @@
+ReadMesh 1 {{ neb.mesh_file }}
+
+set MaxEnergyEvaluations {{ neb.max_energy_evaluations }}
+set MaxPathEvaluations {{ neb.max_path_evaluations }}
+
+! Material data
+{% for material in neb.materials %}
+! Subdomain {{ material.submesh_id }}, {{ material.name }} at {{ material.temperature }}C
+setsubdomain {{ material.submesh_id }} MS {{ material.ms }}
+setsubdomain {{ material.submesh_id }} K1 {{ material.k1 }}
+setsubdomain {{ material.submesh_id }} AEX {{ material.aex }}
+{% endfor %}
+
+external field strength {{ neb.external_field.strength }} {{ neb.external_field.unit }}
+external field direction {{ neb.external_field.x }} {{ neb.external_field.y }} {{ neb.external_field.z }}
+
+Set PathN 2
+ReadMagnetization {{ neb.start_magnetization }}
+MagnetizationToPath 1
+
+ReadMagnetization {{ neb.end_magnetization }}
+MagnetizationToPath 2
+
+EnergyLog {{ neb.energy_log_file }}
+
+RefinePathTo {{ neb.neb_path_points }}
+
+{{ neb.minimizer }}
+Set ExchangeCalculator {{ neb.exchange_calculator }}
+
+MakeInitialPath
+
+CloseLogFile
+WriteTecPlotPath {{ neb.neb_file_name }}
+
+PathStructureEnergies
+
+End

@@ -16,7 +16,14 @@ setup(
         "sqlalchemy",
         "pyyaml",
         "gunicorn",
-        "Cerberus"
+        "Cerberus",
+        "vtk",
+        "falcon",
+        "gunicorn",
+        "requests",
+        "pandas",
+        "tabulate",
+        "jinja2",
     ],
     include_package_data=True,
     entry_points="""

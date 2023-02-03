@@ -3,8 +3,6 @@ A collection of default data to add to the database.
 """
 
 
-
-
 def create_materials(session, materials):
     r"""
     Create materials.

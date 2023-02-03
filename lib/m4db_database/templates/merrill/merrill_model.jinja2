@@ -1,0 +1,35 @@
+Set MaxMeshNumber 1
+
+ReadMesh 1 {{ model.mesh_file }}
+
+Set MaxEnergyEvaluations {{ model.max_evals }}
+
+{{ model.minimizer }}
+Set ExchangeCalculator {{ model.exchange_calculator }}
+
+{% if model.start_magnetization.type == "random" %}
+Randomize All Moments
+{% elif model.start_magnetization.type == "uniform" %}
+Uniform Magnetization {{ model.start_magnetization.x }} {{ model.start_magnetization.y }} {{ model.start_magnetization.z }}
+{% elif model.start_magnetization.type == "model" %}
+ReadTecplotZone {{ model.start_magnetization.tec_file }} 1
+{% endif %}
+
+{% for material in model.materials %}
+! Subdomain {{ material.submesh_id }}, {{ material.name }} at {{ material.temperature }} C
+setsubdomain {{ material.submesh_id }} MS {{ material.ms }}
+setsubdomain {{ material.submesh_id }} K1 {{ material.k1 }}
+setsubdomain {{ material.submesh_id }} AEX {{ material.aex }}
+{% endfor %}
+
+EnergyLog {{ model.energy_log_file }}
+External Field Strength {{ model.external_field.strength }} {{ model.external_field.unit }}
+External Field Direction {{ model.external_field.x }} {{ model.external_field.y }} {{ model.external_field.z }}
+
+Minimize
+WriteMagnetization {{ model.output }}
+CloseLogfile
+
+ReportEnergy
+
+End
