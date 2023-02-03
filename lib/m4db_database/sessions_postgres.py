@@ -45,15 +45,15 @@ def get_session(user=None, database=None, host=None, password=None, scoped=False
         else:
             if user is None and host is None and password is None:
                 db_uri = global_vars.POSTGRES_DATABASE_URI.format(
-                    database=database
+                    db_name=database
                 )
             elif password is None:
                 db_uri = global_vars.POSTGRES_DATABASE_USER_HOST_URI.format(
-                    user=user, host=host, database=database
+                    user=user, host=host, db_name=database
                 )
             else:
                 db_uri = global_vars.POSTGRES_DATABASE_USER_HOST_PASSWORD_URI.format(
-                    user=user, host=host, database=database, password=password
+                    user=user, host=host, db_name=database, password=password
                 )
         if nullpool:
             get_session.engine = create_engine(db_uri, echo=echo, poolclass=NullPool)
