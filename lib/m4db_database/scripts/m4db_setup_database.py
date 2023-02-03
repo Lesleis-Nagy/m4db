@@ -8,82 +8,40 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 
-from argparse import ArgumentParser
+from typer import Typer
 
-from m4db_database.configuration import write_config_to_file
 from m4db_database.orm.latest import Base
-
-from m4db_database.data_defaults import create_units
-from m4db_database.data_defaults import create_running_statuses
-from m4db_database.data_defaults import create_anisotropy_forms
-from m4db_database.data_defaults import create_size_conventions
-from m4db_database.data_defaults import create_materials
-from m4db_database.data_defaults import create_neb_calculation_types
 
 from m4db_database import global_vars
 
-
-def default_config(db_uri, file_root):
-    r"""
-    Create default configuration data.
-
-    Args:
-        db_uri: database URI
-        file_root: file root directory
-
-    Returns: a default configuration data dictionary.
-
-    """
-    config = {
-        "file_root": os.path.abspath(file_root),
-        "db_uri": db_uri,
-        "db_type": global_vars.POSTGRES_DATABASE_TYPE,
-        "log_destination": "stdout",
-        "log_level": "DEBUG",
-        "log_logger_name": "m4db",
-        "mm_type": None,
-        "mm_binary": None,
-        "mm_binary_version": None,
-        "authentication_salt": None,
-        "m4db_runner_web": {
-            "no_of_retries": 5,
-            "backoff_factor": 1
-        },
-        "m4db_serverside": {
-            "default_m4db_user": None,
-            "default_m4db_project": None,
-            "working_dir": "/var/tmp"
-        }
-    }
+app = Typer()
 
 
-def setup_postgres_database(database, user=None, host=None, password=None, echo=False, materials=None, empty_db=False):
+def setup_postgres_database(db_name, user=None, host=None, password=None, echo=False):
     r"""
     Create tables, indexes and relationships under a new database.
     Args:
-        database: the name of the database under which to create database objects.
+        db_name: the name of the database under which to create database objects.
         user: the database user.
         host: the host on which the database lives.
         password: if a password is supplied.
         echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
-        materials: list of materials
-        empty_db: do not add any data to the database.
-
     Returns:
         The url string to connect to the database.
 
     """
+
     if user is None and host is None and password is None:
         db_uri = global_vars.POSTGRES_DATABASE_URI.format(
-            database=database
+            db_name=db_name
         )
     elif password is None:
         db_uri = global_vars.POSTGRES_DATABASE_USER_HOST_URI.format(
-            user=user, host=host, database=database
+            user=user, host=host, db_name=db_name
         )
     else:
         db_uri = global_vars.POSTGRES_DATABASE_USER_HOST_PASSWORD_URI.format(
-            user=user, host=host, database=database, password=password
+            user=user, host=host, db_name=db_name, password=password
         )
 
     if echo:
@@ -104,57 +62,6 @@ def setup_postgres_database(database, user=None, host=None, password=None, echo=
         autocommit=False
     )
     session = Session()
-
-    if not empty_db:
-        create_units(session)
-        create_running_statuses(session)
-        create_size_conventions(session)
-        create_anisotropy_forms(session)
-        create_materials(session, materials)
-        create_neb_calculation_types(session)
-
-    return db_uri
-
-
-def setup_sqlite_database(file, echo=False, materials=None, empty_db=False):
-    r"""
-    Create tables, indexes, relationships etc. for an SQLight database.
-
-    Args:
-        file: the file that will contain the database objects.
-        echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
-        materials: list of materials to add
-        empty_db: do not add any data to the database.
-
-    Returns:
-        The url string to connect to the database.
-    """
-
-    db_uri = global_vars.SQLITE_FILE_URI.format(file=os.path.abspath(file))
-
-    # Connect to the database
-    engine = create_engine(db_uri, echo=echo, poolclass=NullPool)
-
-    if hasattr(Base, "metadata"):
-        metadata = getattr(Base, "metadata")
-        metadata.create_all(engine)
-    else:
-        raise AssertionError("Fatal, m4db_database.orm.Base has no attribute 'metadata'")
-
-    Session = sessionmaker(
-        bind=engine,
-        autoflush=True,
-        autocommit=False
-    )
-    session = Session()
-
-    if not empty_db:
-        create_units(session)
-        create_running_statuses(session)
-        create_size_conventions(session)
-        create_anisotropy_forms(session)
-        create_materials(session, materials)
-        create_neb_calculation_types(session)
 
     return db_uri
 
@@ -211,13 +118,12 @@ def create_file_root(file_root, yes_to_all=False):
     print("Done!")
 
 
-def postgres(database, file_root, config_file, user=None, host=None, password=None, echo=False, yes_to_all=False, materials=None, empty_db=False):
+def postgres(db_name, file_root, user=None, host=None, password=None, echo=False, yes_to_all=False):
     r"""
     Function to handle the postgres option.
     Args:
-        database: database name
+        db_name: database name
         file_root: the root directory of all models, neb paths, etc.
-        config_file: the configuration file to write config information to.
         user: database user name.
         host: url host of the database.
         password: the database password.
@@ -233,144 +139,38 @@ def postgres(database, file_root, config_file, user=None, host=None, password=No
     """
     create_file_root(file_root, yes_to_all=yes_to_all)
 
-    db_uri = setup_postgres_database(database, user, host, password, echo, materials, empty_db)
-
-    if config_file:
-        config = default_config(db_uri, file_root)
-        write_config_to_file(config_file, config)
-    else:
-        print("Warning, no configuration file has been created")
+    db_uri = setup_postgres_database(db_name, user, host, password, echo)
 
 
-def sqlite(file, file_root, config_file, echo=False, yes_to_all=False, materials=None, empty_db=False):
+@app.command()
+def main(db_name: str, file_root: str, user: str = None, host: str = None, password: str = None, verbose: bool = False, yes_to_all: bool = False):
     r"""
-    Function to handle sqlite option.
-    Args:
-        file: argument object containing values needed to create a new sqlite database.
-        file_root: the root directory of all models, neb paths, etc.
-        config_file: the configuration file to write config information to.
-        echo: boolean (default False) set to True if verbose SQLAlchemy output is required.
-        yes_to_all: answer yes to all options.
-        materials: a list of materials to add.
-        empty_db: do not add any data to the database.
-    Returns:
-        None.
-    """
-    create_file_root(file_root, yes_to_all=yes_to_all)
-
-    db_uri = setup_sqlite_database(file, echo, materials, empty_db)
-
-    if config_file:
-        config = default_config(db_uri, file_root)
-        write_config_to_file(config_file, config)
-    else:
-        print("Warning, no configuration file has been created")
-
-
-def get_cmd_line_parser():
-    r"""
-    Function to create a command line argument parser.
-
-    Returns:
-        A command line argument parser object.
+    Create a new M4DB database.
+    :param db_name: the name of the new M4DB database.
+    :param file_root: the new file root - this is where models, paths etc. that are managed by M4DB are stored.
+    :user: the user to which the database relations belong.
+    :host: the machine host on which the database resides.
+    :password: the password required to authenticate the user.
+    :verbose: if this flag is set, then produce additional output as the database is created.
+    :yes_to_all: if this flag is set, then 'yes' then permission is granted to all yes/no options as the database is
+                 created (WARNING this means the file_root is removed!).
 
     """
-    parser = ArgumentParser()
+    print(f"Attempting to create M4DB with name: '{db_name}' ...")
 
-    subparsers = parser.add_subparsers(dest="database_type",
-                                       help="create different database types (sqlite/postgres)")
-
-    # Postgres parser
-    parser_postgres = subparsers.add_parser("postgres",
-                                            help="create a new m4db postgres database")
-    parser_postgres.add_argument("database",
-                                 help="the database name in which to create the new database")
-    parser_postgres.add_argument("file_root",
-                                 help="the root location of models/paths and other data")
-    parser_postgres.add_argument("--config_file",
-                                 help="the configuration file to save values to")
-    parser_postgres.add_argument("--user", default=None,
-                                 help="the database user name with which to access the database")
-    parser_postgres.add_argument("--host", default=None,
-                                 help="the name of the host on which the database lives")
-    parser_postgres.add_argument("--password", default=None,
-                                 help="the database password (WARNING: this is stored in clear in the M4DB_CONFIG).")
-    parser_postgres.add_argument("-v", "--verbose", action="store_true",
-                                 help="produce verbose output when creating the database")
-    parser_postgres.add_argument("--add-materials", default=None,
-                                 help="A comma separated list of materials that will be added (supported: magnetite and iron)")
-    parser_postgres.add_argument("--empty-db", action="store_true", help="Do not add any data to the database")
-    parser_postgres.add_argument("--yes-to-all", action="store_true", help="Answer yes to all questions.")
+    postgres(
+        db_name,
+        file_root,
+        user=user,
+        host=host,
+        password=password,
+        echo=verbose,
+        yes_to_all=yes_to_all)
 
 
-    # SqlLite parser
-    parser_sqlite = subparsers.add_parser("sqlite",
-                                          help="create a new sqlite database")
-    parser_sqlite.add_argument("file",
-                               help="the file containing the sqlite database")
-    parser_sqlite.add_argument("file_root",
-                               help="the root location of models/paths and other data")
-    parser_sqlite.add_argument("config_file",
-                               help="the configuration file to save values to")
-    parser_sqlite.add_argument("-v", "--verbose", action="store_true",
-                               help="produce verbose output when creating the database")
-    parser_sqlite.add_argument("--add-materials", default=None,
-                               help="A comma separated list of materials that will be added (supported: magnetite and iron)")
-    parser_sqlite.add_argument("--empty-db", action="store_true", help="Do not add any data to the database")
-    parser_sqlite.add_argument("--yes-to-all", action="store_true", help="Answer yes to all questions.")
-
-    return parser
-
-
-def main():
-    r"""
-    Program entry point.
-
-    Returns:
-        None.
-    """
-    parser = get_cmd_line_parser()
-    args = parser.parse_args()
-
-    print("Attempting to create M4DB database ...")
-
-    if args.add_materials:
-        materials = [s.strip() for s in args.add_materials.split(",")]
-    else:
-        materials = None
-
-    if args.database_type == "postgres":
-        postgres(
-            args.database,
-            args.file_root,
-            args.config_file,
-            args.user,
-            args.host,
-            password=args.password,
-            echo=args.verbose,
-            yes_to_all=args.yes_to_all,
-            materials=materials,
-            empty_db=args.empty_db)
-    elif args.database_type == "sqlite":
-        sqlite(
-            args.file,
-            args.file_root,
-            args.config_file,
-            echo=args.verbose,
-            yes_to_all=args.yes_to_all,
-            materials=materials,
-            empty_db=args.empty_db)
-    else:
-        print("Unknown database db_type: '{}'".format(args.database_type))
-        sys.exit(1)
-
-    print("Created M4DB database, tables and directories")
-
-    if args.config_file:
-        print("WARNING! make sure to add 'M4DB_CONFIG={}' to your environment!".format(args.config_file))
-    else:
-        print("WARNING! make sure to add 'M4DB_CONFIG' to your environment!")
+def entry_point():
+    app()
 
 
 if __name__ == "__main__":
-    main()
+    app()
