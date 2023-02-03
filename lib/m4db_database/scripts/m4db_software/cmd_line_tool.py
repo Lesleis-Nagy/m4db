@@ -4,7 +4,6 @@ Perform m4db software related command actions.
 
 from enum import Enum
 
-import re
 import sys
 import typer
 
