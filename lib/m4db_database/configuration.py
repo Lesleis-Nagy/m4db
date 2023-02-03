@@ -6,7 +6,7 @@ from cerberus import Validator
 
 from m4db_database.decorators import static
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 
 class Database:
@@ -87,10 +87,10 @@ def read_config_from_environ():
         A python dictionary representation of M4DB database related configuration information.
 
     """
-    file_name = os.environ.get(global_vars.M4DB_DATABASE_CONFIG_ENV_VAR)
+    file_name = os.environ.get(GLOBAL.M4DB_DATABASE_CONFIG_ENV_VAR)
 
     if file_name is None:
-        raise ValueError(f"{global_vars.M4DB_DATABASE_CONFIG_ENV_VAR} environment variable doesn't exist")
+        raise ValueError(f"{GLOBAL.M4DB_DATABASE_CONFIG_ENV_VAR} environment variable doesn't exist")
 
     return read_config_from_file(file_name)
 
@@ -119,9 +119,9 @@ def write_config_to_environ(config):
         None
 
     """
-    file_name = os.environ.get(global_vars.M4DB_DATABASE_CONFIG_ENV_VAR)
+    file_name = os.environ.get(GLOBAL.M4DB_DATABASE_CONFIG_ENV_VAR)
 
     if file_name is None:
-        raise ValueError(f"{global_vars.M4DB_DATABASE_CONFIG_ENV_VAR} environment variable doesn't exist")
+        raise ValueError(f"{GLOBAL.M4DB_DATABASE_CONFIG_ENV_VAR} environment variable doesn't exist")
 
     return write_config_to_file(file_name, config)

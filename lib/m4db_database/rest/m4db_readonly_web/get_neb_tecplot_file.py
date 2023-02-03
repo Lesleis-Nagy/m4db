@@ -12,7 +12,7 @@ import pandas
 from m4db_database.configuration import read_config_from_environ
 from m4db_database.utilities.unique_id import uid_to_dir
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 
 class GetNebTecplotFile:
@@ -33,9 +33,9 @@ class GetNebTecplotFile:
 
         neb_path_file = os.path.join(
             config["file_root"],
-            global_vars.neb_directory_name,
+            GLOBAL.neb_directory_name,
             uid_to_dir(unique_id),
-            global_vars.neb_tecplot_file_name
+            GLOBAL.neb_tecplot_file_name
         )
 
         if os.path.exists(neb_path_file):

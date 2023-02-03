@@ -20,7 +20,7 @@ from m4db_database.file_io.patran import read_patran
 from m4db_database.utilities.geometry import geometry_volume
 from m4db_database.utilities.geometry import geometry_edge_stats
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 
 def check_software(session, args):
@@ -63,7 +63,7 @@ def copy_geometry_files(unique_id, patran_file, script_file, stdout_file):
     file_root = config["file_root"]
     dest_dir = os.path.join(
         file_root,
-        global_vars.geometry_directory_name,
+        GLOBAL.geometry_directory_name,
         uid_to_dir(unique_id)
     )
 
@@ -76,15 +76,15 @@ def copy_geometry_files(unique_id, patran_file, script_file, stdout_file):
         os.makedirs(dest_dir, exist_ok=True)
 
     if os.path.isfile(patran_file):
-        shutil.copyfile(patran_file, os.path.join(dest_dir, global_vars.geometry_patran_file_name))
+        shutil.copyfile(patran_file, os.path.join(dest_dir, GLOBAL.geometry_patran_file_name))
 
     if script_file is not None:
         if os.path.isfile(script_file):
-            shutil.copyfile(script_file, os.path.join(dest_dir, global_vars.geometry_script_file_name))
+            shutil.copyfile(script_file, os.path.join(dest_dir, GLOBAL.geometry_script_file_name))
 
     if stdout_file is not None:
         if os.path.isfile(stdout_file):
-            shutil.copyfile(stdout_file, os.path.join(dest_dir, global_vars.geometry_stdout_file_name))
+            shutil.copyfile(stdout_file, os.path.join(dest_dir, GLOBAL.geometry_stdout_file_name))
 
 
 def new_geometry_action(args):

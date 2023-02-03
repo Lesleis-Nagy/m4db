@@ -10,7 +10,7 @@ from m4db_database.utilities.unique_id import uid_to_dir
 
 from m4db_database.orm.latest import NEB
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 from m4db_database.templates import template_env
 
 
@@ -22,7 +22,7 @@ def runner_data_with_parent(neb):
     # The initial path is the path belonging to the parent of this child.
     runner_data["neb_initial_path_name"] = os.path.join(
         neb.parent_neb.unique_id,
-        global_vars.neb_tecplot_file_name
+        GLOBAL.neb_tecplot_file_name
     )
 
     runner_data["max_energy_evaluations"] = neb.max_energy_evaluations
@@ -62,12 +62,12 @@ def runner_data_with_parent(neb):
         runner_data["external_field"]["z"] = neb.external_field.dir_z
         runner_data["external_field"]["unit"] = unit_symbol
 
-    runner_data["energy_log_file"] = global_vars.energy_log_file_name
+    runner_data["energy_log_file"] = GLOBAL.energy_log_file_name
 
     runner_data["minimizer"] = "ConjugateGradient"
     runner_data["exchange_calculator"] = "1"
 
-    runner_data["neb_file_name"] = global_vars.neb_tecplot_file_name
+    runner_data["neb_file_name"] = GLOBAL.neb_tecplot_file_name
 
     return runner_data
 
@@ -80,9 +80,9 @@ def runner_data_without_parent(neb):
     # Use the geometry associated with the NEB start model (both start and end should be the same).
     runner_data["mesh_file"] = os.path.join(
         config["file_root"],
-        global_vars.geometry_directory_name,
+        GLOBAL.geometry_directory_name,
         uid_to_dir(neb.start_model.geometry.unique_id),
-        global_vars.geometry_patran_file_name
+        GLOBAL.geometry_patran_file_name
     )
 
     runner_data["max_energy_evaluations"] = neb.max_energy_evaluations
@@ -126,20 +126,20 @@ def runner_data_without_parent(neb):
     # Start and end models.
     runner_data["start_magnetization"] = os.path.join(
         neb.start_model.unique_id,
-        global_vars.magnetization_dat_file_name
+        GLOBAL.magnetization_dat_file_name
     )
     runner_data["end_magnetization"] = os.path.join(
         neb.end_model.unique_id,
-        global_vars.magnetization_dat_file_name
+        GLOBAL.magnetization_dat_file_name
     )
 
-    runner_data["energy_log_file"] = global_vars.energy_log_file_name
+    runner_data["energy_log_file"] = GLOBAL.energy_log_file_name
     runner_data["neb_path_points"] = neb.no_of_points
 
     runner_data["minimizer"] = "ConjugateGradient"
     runner_data["exchange_calculator"] = "1"
 
-    runner_data["neb_file_name"] = global_vars.neb_tecplot_file_name
+    runner_data["neb_file_name"] = GLOBAL.neb_tecplot_file_name
 
     return runner_data
 

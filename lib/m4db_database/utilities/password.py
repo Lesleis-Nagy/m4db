@@ -5,7 +5,7 @@ A selection of utility routines for dealing with passwords.
 from hashlib import md5
 
 from m4db_database.configuration import read_config_from_environ
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 
 def password_hash(password):
@@ -17,7 +17,7 @@ def password_hash(password):
 
     config = read_config_from_environ()
 
-    salted_password = global_vars.SALTED_PASSWORD_FORMAT.format(
+    salted_password = GLOBAL.SALTED_PASSWORD_FORMAT.format(
         password=password,
         salt=config.password_salt
     )

@@ -8,7 +8,7 @@ from m4db_database.utilities.unique_id import uid_to_dir
 
 from m4db_database.file_io.merrill_stdio import extract_path_data
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 
 class GetNEBPathEnergiesCSV:
@@ -29,9 +29,9 @@ class GetNEBPathEnergiesCSV:
 
         neb_stdout_file = os.path.join(
             config["file_root"],
-            global_vars.neb_directory_name,
+            GLOBAL.neb_directory_name,
             uid_to_dir(unique_id),
-            global_vars.neb_stdout_file_name
+            GLOBAL.neb_stdout_file_name
         )
 
         if os.path.exists(neb_stdout_file):

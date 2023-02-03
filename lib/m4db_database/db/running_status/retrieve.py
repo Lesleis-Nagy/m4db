@@ -4,7 +4,7 @@ A collection of routines for retrieving running statuses.
 
 from m4db_database.orm.latest import RunningStatus
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 
 def retrieve_running_status(session, running_status_name):
@@ -30,7 +30,7 @@ def retrieve_not_run_status(session):
     :param session: a database session.
     :return: a RunningStatus object.
     """
-    return retrieve_running_status(session, global_vars.running_status_not_run)
+    return retrieve_running_status(session, GLOBAL.running_status_not_run)
 
 
 def retrieve_re_run_running_status(session):
@@ -40,7 +40,7 @@ def retrieve_re_run_running_status(session):
     :return: a RunningStatus object.
     """
     # Attempt to retrieve the 'rerun' running status.
-    return retrieve_running_status(session, global_vars.running_status_re_run)
+    return retrieve_running_status(session, GLOBAL.running_status_re_run)
 
 
 def retrieve_running_running_status(session):
@@ -50,7 +50,7 @@ def retrieve_running_running_status(session):
     :return: a RunningStatus object.
     """
     # Attempt to retrieve the 'running' running status.
-    return retrieve_running_status(session, global_vars.running_status_running)
+    return retrieve_running_status(session, GLOBAL.running_status_running)
 
 
 def retrieve_finished_running_status(session):
@@ -60,7 +60,7 @@ def retrieve_finished_running_status(session):
     :return: a RunningStatus object.
     """
     # Attempt to retrieve the 'finished' running status.
-    return retrieve_running_status(session, global_vars.running_status_finished)
+    return retrieve_running_status(session, GLOBAL.running_status_finished)
 
 
 def retrieve_crashed_running_status(session):
@@ -70,7 +70,7 @@ def retrieve_crashed_running_status(session):
     :return: a RunningStatus object.
     """
     # Attempt to retrieve the 'crashed' running status.
-    return retrieve_running_status(session, global_vars.running_status_crashed)
+    return retrieve_running_status(session, GLOBAL.running_status_crashed)
 
 
 def retrieve_scheduled_running_status(session):
@@ -80,7 +80,7 @@ def retrieve_scheduled_running_status(session):
     :return: a RunningStatus object.
     """
     # Attempt to retrieve the 'scheduled' running status.
-    return retrieve_running_status(session, global_vars.running_status_scheduled)
+    return retrieve_running_status(session, GLOBAL.running_status_scheduled)
 
 
 def retrieve_failed_running_status(session):
@@ -90,4 +90,4 @@ def retrieve_failed_running_status(session):
     :return: a RunningStatus object.
     """
     # Attempt to retrieve the 'failed' running status.
-    return retrieve_running_status(session, global_vars.running_status_failed)
+    return retrieve_running_status(session, GLOBAL.running_status_failed)

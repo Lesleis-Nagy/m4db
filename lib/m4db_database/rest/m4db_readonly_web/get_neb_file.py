@@ -10,7 +10,7 @@ import falcon
 
 from m4db_database.utilities.unique_id import uid_to_dir
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 
 class GetAllNEBDataZip:
@@ -28,9 +28,9 @@ class GetAllNEBDataZip:
         # Check that the data exists.
         data_zip = os.path.join(
             self.config["file_root"],
-            global_vars.neb_directory_name,
+            GLOBAL.neb_directory_name,
             uid_to_dir(unique_id),
-            global_vars.data_zip
+            GLOBAL.data_zip
         )
 
         if not os.path.isfile(data_zip):

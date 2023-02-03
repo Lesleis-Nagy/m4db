@@ -32,7 +32,7 @@ from m4db_database.file_io.merrill_stdio import count_path_fails_and_minimized
 from m4db_database.utilities.archive import unarchive_model
 from m4db_database.utilities.archive import unarchive_neb
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 
 def run_neb(unique_id):
@@ -56,7 +56,7 @@ def run_neb(unique_id):
     # Final destination of the NEB data.
     database_dir = os.path.join(
         config["file_root"],
-        global_vars.neb_directory_name,
+        GLOBAL.neb_directory_name,
         uid_to_dir(unique_id)
     )
     logger.debug(f"NEB destination: '{database_dir}'")
@@ -98,7 +98,7 @@ def run_neb(unique_id):
             unarchive_neb(neb_parent_uid, neb_parent_uid)
 
         # Create a MERRILL script.
-        get_neb_merrill_script(unique_id, global_vars.neb_merrill_script_file_name)
+        get_neb_merrill_script(unique_id, GLOBAL.neb_merrill_script_file_name)
 
         # Set running status to 'running'
         set_neb_running_status(unique_id, "running")
@@ -107,7 +107,7 @@ def run_neb(unique_id):
         logger.debug(f"executing {executable}")
         merrill_t0 = time.time()
         cmd = "{exe:} {merrill_script:}".format(
-            exe=executable, merrill_script=global_vars.neb_merrill_script_file_name)
+            exe=executable, merrill_script=GLOBAL.neb_merrill_script_file_name)
         proc = Popen(
             cmd,
             stdout=PIPE,
@@ -131,22 +131,22 @@ def run_neb(unique_id):
             shutil.rmtree(neb_parent_uid)
 
         # Check whether a file called was created, if so rename it.
-        if os.path.isfile(global_vars.neb_mult_tecplot_file_name):
-            os.rename(global_vars.neb_mult_tecplot_file_name, global_vars.neb_tecplot_file_name)
+        if os.path.isfile(GLOBAL.neb_mult_tecplot_file_name):
+            os.rename(GLOBAL.neb_mult_tecplot_file_name, GLOBAL.neb_tecplot_file_name)
 
         # Write standard output and standard error to files.
-        with open(global_vars.neb_stdout_file_name, "w") as fout:
+        with open(GLOBAL.neb_stdout_file_name, "w") as fout:
             fout.write(stdout)
-        with open(global_vars.neb_stderr_file_name, "w") as fout:
+        with open(GLOBAL.neb_stderr_file_name, "w") as fout:
             fout.write(stderr)
 
         # Check output.
-        path_type = extract_path_type(global_vars.neb_stdout_file_name)
+        path_type = extract_path_type(GLOBAL.neb_stdout_file_name)
         if path_type == "INITIAL_PATH":
             # Do nothing.
             pass
         elif path_type == "NEB_PATH":
-            n_fails, n_mins = count_path_fails_and_minimized(global_vars.neb_stdout_file_name)
+            n_fails, n_mins = count_path_fails_and_minimized(GLOBAL.neb_stdout_file_name)
             if n_fails > 0:
                 set_neb_running_status(unique_id, "re-run")
         else:
@@ -154,14 +154,14 @@ def run_neb(unique_id):
 
         # Write path energies to a JSON file.
         logger.debug("Creating path energies.")
-        path_energies = extract_path_data(global_vars.neb_stdout_file_name)
-        with open(global_vars.neb_path_json, "w") as fout:
+        path_energies = extract_path_data(GLOBAL.neb_stdout_file_name)
+        with open(GLOBAL.neb_path_json, "w") as fout:
             fout.write(json.dumps(path_energies))
 
         # Compress each file in the directory.
         logger.debug("Zipping files")
         src_files = os.listdir(".")
-        src_zip_file = global_vars.data_zip
+        src_zip_file = GLOBAL.data_zip
         zout = zipfile.ZipFile(src_zip_file, "w", zipfile.ZIP_DEFLATED)
         for src_file in src_files:
             logger.debug(f"{src_file} --> {src_zip_file}")

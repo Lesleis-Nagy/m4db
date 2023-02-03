@@ -12,7 +12,7 @@ from typer import Typer
 
 from m4db_database.orm.latest import Base
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 from m4db_database.install.data.anisotropy_forms import populate_anisotropy_forms
 from m4db_database.install.data.neb_calculation_type import populate_neb_calculation_types
@@ -38,15 +38,15 @@ def setup_postgres_database(db_name, user=None, host=None, password=None, echo=F
     """
 
     if user is None and host is None and password is None:
-        db_uri = global_vars.POSTGRES_DATABASE_URI.format(
+        db_uri = GLOBAL.POSTGRES_DATABASE_URI.format(
             db_name=db_name
         )
     elif password is None:
-        db_uri = global_vars.POSTGRES_DATABASE_USER_HOST_URI.format(
+        db_uri = GLOBAL.POSTGRES_DATABASE_USER_HOST_URI.format(
             user=user, host=host, db_name=db_name
         )
     else:
-        db_uri = global_vars.POSTGRES_DATABASE_USER_HOST_PASSWORD_URI.format(
+        db_uri = GLOBAL.POSTGRES_DATABASE_USER_HOST_PASSWORD_URI.format(
             user=user, host=host, db_name=db_name, password=password
         )
 
@@ -91,9 +91,9 @@ def mkdir_file_root(file_root):
     pathlib.Path(file_root).mkdir(parents=True, exist_ok=True)
 
     # Create all the subdirectories needed.
-    os.mkdir(os.path.join(file_root, global_vars.GEOMETRY_DIRECTORY_NAME))
-    os.mkdir(os.path.join(file_root, global_vars.MODEL_DIRECTORY_NAME))
-    os.mkdir(os.path.join(file_root, global_vars.NEB_DIRECTORY_NAME))
+    os.mkdir(os.path.join(file_root, GLOBAL.GEOMETRY_DIRECTORY_NAME))
+    os.mkdir(os.path.join(file_root, GLOBAL.MODEL_DIRECTORY_NAME))
+    os.mkdir(os.path.join(file_root, GLOBAL.NEB_DIRECTORY_NAME))
 
 
 def create_file_root(file_root, yes_to_all=False):

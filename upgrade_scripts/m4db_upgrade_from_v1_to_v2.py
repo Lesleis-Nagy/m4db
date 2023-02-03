@@ -15,7 +15,7 @@ from m4db_database.m4db_utilities_utilities import random_password
 
 from m4db_database.sessions import get_session_from_args
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 
 def drop_unique_constraints(new_session):
@@ -584,8 +584,8 @@ def copy_db_user(old_session, new_session):
 
     # Construct new data and insert in to new database.
     ticket_length = 3600  # default ticket length is 1hr in seconds.
-    ticket_timeout = global_vars.UNIX_EPOCH  # automatically timed out.
-    access_level = global_vars.ACCESS_ALL
+    ticket_timeout = GLOBAL.UNIX_EPOCH  # automatically timed out.
+    access_level = GLOBAL.ACCESS_ALL
     insert_items = [
         {"id": record[0],
          "user_name": record[1],

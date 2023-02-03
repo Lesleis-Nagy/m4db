@@ -31,7 +31,7 @@ from m4db_database.orm.latest import NEBReportData
 from m4db_database.orm.latest import Model
 from m4db_database.orm.latest import NEB
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 
 def import_db_user(db_user_file, session, original_dates=True):
@@ -62,8 +62,8 @@ def import_db_user(db_user_file, session, original_dates=True):
         )
 
         if original_dates:
-            db_user.last_modified = datetime.strptime(db_user_dict["last_modified"], global_vars.DATE_TIME_FORMAT)
-            db_user.created = datetime.strptime(db_user_dict["created"], global_vars.DATE_TIME_FORMAT)
+            db_user.last_modified = datetime.strptime(db_user_dict["last_modified"], GLOBAL.DATE_TIME_FORMAT)
+            db_user.created = datetime.strptime(db_user_dict["created"], GLOBAL.DATE_TIME_FORMAT)
 
         session.add(db_user)
 
@@ -94,8 +94,8 @@ def import_software(software_file, session, original_dates=True):
         )
 
         if original_dates:
-            software.last_modified = datetime.strptime(software_dict["last_modified"], global_vars.DATE_TIME_FORMAT)
-            software.created = datetime.strptime(software_dict["created"], global_vars.DATE_TIME_FORMAT)
+            software.last_modified = datetime.strptime(software_dict["last_modified"], GLOBAL.DATE_TIME_FORMAT)
+            software.created = datetime.strptime(software_dict["created"], GLOBAL.DATE_TIME_FORMAT)
 
         session.add(software)
 
@@ -164,8 +164,8 @@ def import_material(material_file, session, original_dates=True):
             anisotropy_form=anisotropy_form
         )
         if original_dates:
-            material.last_modified = datetime.strptime(material_dict["last_modified"], global_vars.DATE_TIME_FORMAT)
-            material.created = datetime.strptime(material_dict["created"], global_vars.DATE_TIME_FORMAT)
+            material.last_modified = datetime.strptime(material_dict["last_modified"], GLOBAL.DATE_TIME_FORMAT)
+            material.created = datetime.strptime(material_dict["created"], GLOBAL.DATE_TIME_FORMAT)
 
         session.add(material)
 
@@ -194,8 +194,8 @@ def import_unit(unit_file, session, original_dates=True):
 
         )
         if original_dates:
-            unit.last_modified = datetime.strptime(unit_dict["last_modified"], global_vars.DATE_TIME_FORMAT)
-            unit.created = datetime.strptime(unit_dict["created"], global_vars.DATE_TIME_FORMAT)
+            unit.last_modified = datetime.strptime(unit_dict["last_modified"], GLOBAL.DATE_TIME_FORMAT)
+            unit.created = datetime.strptime(unit_dict["created"], GLOBAL.DATE_TIME_FORMAT)
         session.add(unit)
 
     session.commit()
@@ -224,8 +224,8 @@ def import_physical_constant(physical_constant_file, session, original_dates=Tru
         )
 
         if original_dates:
-            physical_constant.last_modified = datetime.strptime(physical_const_dict["last_modified"], global_vars.DATE_TIME_FORMAT)
-            physical_constant.created = datetime.strptime(physical_const_dict["created"], global_vars.DATE_TIME_FORMAT)
+            physical_constant.last_modified = datetime.strptime(physical_const_dict["last_modified"], GLOBAL.DATE_TIME_FORMAT)
+            physical_constant.created = datetime.strptime(physical_const_dict["created"], GLOBAL.DATE_TIME_FORMAT)
 
         session.add(physical_constant)
 
@@ -253,8 +253,8 @@ def import_size_convention(size_convention_file, session, original_dates=True):
         )
 
         if original_dates:
-            size_convention.last_modified = datetime.strptime(size_convention_dict["last_modified"], global_vars.DATE_TIME_FORMAT)
-            size_convention.created = datetime.strptime(size_convention_dict["created"], global_vars.DATE_TIME_FORMAT)
+            size_convention.last_modified = datetime.strptime(size_convention_dict["last_modified"], GLOBAL.DATE_TIME_FORMAT)
+            size_convention.created = datetime.strptime(size_convention_dict["created"], GLOBAL.DATE_TIME_FORMAT)
 
         session.add(size_convention)
     session.commit()
@@ -281,8 +281,8 @@ def import_anisotropy_form(anisotropy_form_file, session, original_dates=True):
         )
 
         if original_dates:
-            anisotropy_form.last_modified = datetime.strptime(anisotropy_form_dict["last_modified"], global_vars.DATE_TIME_FORMAT)
-            anisotropy_form.created = datetime.strptime(anisotropy_form_dict["created"], global_vars.DATE_TIME_FORMAT)
+            anisotropy_form.last_modified = datetime.strptime(anisotropy_form_dict["last_modified"], GLOBAL.DATE_TIME_FORMAT)
+            anisotropy_form.created = datetime.strptime(anisotropy_form_dict["created"], GLOBAL.DATE_TIME_FORMAT)
 
         session.add(anisotropy_form)
     session.commit()
@@ -309,8 +309,8 @@ def import_running_status(running_status_file, session, original_dates=True):
         )
 
         if original_dates:
-            running_status.last_modified = datetime.strptime(running_status_dict["last_modified"], global_vars.DATE_TIME_FORMAT)
-            running_status.created = datetime.strptime(running_status_dict["created"], global_vars.DATE_TIME_FORMAT)
+            running_status.last_modified = datetime.strptime(running_status_dict["last_modified"], GLOBAL.DATE_TIME_FORMAT)
+            running_status.created = datetime.strptime(running_status_dict["created"], GLOBAL.DATE_TIME_FORMAT)
 
         session.add(running_status)
     session.commit()
@@ -337,8 +337,8 @@ def import_neb_calculation_type(neb_calc_type_file, session, original_dates=True
         )
 
         if original_dates:
-            neb_calc_type.last_modified = datetime.strptime(neb_calc_type_dict["last_modified"], global_vars.DATE_TIME_FORMAT)
-            neb_calc_type.created = datetime.strptime(neb_calc_type_dict["created"], global_vars.DATE_TIME_FORMAT)
+            neb_calc_type.last_modified = datetime.strptime(neb_calc_type_dict["last_modified"], GLOBAL.DATE_TIME_FORMAT)
+            neb_calc_type.created = datetime.strptime(neb_calc_type_dict["created"], GLOBAL.DATE_TIME_FORMAT)
 
         session.add(neb_calc_type)
 
@@ -399,8 +399,8 @@ def import_geometry(geometry_file, session, original_dates=True):
             element_size_unit=element_size_unit
         )
         if original_dates:
-            geometry.last_modified = datetime.strptime(geometry_dict["last_modified"], global_vars.DATE_TIME_FORMAT)
-            geometry.created = datetime.strptime(geometry_dict["created"], global_vars.DATE_TIME_FORMAT)
+            geometry.last_modified = datetime.strptime(geometry_dict["last_modified"], GLOBAL.DATE_TIME_FORMAT)
+            geometry.created = datetime.strptime(geometry_dict["created"], GLOBAL.DATE_TIME_FORMAT)
 
         session.add(geometry)
 
@@ -568,8 +568,8 @@ def import_model(model_file, session, original_dates=True):
 
         )
         if original_dates:
-            model.last_modified = datetime.strptime(model_dict["last_modified"], global_vars.DATE_TIME_FORMAT)
-            model.created = datetime.strptime(model_dict["created"], global_vars.DATE_TIME_FORMAT)
+            model.last_modified = datetime.strptime(model_dict["last_modified"], GLOBAL.DATE_TIME_FORMAT)
+            model.created = datetime.strptime(model_dict["created"], GLOBAL.DATE_TIME_FORMAT)
 
         # Materials are added here
         materials_text_list = []

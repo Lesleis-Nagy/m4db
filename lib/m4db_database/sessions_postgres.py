@@ -16,7 +16,7 @@ from sqlalchemy.pool import NullPool
 from m4db_database.configuration import read_config_from_environ
 from m4db_database.decorators import static
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 
 @static(engine=None, Session=None)
@@ -44,15 +44,15 @@ def get_session(user=None, database=None, host=None, password=None, scoped=False
             db_uri = config.database.uri
         else:
             if user is None and host is None and password is None:
-                db_uri = global_vars.POSTGRES_DATABASE_URI.format(
+                db_uri = GLOBAL.POSTGRES_DATABASE_URI.format(
                     db_name=database
                 )
             elif password is None:
-                db_uri = global_vars.POSTGRES_DATABASE_USER_HOST_URI.format(
+                db_uri = GLOBAL.POSTGRES_DATABASE_USER_HOST_URI.format(
                     user=user, host=host, db_name=database
                 )
             else:
-                db_uri = global_vars.POSTGRES_DATABASE_USER_HOST_PASSWORD_URI.format(
+                db_uri = GLOBAL.POSTGRES_DATABASE_USER_HOST_PASSWORD_URI.format(
                     user=user, host=host, db_name=database, password=password
                 )
         if nullpool:

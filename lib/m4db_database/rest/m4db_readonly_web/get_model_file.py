@@ -14,7 +14,7 @@ from falcon import after
 
 from m4db_database.utilities.unique_id import uid_to_dir
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 from m4db_database.utilities.archive import unarchive_model
 
@@ -37,9 +37,9 @@ class GetAllModelDataZip:
         # Check that the data exists.
         data_zip = os.path.join(
             self.config["file_root"],
-            global_vars.model_directory_name,
+            GLOBAL.model_directory_name,
             uid_to_dir(unique_id),
-            global_vars.data_zip
+            GLOBAL.data_zip
         )
 
         if not os.path.isfile(data_zip):
@@ -63,8 +63,8 @@ class GetModelJSONZip:
         try:
             unarchive_model(unique_id, req.temp_dir)
 
-            model_json = os.path.join(req.temp_dir, global_vars.magnetization_json_file_name)
-            model_json_zip = os.path.join(req.temp_dir, global_vars.magnetization_json_zip_file_name)
+            model_json = os.path.join(req.temp_dir, GLOBAL.magnetization_json_file_name)
+            model_json_zip = os.path.join(req.temp_dir, GLOBAL.magnetization_json_zip_file_name)
 
             if not os.path.isfile(model_json):
                 self.logger.debug(f"Could not find '{model_json}' in unarchived data set.")
@@ -96,8 +96,8 @@ class GetModelTecplotZip:
         try:
             unarchive_model(unique_id, req.temp_dir)
 
-            model_tecplot = os.path.join(req.temp_dir, global_vars.magnetization_tecplot_file_name)
-            model_tecplot_zip = os.path.join(req.temp_dir, global_vars.magnetization_tecplot_zip_file_name)
+            model_tecplot = os.path.join(req.temp_dir, GLOBAL.magnetization_tecplot_file_name)
+            model_tecplot_zip = os.path.join(req.temp_dir, GLOBAL.magnetization_tecplot_zip_file_name)
 
             if not os.path.isfile(model_tecplot):
                 self.logger.debug(f"Could not find '{model_tecplot}' in unarchived data set.")

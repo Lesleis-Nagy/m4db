@@ -38,7 +38,7 @@ from sqlalchemy.orm import relationship
 
 from m4db_database.utilities.password import password_hash
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 now = datetime.now
 
@@ -97,7 +97,7 @@ class DBUser(Base):
     telephone = Column(String, nullable=True)
     ticket_hash = Column(String, nullable=True)  # Transient
     ticket_length = Column(Integer, nullable=False)  # length of the valid ticket in minutes.
-    ticket_timeout = Column(DateTime, default=global_vars.UNIX_EPOCH, nullable=False)  # Transient
+    ticket_timeout = Column(DateTime, default=GLOBAL.UNIX_EPOCH, nullable=False)  # Transient
     access_level = Column(Integer, nullable=False)  # The access level of the user, bitwise OR-ed
     last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
     created = Column(DateTime, default=now, nullable=False)
@@ -126,8 +126,8 @@ class DBUser(Base):
             "telephone": self.telephone,
             "ticket_length": self.ticket_length,
             "access_level": self.access_level,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -179,8 +179,8 @@ class Software(Base):
             "description": self.description,
             "url": self.url,
             "citation": self.citation,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -223,8 +223,8 @@ class Unit(Base):
             "symbol": self.symbol,
             "name": self.name,
             "power": self.power,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -270,8 +270,8 @@ class PhysicalConstant(Base):
             "name": self.name,
             "value": self.value,
             "unit": self.unit,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -314,8 +314,8 @@ class SizeConvention(Base):
             "id": self.id,
             "symbol": self.symbol,
             "description": self.description,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -355,8 +355,8 @@ class AnisotropyForm(Base):
             "id": self.id,
             "name": self.name,
             "description": self.description,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -442,8 +442,8 @@ class Geometry(Base):
             "has_exodus": self.has_exodus,
             "has_mesh_gen_script": self.has_mesh_gen_script,
             "has_mesh_gen_output": self.has_mesh_gen_output,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT),
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT),
             "size_unit": self.size_unit.as_dict(),
             "element_size_unit": self.element_size_unit.as_dict() if self.element_size_unit is not None else None,
             "size_convention": self.size_convention.as_dict(),
@@ -514,8 +514,8 @@ class Material(Base):
             "q_hardness": self.q_hardness,
             "axis_theta": self.axis_theta,
             "axis_phi": self.axis_phi,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT),
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT),
             "anisotropy_form": self.anisotropy_form.as_dict()
         }
 
@@ -560,8 +560,8 @@ class Field(Base):
         return {
             "id": self.id,
             "db_type": self.type,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -601,8 +601,8 @@ class ModelField(Field):
         return {
             "id": self.id,
             "db_type": self.type,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT),
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT),
             "model_unique_id": self.model.unique_id
         }
 
@@ -641,8 +641,8 @@ class RandomField(Field):
         return {
             "id": self.id,
             "db_type": self.type,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT),
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT),
             "seed": self.seed
         }
 
@@ -809,8 +809,8 @@ class UniformField(Field):
         return {
             "id": self.id,
             "db_type": self.type,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT),
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT),
             "theta": self.theta,
             "phi": self.phi,
             "dir_x": self.dir_x,
@@ -859,8 +859,8 @@ class RunningStatus(Base):
             "id": self.id,
             "name": self.name,
             "description": self.description,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -923,8 +923,8 @@ class ModelRunData(Base):
             "has_helicity_dat": self.has_helicity_dat,
             "has_vorticity_dat": self.has_vorticity_dat,
             "has_adm_dat": self.has_adm_dat,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -1011,8 +1011,8 @@ class Project(Base):
             "id": self.id,
             "name": self.name,
             "description": self.description,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
     @staticmethod
@@ -1031,8 +1031,8 @@ class Project(Base):
             description=project_dict["description"]
         )
         if original_dates:
-            project.last_modified = datetime.strptime(project_dict["last_modified"], global_vars.DATE_TIME_FORMAT)
-            project.created = datetime.strptime(project_dict["created"], global_vars.DATE_TIME_FORMAT)
+            project.last_modified = datetime.strptime(project_dict["last_modified"], GLOBAL.DATE_TIME_FORMAT)
+            project.created = datetime.strptime(project_dict["created"], GLOBAL.DATE_TIME_FORMAT)
 
         return project
 
@@ -1076,8 +1076,8 @@ class Metadata(Base):
         """
         return {
             "id": self.id,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT),
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT),
             "project_name": self.project.name,
             "db_user_user_name": self.db_user.user_name,
             "software_name": self.software.name if self.software is not None else None,
@@ -1115,8 +1115,8 @@ class LegacyModelInfo(Base):
         return {
             "id": self.id,
             "legacy_model_id": self.legacy_model_id,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -1163,8 +1163,8 @@ class ModelMaterialAssociation(Base):
             "q_hardness": self.material.q_hardness,
             "axis_theta": self.material.axis_theta,
             "axis_phi": self.material.axis_phi,
-            "last_modified": self.material.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.material.created.strftime(global_vars.DATE_TIME_FORMAT),
+            "last_modified": self.material.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.material.created.strftime(GLOBAL.DATE_TIME_FORMAT),
             "anisotropy_form": self.material.anisotropy_form.as_dict(),
             "submesh_id": self.submesh_id
         }
@@ -1282,8 +1282,8 @@ class Model(Base):
             "e_tot": self.e_tot,
             "volume": self.volume,
             "max_energy_evaluations": self.max_energy_evaluations,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT),
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT),
             "geometry": self.geometry.as_dict(),
             "materials": [mma.as_dict() for mma in self.materials],
             "model_materials_text": self.model_materials_text.as_dict(),
@@ -1325,8 +1325,8 @@ class ModelMaterialsText(Base):
             "materials": self.materials,
             "submeshidxs_materials": self.submeshidxs_materials,
             "submeshidxs_materials_temperatures": self.submeshidxs_materials_temperatures,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -1365,8 +1365,8 @@ class NEBCalculationType(Base):
             "id": self.id,
             "name": self.name,
             "description": self.description,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -1414,8 +1414,8 @@ class NEBRunData(Base):
             "has_energy_log": self.has_energy_log,
             "has_tecplot": self.has_tecplot,
             "has_neb_energies": self.has_neb_energies,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -1468,8 +1468,8 @@ class NEBReportData(Base):
             "has_x_png": self.has_x_png,
             "has_y_png": self.has_y_png,
             "has_z_png": self.has_z_png,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT)
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
@@ -1563,8 +1563,8 @@ class NEB(Base):
             "no_of_points": self.no_of_points,
             "max_energy_evaluations": self.max_energy_evaluations,
             "max_path_evaluations": self.max_path_evaluations,
-            "last_modified": self.last_modified.strftime(global_vars.DATE_TIME_FORMAT),
-            "created": self.created.strftime(global_vars.DATE_TIME_FORMAT),
+            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
+            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT),
             "external_field": self.external_field.as_dict() if self.external_field is not None else None,
             "start_model_unique_id": self.start_model.unique_id,
             "end_model_unique_id": self.end_model.unique_id,

@@ -13,7 +13,7 @@ from m4db_database.orm.latest import RandomField
 from m4db_database.orm.latest import UniformField
 from m4db_database.orm.latest import ModelField
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 from m4db_database.templates import template_env
 
 
@@ -39,9 +39,9 @@ class GetModelMerrillScript:
 
         runner_data["mesh_file"] = os.path.join(
             config["file_root"],
-            global_vars.geometry_directory_name,
+            GLOBAL.geometry_directory_name,
             uid_to_dir(model.geometry.unique_id),
-            global_vars.geometry_patran_file_name
+            GLOBAL.geometry_patran_file_name
         )
 
         runner_data["max_evals"] = model.max_energy_evaluations
@@ -66,7 +66,7 @@ class GetModelMerrillScript:
                 "type": "model",
                 "tec_file": os.path.join(
                     model.start_magnetization.model.unique_id,
-                    global_vars.magnetization_tecplot_file_name
+                    GLOBAL.magnetization_tecplot_file_name
                 )
             }
 
@@ -82,7 +82,7 @@ class GetModelMerrillScript:
             })
         runner_data["materials"] = materials
 
-        runner_data["energy_log_file"] = global_vars.energy_log_file_name
+        runner_data["energy_log_file"] = GLOBAL.energy_log_file_name
 
         runner_data["external_field"] = {
             "strength": 0.0,
@@ -106,7 +106,7 @@ class GetModelMerrillScript:
             runner_data["external_field"]["z"] = model.external_field.dir_z
             runner_data["external_field"]["unit"] = unit_symbol
 
-        runner_data["output"] = global_vars.magnetization_output_file_name
+        runner_data["output"] = GLOBAL.magnetization_output_file_name
 
         merrill_template = template_env("merrill").get_template("merrill_model.jinja2")
 

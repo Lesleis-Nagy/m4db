@@ -13,7 +13,7 @@ from sqlalchemy.pool import NullPool
 from m4db_database.configuration import read_config_from_environ
 from m4db_database.decorators import static
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 
 @static(engine=None, Session=None)
@@ -36,7 +36,7 @@ def get_session(file=None, scoped=False, echo=False, nullpool=False):
             config = read_config_from_environ()
             db_uri = config["db_uri"]
         else:
-            db_uri = global_vars.SQLITE_FILE_URI.format(file=file)
+            db_uri = GLOBAL.SQLITE_FILE_URI.format(file=file)
         if nullpool:
             get_session.engine = create_engine(db_uri, echo=echo, nullpool=NullPool)
         else:

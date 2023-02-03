@@ -4,7 +4,7 @@ Set of utilities to open databases.
 
 from m4db_database.configuration import read_config_from_environ
 
-from m4db_database import global_vars
+from m4db_database import GLOBAL
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -27,10 +27,10 @@ def get_session(scoped=False, echo=False, nullpool=False):
     """
     config = read_config_from_environ()
 
-    if config.database.type == global_vars.POSTGRES_DATABASE_TYPE:
+    if config.database.type == GLOBAL.POSTGRES_DATABASE_TYPE:
         from m4db_database.sessions_postgres import get_session
         return get_session(scoped=scoped, echo=echo, nullpool=nullpool)
-    if config.database.type == global_vars.SQLITE_DATABASE_TYPE:
+    if config.database.type == GLOBAL.SQLITE_DATABASE_TYPE:
         from m4db_database.sessions_sqlite import get_session
         return get_session(scoped=scoped, echo=echo)
 
@@ -60,25 +60,25 @@ def get_session_from_args(db_type, **kwargs):
         password = kwargs["password"] if "password" in kwargs.keys() else None
 
         if user is not None and host is not None and password is not None:
-            uri = global_vars.POSTGRES_DATABASE_USER_HOST_PASSWORD_URI.format(
+            uri = GLOBAL.POSTGRES_DATABASE_USER_HOST_PASSWORD_URI.format(
                 database=db_name, user=user, host=host, password=password
             )
         elif user is not None and host is not None and password is None:
-            uri = global_vars.POSTGRES_DATABASE_USER_HOST_URI.format(
+            uri = GLOBAL.POSTGRES_DATABASE_USER_HOST_URI.format(
                 database=db_name, user=user, host=host
             )
         elif user is not None and host is None and password is None:
-            uri = global_vars.POSTGRES_DATABASE_HOST_URI.format(
+            uri = GLOBAL.POSTGRES_DATABASE_HOST_URI.format(
                 database=db_name, user=user
             )
         elif user is None and host is None and password is None:
-            uri = global_vars.POSTGRES_DATABASE_URI.format(database=db_name)
+            uri = GLOBAL.POSTGRES_DATABASE_URI.format(database=db_name)
         else:
             raise ValueError("Unknown combination of parameters to connect to database.")
     elif db_type == "sqlite":
         if "file" not in kwargs.keys():
             raise ValueError("When using 'sqlite', the parameter 'file' is mandatory")
-        uri = global_vars.SQLITE_FILE_URI.format(file=kwargs["file"])
+        uri = GLOBAL.SQLITE_FILE_URI.format(file=kwargs["file"])
 
     if nullpool:
         engine = create_engine(uri, poolclass=NullPool, echo=echo)

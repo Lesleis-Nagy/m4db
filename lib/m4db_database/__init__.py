@@ -2,10 +2,11 @@ r"""
 Global variables.
 """
 
+import re
 from datetime import datetime
 
 
-class global_vars:
+class GLOBAL:
     r""""
     Dummy class to define some global variables.
     """
@@ -46,6 +47,7 @@ class global_vars:
 
     SALTED_PASSWORD_FORMAT = "{password}{salt}"
 
+    REGEX_SOFTWARE_AND_VERSION = re.compile(r"([a-zA-Z0-9]+)@([0-9.-]+)")
 
 
 
