@@ -16,7 +16,7 @@ def create_db_user(user_name, first_name, surname, email, access_level, ticket_l
     :param surname: the user's surname.
     :param email: the user's email.
     :param access_level: the access level for the user - determines which services the user can access.
-    :param ticket_length: the length (in seconds) fro the users issued tickets.
+    :param ticket_length: the length (in seconds) for the users issued tickets.
     :param session: the database session.
     :param initials: the user's initials (optional).
     :param telephone: the user's telephone number (optional).

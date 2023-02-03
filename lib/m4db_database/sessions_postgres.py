@@ -41,7 +41,7 @@ def get_session(user=None, database=None, host=None, password=None, scoped=False
     if get_session.engine is None:
         if user is None and database is None and host is None:
             config = read_config_from_environ()
-            db_uri = config["db_uri"]
+            db_uri = config.database.uri
         else:
             if user is None and host is None and password is None:
                 db_uri = global_vars.POSTGRES_DATABASE_URI.format(

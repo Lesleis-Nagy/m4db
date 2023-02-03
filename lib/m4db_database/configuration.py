@@ -40,9 +40,9 @@ def validation_schema() -> Validator:
         validation_schema.validator.schema = {
             "password-salt": {"type": "string", "required": True},
             "database": {
-                "type": dict,
+                "type": "dict",
                 "schema": {
-                    "type": {"type": "string", "oneof": ["POSTGRES"], "required": True},
+                    "type": {"type": "string", "regex": r"POSTGRES", "required": True},
                     "uri": {"type": "string", "required": True},
                     "file-root": {"type": "string", "required": True}
                 },
