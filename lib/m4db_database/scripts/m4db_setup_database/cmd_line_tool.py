@@ -148,7 +148,7 @@ def postgres(db_name, file_root, user=None, host=None, password=None, echo=False
 
     Returns:
         None.
-        
+
     """
     create_file_root(file_root, yes_to_all=yes_to_all)
 
@@ -156,7 +156,8 @@ def postgres(db_name, file_root, user=None, host=None, password=None, echo=False
 
 
 @app.command()
-def main(db_name: str, file_root: str, user: str = None, host: str = None, password: str = None, verbose: bool = False, yes_to_all: bool = False):
+def main(db_name: str, file_root: str, user: str = None, host: str = None, password: str = None, verbose: bool = False,
+         yes_to_all: bool = False):
     r"""
     Create a new M4DB database.
     :param db_name: the name of the new M4DB database.
