@@ -3,11 +3,8 @@ Perform various m4db project related actions.
 """
 
 import typer
-import sys
 
 from m4db_database.orm.latest import Project
-from m4db_database.configuration import read_config_from_environ
-from m4db_database.configuration import write_config_to_environ
 from m4db_database.sessions import get_session
 
 from m4db_database.db.project.create import create_project
