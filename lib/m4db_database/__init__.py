@@ -11,10 +11,10 @@ class global_vars:
     """
 
     # Postgres related global variables.
-    POSTGRES_DATABASE_USER_HOST_URI = "postgresql+psycopg2://{user:}@{host:}/{database:}"
-    POSTGRES_DATABASE_HOST_URI = "postgresql+psycopg2://{host:}/{database:}"
-    POSTGRES_DATABASE_USER_HOST_PASSWORD_URI = "postgresql+psycopg2://{user:}:{password:}@{host:}/{database:}"
-    POSTGRES_DATABASE_URI = "postgresql+psycopg2:///{database:}"
+    POSTGRES_DATABASE_USER_HOST_URI = "postgresql+psycopg2://{user:}@{host:}/{db_name:}"
+    POSTGRES_DATABASE_HOST_URI = "postgresql+psycopg2://{host:}/{db_name:}"
+    POSTGRES_DATABASE_USER_HOST_PASSWORD_URI = "postgresql+psycopg2://{user:}:{password:}@{host:}/{db_name:}"
+    POSTGRES_DATABASE_URI = "postgresql+psycopg2:///{db_name:}"
 
     POSTGRES_DATABASE_TYPE = "POSTGRES"
 
