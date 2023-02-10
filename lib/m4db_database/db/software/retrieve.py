@@ -18,6 +18,7 @@ def retrieve_software(session, software_name, software_version: str, allow_none=
         filter(Software.name == software_name). \
         filter(Software.version == str(software_version)). \
         one_or_none()
+
     # If the software cannot be found ...
     if software is None:
         # If we're allowing None as a return value ...

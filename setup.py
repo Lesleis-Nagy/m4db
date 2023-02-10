@@ -24,6 +24,7 @@ setup(
         "pandas",
         "tabulate",
         "jinja2",
+        "Cerberus"
     ],
     include_package_data=True,
     entry_points="""

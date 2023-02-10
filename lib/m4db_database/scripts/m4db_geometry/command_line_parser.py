@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 
-from m4db_serverside.db.unit.retrieve import allowed_size_unit_symbols
-from m4db_serverside.db.size_convention.retrieve import allowed_size_convention_symbols
+from m4db_database.db.unit.retrieve import allowed_size_unit_symbols
+from m4db_database.db.size_convention.retrieve import allowed_size_convention_symbols
 
 
 def add_subparser(subparsers):
