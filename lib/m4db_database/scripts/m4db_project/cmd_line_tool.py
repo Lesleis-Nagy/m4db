@@ -4,6 +4,8 @@ Perform various m4db project related actions.
 
 import typer
 
+import pandas as pd
+
 from tabulate import tabulate
 
 from m4db_database.orm.latest import Project
@@ -14,12 +16,17 @@ from m4db_database.db.project.create import create_project
 
 app = typer.Typer()
 
+NAME = "Name"
+DESCRIPTION = "Description"
 
 @app.command()
-def list():
+def list(csv_file: str = None):
     r"""
     Display all projects in m4db.
-    :return: None
+
+    :param csv_file save output to this csv file instead of writing to stdout.
+
+    :return: None.
     """
     session = get_session(nullpool=True)
 
@@ -32,10 +39,16 @@ def list():
             print("There are currently no projects.")
         else:
             # ... otherwise print project information
+            df_dict = {NAME: [],
+                       DESCRIPTION: []}
             for project in projects:
-                print("Print details for project: {}".format(project.name))
-                print("   Description: {}".format(project.description))
-                print("")
+                df_dict[NAME].append(project.name)
+                df_dict[DESCRIPTION].append(project.description)
+            df = pd.DataFrame(df_dict)
+            if csv_file:
+                df.to_csv(csv_file, index=False)
+            else:
+                print(tabulate(df, headers="keys", tablefmt="psql", showindex="False"))
     finally:
         session.close()
 
