@@ -1,22 +1,28 @@
 r"""
 Perform m4db software related command actions.
 """
-
 from enum import Enum
 
-import sys
 import typer
 
-from m4db_database import GLOBAL
+import pandas as pd
+
+from tabulate import tabulate
 
 from m4db_database.orm.latest import Software
 
 from m4db_database.sessions import get_session
 
 from m4db_database.db.software.create import create_software
-from m4db_database.db.software.retrieve import retrieve_software
 
 app = typer.Typer()
+
+NAME = "Name"
+VERSION = "Version"
+DESCRIPTION = "Description"
+URL = "URL"
+CITATION = "Citation"
+EXECUTABLE = "Executable"
 
 
 class SoftwareFieldNames(str, Enum):
@@ -29,29 +35,41 @@ class SoftwareFieldNames(str, Enum):
 
 
 @app.command()
-def list():
+def list(csv_file: str = None):
     r"""
-    Display all software in m4db
+    List the software in the system.
+
+    :param csv_file: save output to csv file instead of stdout.
+
     :return: None
     """
     session = get_session(nullpool=True)
-
     try:
         software_list = session.query(Software).all()
+
         # If there are no software items ...
         if len(software_list) == 0:
             # ... tell the user
             print("There are currently no items of software.")
         else:
-            # ... otherwise print software information
+            df_dict = {NAME: [],
+                       VERSION: [],
+                       DESCRIPTION: [],
+                       URL: [],
+                       CITATION: [],
+                       EXECUTABLE: []}
             for software in software_list:
-                print("Details for software: {}".format(software.name))
-                print("   Version:     {}".format(software.version))
-                print("   Description: {}".format(software.description))
-                print("   URL:         {}".format(software.url))
-                print("   Citation:    {}".format(software.citation))
-                print("   Executable:  {}".format(software.executable))
-                print("")
+                df_dict[NAME].append(software.name)
+                df_dict[VERSION].append(software.version)
+                df_dict[DESCRIPTION].append(software.description)
+                df_dict[URL].append(software.url)
+                df_dict[CITATION].append(software.citation)
+                df_dict[EXECUTABLE].append(software.executable)
+            df = pd.DataFrame(df_dict)
+            if csv_file:
+                df.to_csv(csv_file, index=False)
+            else:
+                print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
     finally:
         session.close()
 
@@ -79,8 +97,7 @@ def add(name: str, version: str, executable: str = None, description: str = None
             executable,
             description,
             url,
-            citation
-        )
+            citation)
         session.add(software)
         session.commit()
     except ValueError as exception_obj:
@@ -90,52 +107,50 @@ def add(name: str, version: str, executable: str = None, description: str = None
 
 
 @app.command()
-def update(software_and_version: str, field: SoftwareFieldNames, value: str):
+def update(name: str, version: str, field: SoftwareFieldNames, value: str):
     r"""
     Updates some of a software's data items
-    :param software: the name of the software and version separated by an '@' symbol,
-                     for example merrill@1.8.1.
+    :param name: the name of the software to update.
+    :param version: the version of the software to update.
     :param field: the field to update.
     :param value: the new value of the required field.
     :return: None
     """
-    match_sw_ver = GLOBAL.REGEX_SOFTWARE_AND_VERSION.match(software_and_version)
-    if match_sw_ver:
+    session = get_session(nullpool=True)
 
-        name = match_sw_ver.group(1)
-        version = match_sw_ver.group(2)
+    try:
+        software = session.query(Software) \
+            .filter(Software.name == name, Software.version == version) \
+            .one_or_none()
 
-        session = get_session(nullpool=True)
-
-        try:
-            software = retrieve_software(session, name, version)
-
-            if field == "name":
+        if software is None:
+            print(f"Software '{name}' at version '{version}' could not be found.")
+        else:
+            if field == SoftwareFieldNames.name.value:
                 software.name = value
-            elif field == "version":
+                session.commit()
+            elif field == SoftwareFieldNames.version.value:
                 software.version = value
-            elif field == "executable":
+                session.commit()
+            elif field == SoftwareFieldNames.executable.value:
                 software.executable = value
-            elif field == "description":
+                session.commit()
+            elif field == SoftwareFieldNames.description.value:
                 software.description = value
-            elif field == "url":
+                session.commit()
+            elif field == SoftwareFieldNames.url.value:
                 software.url = value
-            elif field == "citation":
+                session.commit()
+            elif field == SoftwareFieldNames.citation.value:
                 software.citation = value
+                session.commit()
             else:
                 print(f"Unknown field '{field}'")
-                sys.exit(1)
-            session.commit()
 
-        except ValueError as exception_obj:
-            print(str(exception_obj))
-        finally:
-            session.close()
-            sys.exit(1)
-
-    else:
-
-        print(f"Software and version '{software_and_version}' are not in the correct format.")
+    except ValueError as exception_obj:
+        print(str(exception_obj))
+    finally:
+        session.close()
 
 
 def entry_point():
