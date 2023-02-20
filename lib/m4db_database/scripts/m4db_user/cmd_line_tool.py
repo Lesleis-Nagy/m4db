@@ -1,5 +1,7 @@
 import typer
 
+from tabulate import tabulate
+
 from m4db_database.orm.latest import DBUser
 
 from m4db_database.sessions import get_session
@@ -14,7 +16,7 @@ app = typer.Typer()
 @app.command()
 def list():
     r"""
-    Create a new model from input piped from stdin.
+    List the users in the system.
     :return: None.
     """
     session = get_session(nullpool=True)
@@ -27,14 +29,12 @@ def list():
             print("There are currently no database users.")
         else:
             # ... otherwise print user information
+            table = []
             for user in users:
-                print("Print details for user: {}".format(user.user_name))
-                print("   First name: {}".format(user.first_name))
-                print("   Initials:   {}".format(user.initials))
-                print("   Surname:    {}".format(user.surname))
-                print("   Email:      {}".format(user.email))
-                print("   Telephone:  {}".format(user.telephone))
-                print("")
+                table.append([
+                    user.user_name, user.first_name, user.initials, user.surname, user.email, user.telephone
+                ])
+            print(tabulate(table, headers=["username", "first name", "initials", "surname", "email", "telephone"]))
     finally:
         session.close()
 
