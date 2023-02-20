@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="m4db-database",
-    version="1.0.0a",
+    version="0.1.0",
     packages=find_packages(
         where="lib",
         include="m4db_database/*"
@@ -16,7 +16,6 @@ setup(
         "sqlalchemy",
         "pyyaml",
         "gunicorn",
-        "Cerberus",
         "vtk",
         "falcon",
         "gunicorn",
@@ -24,7 +23,7 @@ setup(
         "pandas",
         "tabulate",
         "jinja2",
-        "Cerberus"
+        "schematics"
     ],
     include_package_data=True,
     entry_points="""
