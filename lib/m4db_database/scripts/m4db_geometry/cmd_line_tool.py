@@ -25,7 +25,13 @@ from m4db_database import GLOBAL
 
 app = typer.Typer()
 
+@app.command()
+def list():
+    r"""
+    list the geometries in the system.
+    Returns:
 
+    """
 # def check_software(session, args):
 #     r"""
 #     Check to see if the required software is present in the database if it is not, then ask the user if
