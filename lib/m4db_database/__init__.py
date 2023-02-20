@@ -49,15 +49,6 @@ class GLOBAL:
 
     REGEX_SOFTWARE_AND_VERSION = re.compile(r"([a-zA-Z0-9]+)@([0-9.-]+)")
 
-    # Specification for the geometry name syntax:
-    # Capture group 1: the geometry base name
-    #               3: is the size
-    #               5: is the unit
-    #               6: is the size convention
-    #               8: is the aspect ratio
-    REGEX_TRUNCATED_CUBOCTAHEDRA = re.compile(r"^([a-z]+):(([0-9]+(\.[0-9]+)?)(m|cm|mm|um|nm|pm)):(ESVD|ECVL):(([0-9]+(\.[0-9]+)?)ar)$")
-
-
 
 
 
