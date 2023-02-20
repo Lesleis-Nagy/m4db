@@ -1,5 +1,7 @@
 import typer
 
+import pandas as pd
+
 from tabulate import tabulate
 
 from m4db_database.orm.latest import DBUser
@@ -12,11 +14,20 @@ from m4db_database.utilities.access_levels import string_to_access_level
 
 app = typer.Typer()
 
+USERNAME = "Username"
+FIRST_NAME = "First name"
+INITIALS = "Initials"
+SURNAME = "Surname"
+EMAIL = "Email"
+TELEPHONE = "Telephone"
 
 @app.command()
-def list():
+def list(csv_file: str = None):
     r"""
     List the users in the system.
+
+    :param csv_file: save output to csv file instead of stdout.
+
     :return: None.
     """
     session = get_session(nullpool=True)
@@ -29,12 +40,24 @@ def list():
             print("There are currently no database users.")
         else:
             # ... otherwise print user information
-            table = []
+            df_dict = {USERNAME: [],
+                       FIRST_NAME: [],
+                       INITIALS: [],
+                       SURNAME: [],
+                       EMAIL: [],
+                       TELEPHONE: []}
             for user in users:
-                table.append([
-                    user.user_name, user.first_name, user.initials, user.surname, user.email, user.telephone
-                ])
-            print(tabulate(table, headers=["username", "first name", "initials", "surname", "email", "telephone"]))
+                df_dict[USERNAME].append(user.user_name)
+                df_dict[FIRST_NAME].append(user.first_name)
+                df_dict[INITIALS].append(user.initials)
+                df_dict[SURNAME].append(user.surname)
+                df_dict[EMAIL].append(user.email)
+                df_dict[TELEPHONE].append(user.telephone)
+            df = pd.DataFrame(df_dict)
+            if csv_file:
+                df.to_csv(csv_file, index=False)
+            else:
+                print(tabulate(df, headers="keys", tablefmt="psql", showindex="False"))
     finally:
         session.close()
 

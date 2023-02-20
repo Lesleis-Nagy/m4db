@@ -4,7 +4,10 @@ Perform various m4db project related actions.
 
 import typer
 
+from tabulate import tabulate
+
 from m4db_database.orm.latest import Project
+
 from m4db_database.sessions import get_session
 
 from m4db_database.db.project.create import create_project
