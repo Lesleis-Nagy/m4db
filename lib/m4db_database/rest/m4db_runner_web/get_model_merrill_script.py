@@ -41,7 +41,7 @@ class GetModelMerrillScript:
             config["file_root"],
             GLOBAL.geometry_directory_name,
             uid_to_dir(model.geometry.unique_id),
-            GLOBAL.geometry_patran_file_name
+            GLOBAL.GEOMETRY_PATRAN_FILE_NAME
         )
 
         runner_data["max_evals"] = model.max_energy_evaluations

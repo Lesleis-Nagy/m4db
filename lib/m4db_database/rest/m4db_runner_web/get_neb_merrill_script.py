@@ -82,7 +82,7 @@ def runner_data_without_parent(neb):
         config["file_root"],
         GLOBAL.geometry_directory_name,
         uid_to_dir(neb.start_model.geometry.unique_id),
-        GLOBAL.geometry_patran_file_name
+        GLOBAL.GEOMETRY_PATRAN_FILE_NAME
     )
 
     runner_data["max_energy_evaluations"] = neb.max_energy_evaluations
