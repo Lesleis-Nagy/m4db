@@ -21,6 +21,7 @@ SURNAME = "Surname"
 EMAIL = "Email"
 TELEPHONE = "Telephone"
 
+
 @app.command()
 def list(csv_file: str = None):
     r"""
@@ -57,7 +58,7 @@ def list(csv_file: str = None):
             if csv_file:
                 df.to_csv(csv_file, index=False)
             else:
-                print(tabulate(df, headers="keys", tablefmt="psql", showindex="False"))
+                print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
     finally:
         session.close()
 
@@ -66,33 +67,21 @@ def list(csv_file: str = None):
 def add(user_name: str, first_name: str, surname: str, email: str, initials: str = None, telephone: str = None):
     r"""
     Adds a new database user.
-    :user_name: the username to identify the new user.
-    :first_name: the first name of the new user.
-    :surname: the surname of the new user.
-    :email: the email of the new user.
-    :initial: initials of the new user.
-    :telephone: the telephone number of the new user.
+    :param user_name: the username to identify the new user.
+    :param first_name: the first name of the new user.
+    :param surname: the surname of the new user.
+    :param email: the email of the new user.
+    :param initials: initials of the new user.
+    :param telephone: the telephone number of the new user.
     """
     session = get_session(nullpool=True)
 
-    access_level = string_to_access_level("ADMIN")
-    ticket_length = 1000
-
     try:
-        db_user = create_db_user(
-            user_name,
-            first_name,
-            surname,
-            email,
-            access_level,
-            ticket_length,
-            session,
-            initials,
-            telephone)
-        session.add(db_user)
-        session.commit()
-    except ValueError as exception_obj:
-        print(str(exception_obj))
+        create_db_user(session, user_name, first_name, surname, email, initials, telephone)
+
+    except ValueError as e:
+        print("User not created - something went wrong.")
+
     finally:
         session.close()
 
