@@ -15,8 +15,10 @@ regex_element_data = re.compile(r"^02\s+([0-9]+)\s+([0-9]+)\s+([0-9]+)\s+([0-9]+
 def read_patran(patran_file):
     r"""
     Read a patran file header information.
+
     :param patran_file: the patran file name
-    :return: patran file header information.
+
+    :return: a 3-tuple containing the patran file vertices, elements, and submesh indices.
     """
     current_line_no = 1
     vertex_dict = {}
@@ -110,8 +112,4 @@ def read_patran(patran_file):
             len(elements), nelems
         ))
 
-    return {
-        "vertices": vertices,
-        "elements": elements,
-        "submesh_indices": sorted(submesh_ids.keys())
-    }
+    return vertices, elements, sorted(submesh_ids.keys())
