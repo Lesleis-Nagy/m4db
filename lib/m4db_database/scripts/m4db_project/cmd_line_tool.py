@@ -48,7 +48,7 @@ def list(csv_file: str = None):
             if csv_file:
                 df.to_csv(csv_file, index=False)
             else:
-                print(tabulate(df, headers="keys", tablefmt="psql", showindex="False"))
+                print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
     finally:
         session.close()
 
