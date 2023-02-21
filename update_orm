@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+
+import os
+import re
+import shutil
+
+import typer
+
+regex_schema_name = re.compile(f"v[0-9]+_schema")
+ORM_SCHEMA_DIR = "lib/m4db_database/orm"
+
+app = typer.Typer()
+
+
+@app.command()
+def update(schema_name: str):
+    r"""
+    Update the 'latest.py' schema with this schema.
+
+    :param schema_name: the name of the schema with which to update 'latest.py'.
+    """
+    match_schema_name = regex_schema_name.match(schema_name)
+    if match_schema_name:
+        src_file = os.path.join(ORM_SCHEMA_DIR, f"{schema_name}.py")
+        dst_file = os.path.join(ORM_SCHEMA_DIR, "latest.py")
+        if os.path.isfile(src_file):
+            shutil.copy(src_file, dst_file)
+        else:
+            print(f"An orm schema file '{src_file}' does not exist.")
+    else:
+        print(f"The input schema '{schema_name}' does not match the input format.")
+
+
+def main():
+    app()
+
+
+if __name__ == "__main__":
+    main()
