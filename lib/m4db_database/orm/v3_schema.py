@@ -20,19 +20,21 @@
 #     10) Model has a volume and relative helicity field.
 #     11) Software contains the executable used to run a model.
 # Changes from Version 2
-#      1) The Geometry name column will now contain JSON text.
-#      2) Geometry size column is now nullable.
-#      3) Geometry nelements column is now nullable.
-#      4) Geometry nvertices column is now nullable.
-#      5) Geometry size_unit_id column is now nullable.
-#      6) Geometry size_convention_id column is now nullable.
-#      7) The unique constraint 'uniq_geometry_01', (this used to be (name, size, size_unit_id)) is now just on name.
-#      8) Some minor comment updates.
+#      1) The Geometry class is now abstract and a parent class of (currently) two new geometry
+#         types: i) ellipsoids, ii) truncated octahedra
+#      2) Ellipsoids are unique on size, element size, prolateness, oblateness and size convention
+#      3) TrunctedOctahedra are unique on size, element size, aspect ratio, truncation factor and size convention
+#      4) Note: Ellipsoids and TruncatedOctahedra objects repeat the size, element size and size convention fields
+#         (instead of having these in the parent Geometry class) because it is the simplest way to enforce the
+#         required unique constraint.
+#      5) Two new enumerations are added "GeometryEnum" that enumerates the geometries supported and
+#                                        "GeometryClassEnum" that enumerates the geometry classes supported.
 #
 
 import os
 
 from datetime import datetime
+from enum import Enum
 from math import sqrt, sin, cos, acos, atan2, pi
 
 import uuid
@@ -105,10 +107,6 @@ class DBUser(Base):
     surname = Column(String, nullable=False)
     email = Column(String, nullable=False)
     telephone = Column(String, nullable=True)
-    ticket_hash = Column(String, nullable=True)  # Transient
-    ticket_length = Column(Integer, nullable=False)  # length of the valid ticket in minutes.
-    ticket_timeout = Column(DateTime, default=GLOBAL.UNIX_EPOCH, nullable=False)  # Transient
-    access_level = Column(Integer, nullable=False)  # The access level of the user, bitwise OR-ed
     last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
     created = Column(DateTime, default=now, nullable=False)
 
@@ -134,8 +132,6 @@ class DBUser(Base):
             "surname": self.surname,
             "email": self.email,
             "telephone": self.telephone,
-            "ticket_length": self.ticket_length,
-            "access_level": self.access_level,
             "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
             "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
@@ -194,97 +190,6 @@ class Software(Base):
         }
 
 
-class Unit(Base):
-    """
-    Holds a number of units used to give the sizes/magnitudes of some values
-    found in the database.
-
-    Attributes:
-        id: a unique internal id for the object
-        symbol: the symbol associated with the unit
-        name: the unit's name
-        power: the power/exponent of the unit (in the natural base of the unit)
-        last_modified: the date/time at which this object/record was modified
-        created: the creation date/time of this object/record
-    """
-    __tablename__ = 'unit'
-
-    id = Column(Integer, primary_key=True)
-    symbol = Column(String, nullable=False)
-    name = Column(String, nullable=False)
-    power = Column(Float, nullable=False)
-    last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
-    created = Column(DateTime, default=now, nullable=False)
-
-    __table_args__ = (
-        UniqueConstraint('symbol', name='uniq_unit_01'),
-    )
-
-    def as_dict(self):
-        r"""
-        Get a python dictionary representation of this object.
-
-        Returns:
-            A dictionary representing this object.
-
-        """
-        return {
-            "id": self.id,
-            "symbol": self.symbol,
-            "name": self.name,
-            "power": self.power,
-            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
-            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
-        }
-
-
-class PhysicalConstant(Base):
-    """
-    Holds a number of important physical constants.
-
-    Attributes:
-        id: a unique internal id for the objec
-        symbol: the symbol associated with the physical constant
-        name: the constant's name
-        value: the constant's value
-        unit: the symbolic unit for the contant
-        last_modified: the date/time at which this object/record was modified
-        created: the creation date/time of this object/record
-
-    """
-    __tablename__ = 'physical_constant'
-
-    id = Column(Integer, primary_key=True)
-    symbol = Column(String, nullable=False)
-    name = Column(String, nullable=False)
-    value = Column(Float, nullable=False)
-    unit = Column(String, nullable=False)
-    last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
-    created = Column(DateTime, default=now, nullable=False)
-
-    __table_args__ = (
-        UniqueConstraint('symbol', name='uniq_physical_constant_01'),
-    )
-
-    def as_dict(self):
-        r"""
-        Get a python dictionary representation of this object.
-
-        Returns:
-            A dictionary representing this object.
-
-        """
-        return {
-            "id": self.id,
-            "symbol": self.symbol,
-            "name": self.name,
-            "value": self.value,
-            "unit": self.unit,
-            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
-            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
-        }
-
-
 class SizeConvention(Base):
     """
     Holds a size convention, size conventions are useful since we use them as
@@ -298,7 +203,6 @@ class SizeConvention(Base):
         description: a description for the size convention
         last_modified: the date/time at which this object/record was modified
         created: the creation date/time of this object/record
-
     """
     __tablename__ = 'size_convention'
 
@@ -327,6 +231,14 @@ class SizeConvention(Base):
             "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
             "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
+
+
+class SizeConventionEnum(str, Enum):
+    r"""
+    A class to hold acceptable size conventions.
+    """
+    esvd = "ESVD"  # Equivalent Spherical Volume Diameter
+    ecvl = "ECVL"  # Equivalent Cubic Volume Length
 
 
 class AnisotropyForm(Base):
@@ -372,42 +284,40 @@ class AnisotropyForm(Base):
 
 class Geometry(Base):
     """
-    Hold's geometry data. The natural key for a geometry is name/size pair
-    (hence the reason why size is a string). Note: size is given as a string
-    decimal of the form '[0-9]*\.[0-9]+', and is assumed to have the units
-    defined by size_unit.
+    The parent class/entity of all geometries. This object should *NOT* be used on its own since it is abstract -
+    please use one of the derived types:
+        Ellipsoid,
+        TruncatedOctahedron
 
     Attributes:
         id: a unique internal id for the object
         unique_id: a unique identifier for the geometry that may be used outside the database.
-        name: the name of the geometry (as a JSON string)
-        size: the size of the geometry upon creation (in the given units) (deprecated)
-        element_size: the element size at which this geometry was meshed (deprecated)
-        description: a brief description of the geometry
-        nelements: the number of elements that comprise the geometry
-        nvertices: the number of vertices that comprise the geometry
-        nsubmeshes: the numbe of submeshes that comprise the geometry (deprecated)
-        volume_total: the total volume of the geometry
-        has_patran: a patran file is available for the geometry
-        has_exodus: an exodus file is available for the geometry
-        has_mesh_gen_script: a script to generate the mesh is available for the geometry
-        has_mesh_gen_output: a flag to indicate whether output from the meshing program, in addition to the mesh, is
-                             available.
+        type: type the geometry.
+        nelements: the number of elements that comprise the geometry.
+        nvertices: the number of vertices that comprise the geometry.
+        nsubmeshes: the number of submeshes that comprise the geometry.
+        volume_total: the total volume of the geometry.
+        has_patran: flag indicates that a patran file is available for the geometry
+        has_exodus: flag indicates that an exodus file is available for the geometry
+        has_mesh_gen_script: flag indicates that a script to generate the mesh is available for the geometry
+        has_mesh_gen_output: flag indicates that output from meshing program, in addition to the mesh, is available.
         last_modified: the date/time at which this object/record was modified
         created: the creation date/time of this object/record
+
     """
     __tablename__ = 'geometry'
 
     id = Column(Integer, primary_key=True, nullable=False)
     unique_id = Column(String, default=new_unique_id, nullable=False)
-    name = Column(String, nullable=False)
-    size = Column(Numeric(10,5), nullable=True)
-    element_size = Column(Numeric(10,5), nullable=True)
-    description = Column(String, nullable=True)
+    type = Column(String, nullable=False)
     nelements = Column(Integer, nullable=True)
     nvertices = Column(Integer, nullable=True)
     nsubmeshes = Column(Integer, default=1, nullable=False)
-    volume_total = Column(Float, nullable=True)
+    computed_volume = Column(Float, nullable=True)
+    computed_element_length_average = Column(Float, nullable=True)
+    computed_element_length_standard_deviation = Column(Float, nullable=True)
+    computed_element_length_minimum = Column(Float, nullable=True)
+    computed_element_length_maximum = Column(Float, nullable=True)
     has_patran = Column(Boolean, default=False, nullable=False)
     has_exodus = Column(Boolean, default=False, nullable=False)
     has_mesh_gen_script = Column(Boolean, default=False, nullable=False)
@@ -415,54 +325,135 @@ class Geometry(Base):
     last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
     created = Column(DateTime, default=now, nullable=False)
 
-    size_unit_id = Column(Integer, ForeignKey('unit.id'), nullable=True)
-    size_unit = relationship('Unit', uselist=False, foreign_keys=[size_unit_id])
-
-    element_size_unit_id = Column(Integer, ForeignKey('unit.id'), nullable=True)
-    element_size_unit = relationship('Unit', uselist=False, foreign_keys=[element_size_unit_id])
-
-    size_convention_id = Column(Integer, ForeignKey('size_convention.id'), nullable=True)
-    size_convention = relationship('SizeConvention', uselist=False)
-
     # The software id used to generate the geometry
     software_id = Column(Integer, ForeignKey('software.id'), nullable=True)
     software = relationship('Software')
 
+    __mapper_args__ = {
+        'polymorphic_identity': 'geometry',
+        'polymorphic_on': type
+    }
+
     __table_args__ = (
-        UniqueConstraint('name', name='uniq_geometry_01'),
-        UniqueConstraint('unique_id', name='uniq_geometry_02'),
+        UniqueConstraint('unique_id', name='uniq_geometry_01'),
+    )
+
+    def _as_dict(self):
+        return {
+            'id': self.id,
+            'unique_id': self.unique_id,
+            'type': self.type,
+            'nelements': self.nelements,
+            'nvertices': self.nvertices,
+            'nsubmeshes': self.nsubmeshes,
+            'volume_total': self.volume_total,
+            'has_patran': self.has_patran,
+            'has_exodus': self.has_exodus,
+            'has_mesh_gen_script': self.has_mesh_gen_script,
+            'has_mesh_gen_output': self.has_mesh_gen_output,
+            'las_modified': self.last_modified,
+            'created': self.created
+        }
+
+
+class Ellipsoid(Geometry):
+    r"""
+    An ellipsoid geometry that derives its structure from an existing Geometry object.
+
+    Attributes:
+        size: the size of the geometry upon creation (in micron).
+        element_size: element size at which this geometry was meshed (i.e. the element size specified to the mesher).
+        prolateness: a measurement of the prolateness of the ellipsoid (x-length / y-length)
+        oblateness: a measurement of the oblateness of the ellipsoid (y-length / z-length)
+        size_convention: the convention in which the size is named.
+
+    """
+    __tablename__ = "ellipsoid"
+
+    id = Column(Integer, ForeignKey('geometry.id'), primary_key=True, nullable=False)
+    size = Column(Numeric(10, 5), nullable=True)
+    element_size = Column(Numeric(10, 5), nullable=True)
+    prolateness = Column(Numeric(10, 5))
+    oblateness = Column(Numeric(10, 5))
+
+    size_convention_id = Column(Integer, ForeignKey('size_convention.id'), nullable=True)
+    size_convention = relationship('SizeConvention')
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ellipsoid',
+    }
+
+    __table_args__ = (UniqueConstraint('size',
+                                       'element_size',
+                                       'size_convention_id',
+                                       'prolateness',
+                                       'oblateness',
+                                       name='uniq_ellipsoid_01'),)
+
+    def as_dict(self):
+        output = self._as_dict()
+        output['size'] = self.size
+        output['element_size'] = self.element_size
+        output['size_convention'] = self.size_convention.symbol
+        output["prolateness"] = self.prolateness
+        output["oblateness"] = self.oblateness
+
+        return output
+
+
+class TruncatedOctahedron(Geometry):
+    r"""
+    An truncated octahedral geometry that derives its structure from an existing Geometry object.
+
+    Attributes:
+        size: the size of the geometry upon creation (in micron).
+        element_size: element size at which this geometry was meshed (i.e. the element size specified to the mesher).
+        truncation_factor: a measurement of the prolateness of the ellipsoid (x-length / y-length)
+        aspect_ratio: a measurement of the oblateness of the ellipsoid (y-length / z-length)
+
+        size_convention: the convention in which the size is named.
+    """
+    __tablename__ = "truncated_octahedron"
+
+    id = Column(Integer, ForeignKey('geometry.id'), primary_key=True, nullable=False)
+    size = Column(Numeric(10, 5), nullable=True)
+    element_size = Column(Numeric(10, 5), nullable=True)
+    truncation_factor = Column(Numeric(10, 5))
+    aspect_ratio = Column(Numeric(10, 5))
+
+    size_convention_id = Column(Integer, ForeignKey('size_convention.id'), nullable=True)
+    size_convention = relationship('SizeConvention')
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'truncated_octahedron'
+    }
+
+    __table_args__ = (
+        UniqueConstraint('size',
+                         'element_size',
+                         'size_convention_id',
+                         'truncation_factor',
+                         'aspect_ratio',
+                         name='uniq_truncated_octahedron_01'),
     )
 
     def as_dict(self):
-        r"""
-        Get a python dictionary representation of this object.
+        output = self._as_dict()
+        output['size'] = self.size
+        output['element_size'] = self.element_size
+        output['size_convention'] = self.size_convention.symbol
+        output["truncation_factor"] = self.truncation_factor
+        output["aspect_ratio"] = self.aspect_ratio
 
-        Returns:
-            A dictionary representing this object.
+        return output
 
-        """
-        return {
-            "id": self.id,
-            "unique_id": self.unique_id,
-            "name": self.name,
-            "size": str(self.size),
-            "element_size": str(self.element_size) if self.element_size is not None else None,
-            "description": self.description,
-            "nelements": self.nelements,
-            "nvertices": self.nvertices,
-            "nsubmeshes": self.nsubmeshes,
-            "volume_total": self.volume_total,
-            "has_patran": self.has_patran,
-            "has_exodus": self.has_exodus,
-            "has_mesh_gen_script": self.has_mesh_gen_script,
-            "has_mesh_gen_output": self.has_mesh_gen_output,
-            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
-            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT),
-            "size_unit": self.size_unit.as_dict(),
-            "element_size_unit": self.element_size_unit.as_dict() if self.element_size_unit is not None else None,
-            "size_convention": self.size_convention.as_dict(),
-            "software": self.software.as_dict() if self.software is not None else None
-        }
+
+class GeometryEnum(str, Enum):
+    r"""
+    Class to enumerate strings representing supported geometries.
+    """
+    ellipsoid = "ellipsoid"
+    truncated_octahedron = "truncated_octahedron"
 
 
 class Material(Base):
@@ -483,7 +474,6 @@ class Material(Base):
         q_hardness: the micromagnetic magnetic hardness
         last_modified: the data/time at which the object/record was modified
         created: the creation date/time of this object/record
-
     """
     __tablename__ = 'material'
 
@@ -503,6 +493,8 @@ class Material(Base):
 
     anisotropy_form_id = Column(Integer, ForeignKey('anisotropy_form.id'), nullable=False)
     anisotropy_form = relationship('AnisotropyForm', uselist=False)
+
+    material_id = Column(Integer, ForeignKey("model.id"))
 
     __table_args__ = (
         UniqueConstraint('name', 'temperature', name='uniq_material_01'),
@@ -539,10 +531,9 @@ class Field(Base):
     The parent class/entity of all fields. This field object/entity should
     *NOT* be used on its own since it is abstract - please use one of the
     derived types:
-        1) FileField - encapsulates a field from a file (e.g. '.dat') (DEPRECATED)
-        2) ModelField - encapsulates a field from an existing micromagnetic model
-        3) RandomField - encapsulates a random field
-        4) UniformField - encapsulates a uniform field in a particular direction
+        1) ModelField - encapsulates a field from an existing micromagnetic model
+        2) RandomField - encapsulates a random field
+        3) UniformField - encapsulates a uniform field in a particular direction
 
     Attributes:
         id: a unique internal id for the object
@@ -562,21 +553,6 @@ class Field(Base):
         'polymorphic_identity': 'field',
         'polymorphic_on': type
     }
-
-    def as_dict(self):
-        r"""
-        Get a python dictionary representation of this object.
-
-        Returns:
-            A dictionary representing this object.
-
-        """
-        return {
-            "id": self.id,
-            "db_type": self.type,
-            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
-            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
-        }
 
 
 class ModelField(Field):
@@ -671,146 +647,27 @@ class UniformField(Field):
 
     Attributes:
         id: a unique internal id for the object.
-        theta: the azimuthal component of the field.
-        phi: polar component of the field.
         dir_x: the x component of the field direction.
         dir_y: the y component of the field direction.
         dir_z: the z component of the field direction.
-        magnitude: the radial component of the field.
+        magnitude: the magnitude of the field (in micro Tesla).
         last_modified: the date/time at which this object/record was modified.
         created: the creation date/time of this object/record.
-        unit_id: the id of a unit record, this is the unit of the field magnitude.
 
     """
     __tablename__ = 'uniform_field'
 
     id = Column(Integer, ForeignKey('field.id'), primary_key=True, nullable=False)
-    theta = Column(Float, nullable=False)
-    phi = Column(Float, nullable=False)
     dir_x = Column(Float, nullable=False)
     dir_y = Column(Float, nullable=False)
     dir_z = Column(Float, nullable=False)
-    magnitude = Column(Float, nullable=False)
-    last_modified = column_property(Column(DateTime, default=now, onupdate=now, nullable=False),
-                                    Field.last_modified)
+    magnitude = Column(Float, nullable=False)  # Magnitude is always in micro Tesla
+    last_modified = column_property(Column(DateTime, default=now, onupdate=now, nullable=False), Field.last_modified)
     created = column_property(Column(DateTime, default=now, nullable=False), Field.created)
-
-    unit_id = Column(Integer, ForeignKey('unit.id'), nullable=False)
-    unit = relationship('Unit')
 
     __mapper_args__ = {
         'polymorphic_identity': 'uniform_field',
     }
-
-    def __init__(self, **kwargs):
-        use_degrees = False
-        if 'use_degrees' in kwargs.keys():
-            use_degrees = kwargs['use_degrees']
-
-        if 'theta' in kwargs.keys() and 'phi' in kwargs.keys() and 'magnitude' in kwargs.keys():
-            # Initialise based on spherical-polar.
-            if use_degrees:
-                self.theta = self.degree_to_radian(kwargs['theta'])
-                self.phi = self.degree_to_radian(kwargs['phi'])
-                self.magnitude = kwargs['magnitude']
-                self.dir_x, self.dir_y, self.dir_z = self.spherical_to_cartesian_direction(self.theta, self.phi)
-            else:
-                self.theta = kwargs['theta']
-                self.phi = kwargs['phi']
-                self.magnitude = kwargs['magnitude']
-                self.dir_x, self.dir_y, self.dir_z = self.spherical_to_cartesian_direction(self.theta, self.phi)
-        elif 'dx' in kwargs.keys() and 'dy' in kwargs.keys() and 'dz' in kwargs.keys() and 'magnitude' in kwargs.keys():
-            # Initialise based on Cartesian.
-            dx = kwargs['dx']
-            dy = kwargs['dy']
-            dz = kwargs['dz']
-
-            (theta, phi) = UniformField.cartesian_to_spherical_direction(dx, dy, dz)
-
-            self.theta = theta
-            self.phi = phi
-            self.magnitude = kwargs['magnitude']
-
-            vlen = sqrt(dx*dx + dy*dy + dz*dz)
-            self.dir_x = dx/vlen
-            self.dir_y = dy/vlen
-            self.dir_z = dz/vlen
-        else:
-            raise ValueError(
-                "UniformField must be defined in therms of ('magnitude', 'theta', 'phi')"
-                " OR ('dx', 'dy', 'dz', 'magnitude')")
-
-        if 'unit' in kwargs.keys():
-            self.unit = kwargs['unit']
-
-    @hybrid_property
-    def cartesian_direction(self):
-        r"""
-        Access the direction of the UniformField vector using Cartesian representation.
-        """
-        return UniformField.spherical_to_cartesian_direction(self.theta, self.phi)
-
-    @hybrid_property
-    def degree_direction(self):
-        r"""
-        Retrieve the directional component (theta, phi) of the UniformField in units of degree.
-        """
-        return self.radian_to_degree(self.theta), self.radian_to_degree(self.phi)
-
-    @cartesian_direction.setter
-    def cartesian_direction(self, **kwargs):
-        r"""
-        Set the direction of a UniformField vector to correspond to the new direction defined in Cartesian
-        components.
-        """
-        if 'dx' in kwargs.keys() and 'dy' in kwargs.keys() and 'dz' in kwargs.keys():
-            # Only change the direction.
-            dx = kwargs['dx']
-            dy = kwargs['dy']
-            dz = kwargs['dz']
-            theta, phi = UniformField.cartesian_to_spherical_direction(dx, dy, dz)
-            self.theta = theta
-            self.phi = phi
-
-    @degree_direction.setter
-    def degree_direction(self, **kwargs):
-        r"""
-        Set the internal representation of the UniformField vector to
-        correspond to the new field y-component value.
-        """
-
-        self.theta = UniformField.degree_to_radian(kwargs['theta'])
-        self.phi = UniformField.degree_to_radian(kwargs['phi'])
-
-    @staticmethod
-    def spherical_to_cartesian_direction(theta, phi):
-        """
-        Private function to convert sphercal-polar coordinate to Cartesian.
-        """
-
-        x = cos(theta) * sin(phi)
-        y = sin(theta) * sin(phi)
-        z = cos(phi)
-
-        return x, y, z
-
-    @staticmethod
-    def cartesian_to_spherical_direction(x, y, z):
-        """
-        Private function to convert Cartesian coordinate to spheical-polar.
-        """
-        theta = atan2(y, x)
-        phi = acos(z)        # Don't divide by radial component here since we assume x,y,z specifies *ONLY* a direction.
-
-        return theta, phi
-
-    @staticmethod
-    def degree_to_radian(value):
-        return value * (pi / 180.0)
-
-    @staticmethod
-    def radian_to_degree(value):
-        return value * (180.0 / pi)
 
     def as_dict(self):
         r"""
@@ -830,8 +687,7 @@ class UniformField(Field):
             "dir_x": self.dir_x,
             "dir_y": self.dir_y,
             "dir_z": self.dir_z,
-            "magnitude": self.magnitude,
-            "unit": self.unit.as_dict()
+            "magnitude": self.magnitude
         }
 
 
@@ -1134,56 +990,6 @@ class LegacyModelInfo(Base):
         }
 
 
-class ModelMaterialAssociation(Base):
-    r"""
-    A helper object that associated Materials and Models together. This object
-    provides a many-to-many link between Models and Materials so that one
-    Model can have many materials, and one Material can belong to many
-    Models.
-
-    Attributes:
-        model_id: the primary key of a Model.
-        material_id: the primary key of a Material.
-        submesh_id: the index of the material, this should correspond with the sub-mesh indexing of the Geometry (in
-                    particular its underlying file) associated with a Model.
-        created: the time when the object was created.
-        last_modified: the time when the object was last modified.
-    r"""
-    __tablename__ = 'model_material_association'
-    model_id = Column(Integer, ForeignKey('model.id'), primary_key=True)
-    material_id = Column(Integer, ForeignKey('material.id'), primary_key=True)
-    submesh_id = Column(Integer, nullable=False)
-
-    material = relationship("Material")
-
-    def as_dict(self):
-        r"""
-        Get a python dictionary representation of this object, which is basically
-        the material associated with this object with the addition of the submesh id.
-
-        Returns:
-            A dictionary representing this object.
-
-        """
-        return {
-            "id": self.material.id,
-            "name": self.material.name,
-            "temperature": str(self.material.temperature),
-            "k1": self.material.k1,
-            "aex": self.material.aex,
-            "ms": self.material.ms,
-            "kd": self.material.kd,
-            "lambda_ex": self.material.lambda_ex,
-            "q_hardness": self.material.q_hardness,
-            "axis_theta": self.material.axis_theta,
-            "axis_phi": self.material.axis_phi,
-            "last_modified": self.material.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
-            "created": self.material.created.strftime(GLOBAL.DATE_TIME_FORMAT),
-            "anisotropy_form": self.material.anisotropy_form.as_dict(),
-            "submesh_id": self.submesh_id
-        }
-
-
 class Model(Base):
     r"""
     Holds information about a single micromagnetic model. A micromagnetic
@@ -1233,10 +1039,7 @@ class Model(Base):
     geometry_id = Column(Integer, ForeignKey('geometry.id'), nullable=False)
     geometry = relationship('Geometry', uselist=False)
 
-    materials = relationship("ModelMaterialAssociation")
-
-    model_materials_text_id = Column(Integer, ForeignKey('model_materials_text.id'), nullable=False)
-    model_materials_text = relationship("ModelMaterialsText")
+    materials = relationship("Material")
 
     start_magnetization_id = Column(Integer, ForeignKey('field.id'), nullable=False)
     start_magnetization = relationship('Field', uselist=False, foreign_keys=[start_magnetization_id])
@@ -1300,7 +1103,6 @@ class Model(Base):
             "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT),
             "geometry": self.geometry.as_dict(),
             "materials": [mma.as_dict() for mma in self.materials],
-            "model_materials_text": self.model_materials_text.as_dict(),
             "start_magnetization": self.start_magnetization.as_dict(),
             "external_field": self.external_field.as_dict() if self.external_field is not None else None,
             "running_status": self.running_status.as_dict(),
@@ -1308,39 +1110,6 @@ class Model(Base):
             "model_report_data": self.model_report_data.as_dict(),
             "mdata": self.mdata.as_dict(),
             "legacy_model_info": self.legacy_model_info.as_dict()if self.legacy_model_info is not None else None,
-        }
-
-
-class ModelMaterialsText(Base):
-    r"""
-    A convenience class/table that holds a text version of the material(s) that belong to a model. This class is *ONLY*
-    used for display purposes.
-    """
-    __tablename__ = "model_materials_text"
-
-    id = Column(Integer, primary_key=True)
-    materials = Column(String, nullable=False)
-    submeshidxs_materials = Column(String, nullable=False)
-    submeshidxs_materials_temperatures = Column(String, nullable=False)
-    last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
-    created = Column(DateTime, default=now, nullable=False)
-
-    def as_dict(self):
-        r"""
-        Get a python dictionary representation of this object.
-
-        Returns:
-            A dictionary representing this object.
-
-        """
-
-        return {
-            "id": self.id,
-            "materials": self.materials,
-            "submeshidxs_materials": self.submeshidxs_materials,
-            "submeshidxs_materials_temperatures": self.submeshidxs_materials_temperatures,
-            "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
-            "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
 
