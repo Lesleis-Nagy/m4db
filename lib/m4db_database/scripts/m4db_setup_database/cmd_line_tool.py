@@ -18,7 +18,6 @@ from m4db_database.install.data.anisotropy_forms import populate_anisotropy_form
 from m4db_database.install.data.neb_calculation_type import populate_neb_calculation_types
 from m4db_database.install.data.running_statuses import populate_running_statuses
 from m4db_database.install.data.size_conventions import populate_size_conventions
-from m4db_database.install.data.units import populate_units
 
 app = Typer()
 
@@ -74,7 +73,6 @@ def setup_postgres_database(db_name, user=None, host=None, password=None, echo=F
     populate_neb_calculation_types(session)
     populate_running_statuses(session)
     populate_size_conventions(session)
-    populate_units(session)
 
     return db_uri
 
