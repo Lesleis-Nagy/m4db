@@ -49,15 +49,10 @@ class GLOBAL:
 
     REGEX_SOFTWARE_AND_VERSION = re.compile(r"([a-zA-Z0-9]+)@([0-9.-]+)")
 
-
-
-
-
-
-
-
-
-
+    GEOMETRY_PATRAN_FILE_NAME = "geometry.pat"
+    GEOMETRY_EXODUS_FILE_NAME = "geometry.e"
+    GEOMETRY_SCRIPT_FILE_NAME = "geometry.cubit"
+    GEOMETRY_STDOUT_FILE_NAME = "geometry.stdout"
 
 
 
@@ -66,9 +61,6 @@ class GLOBAL:
     geometry_directory_name = "geometry"
     neb_directory_name = "neb"
 
-    geometry_patran_file_name = "geometry.pat"
-    geometry_stdout_file_name = "geometry.stdout"
-    geometry_script_file_name = "geometry.cubit"
 
     energy_log_file_name = "energy"
 
