@@ -48,14 +48,13 @@ def order_pair(pair):
         return pair[0], pair[1]
 
 
-def geometry_volume(geometry):
+def geometry_volume(vertices, elements):
     r"""
     Compute the volume of a geometry
-    :param geometry: a geometry data structure.
+    :param vertices: the vertices of the mesh.
+    :param elements: the element indices of the mesh.
     :return: the total volume of a geometry.
     """
-    vertices = geometry["vertices"]
-    elements = geometry["elements"]
 
     # For each tetrahedron calculate a volume
     tetra_volumes = []
@@ -70,22 +69,20 @@ def geometry_volume(geometry):
     return sum(tetra_volumes)
 
 
-def geometry_edge_stats(geometry):
+def geometry_edge_stats(vertices, elements):
     r"""
     Compute statistics related to tetrahedral edge lengths of a geometry
-    :param geometry: a geometry data structure.
+    :param vertices: the vertices of the mesh.
+    :param elements: the element indices of the mesh.
     :return: a tuple containing:
                 average edge length,
                 standard deviation of edge length,
                 maximum edge length,
                 minimum edge length
     """
-    vertices = geometry["vertices"]
-    elements = geometry["elements"]
-
     # For each unique edge, calculate a distance.
     edge_lengths = {}
-    for elem_idxs in elements[:][0:3]:
+    for elem_idxs in elements[:, 0:3]:
         for vidx_i in range(len(elem_idxs)):
             for vidx_j in range(vidx_i+1, len(elem_idxs)):
                 edge_key = order_pair((elem_idxs[vidx_i], elem_idxs[vidx_j]))
