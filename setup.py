@@ -32,5 +32,6 @@ setup(
     m4db-user=m4db_database.scripts.m4db_user.cmd_line_tool:entry_point
     m4db-software=m4db_database.scripts.m4db_software.cmd_line_tool:entry_point
     m4db-project=m4db_database.scripts.m4db_project.cmd_line_tool:entry_point
+    m4db-geometry=m4db_database.scripts.m4db_geometry.cmd_line_tool:entry_point
     """
 )
