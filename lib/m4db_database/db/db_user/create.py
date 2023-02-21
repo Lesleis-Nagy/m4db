@@ -7,17 +7,14 @@ from m4db_database.orm.latest import DBUser
 from m4db_database.utilities.password import password_hash
 
 
-def create_db_user(user_name, first_name, surname, email, access_level, ticket_length, session, initials=None,
-                   telephone=None):
+def create_db_user(session, user_name, first_name, surname, email, initials=None, telephone=None):
     r"""
     Create a new db user.
+    :param session: the database session.
     :param user_name: the user's user name.
     :param first_name: the user's first name
     :param surname: the user's surname.
     :param email: the user's email.
-    :param access_level: the access level for the user - determines which services the user can access.
-    :param ticket_length: the length (in seconds) for the users issued tickets.
-    :param session: the database session.
     :param initials: the user's initials (optional).
     :param telephone: the user's telephone number (optional).
     :return: None
@@ -33,11 +30,12 @@ def create_db_user(user_name, first_name, surname, email, access_level, ticket_l
         first_name=first_name,
         surname=surname,
         email=email,
-        access_level=access_level,
-        ticket_length=ticket_length,
         initials=initials,
         telephone=telephone
     )
+
+    session.add(db_user)
+    session.commit()
 
     # Return the database user
     return db_user
