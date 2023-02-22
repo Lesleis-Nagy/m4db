@@ -54,14 +54,6 @@ class GLOBAL:
     GEOMETRY_SCRIPT_FILE_NAME = "geometry.cubit"
     GEOMETRY_STDOUT_FILE_NAME = "geometry.stdout"
 
-
-
-
-    model_directory_name = "model"
-    geometry_directory_name = "geometry"
-    neb_directory_name = "neb"
-
-
     energy_log_file_name = "energy"
 
     data_zip = "data.zip"
