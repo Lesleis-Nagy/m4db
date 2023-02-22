@@ -58,7 +58,7 @@ def run_model(unique_id):
     # This is the final destination of model data.
     database_dir = os.path.join(
         config["file_root"],
-        GLOBAL.model_directory_name,
+        GLOBAL.MODEL_DIRECTORY_NAME,
         uid_to_dir(unique_id)
     )
     logger.debug(f"model destination: '{database_dir}")

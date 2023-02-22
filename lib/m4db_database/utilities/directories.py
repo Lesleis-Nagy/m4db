@@ -21,7 +21,7 @@ def geometry_directory(unique_id):
 
     dest_dir = os.path.join(
         config.database.file_root,
-        GLOBAL.geometry_directory_name,
+        GLOBAL.GEOMETRY_DIRECTORY_NAME,
         uid_to_dir(unique_id)
     )
 

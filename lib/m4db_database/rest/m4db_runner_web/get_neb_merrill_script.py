@@ -80,7 +80,7 @@ def runner_data_without_parent(neb):
     # Use the geometry associated with the NEB start model (both start and end should be the same).
     runner_data["mesh_file"] = os.path.join(
         config["file_root"],
-        GLOBAL.geometry_directory_name,
+        GLOBAL.GEOMETRY_DIRECTORY_NAME,
         uid_to_dir(neb.start_model.geometry.unique_id),
         GLOBAL.GEOMETRY_PATRAN_FILE_NAME
     )

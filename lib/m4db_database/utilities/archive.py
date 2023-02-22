@@ -75,7 +75,7 @@ def archive_neb(unique_id):
 
     neb_path = os.path.join(
         config["file_root"],
-        global_vars.neb_directory_name,
+        global_vars.NEB_DIRECTORY_NAME,
         uid_to_dir(unique_id)
     )
 
@@ -112,7 +112,7 @@ def unarchive_neb(unique_id, destination):
 
     model_archive = os.path.join(
         config["file_root"],
-        global_vars.neb_directory_name,
+        global_vars.NEB_DIRECTORY_NAME,
         uid_to_dir(unique_id),
         global_vars.data_zip
     )

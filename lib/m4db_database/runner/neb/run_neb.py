@@ -56,7 +56,7 @@ def run_neb(unique_id):
     # Final destination of the NEB data.
     database_dir = os.path.join(
         config["file_root"],
-        GLOBAL.neb_directory_name,
+        GLOBAL.NEB_DIRECTORY_NAME,
         uid_to_dir(unique_id)
     )
     logger.debug(f"NEB destination: '{database_dir}'")

@@ -37,7 +37,7 @@ class GetAllModelDataZip:
         # Check that the data exists.
         data_zip = os.path.join(
             self.config["file_root"],
-            GLOBAL.model_directory_name,
+            GLOBAL.MODEL_DIRECTORY_NAME,
             uid_to_dir(unique_id),
             GLOBAL.data_zip
         )

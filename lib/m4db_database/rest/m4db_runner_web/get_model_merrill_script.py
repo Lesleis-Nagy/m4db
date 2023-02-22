@@ -39,7 +39,7 @@ class GetModelMerrillScript:
 
         runner_data["mesh_file"] = os.path.join(
             config["file_root"],
-            GLOBAL.geometry_directory_name,
+            GLOBAL.GEOMETRY_DIRECTORY_NAME,
             uid_to_dir(model.geometry.unique_id),
             GLOBAL.GEOMETRY_PATRAN_FILE_NAME
         )

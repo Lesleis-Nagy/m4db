@@ -28,7 +28,7 @@ class GetAllNEBDataZip:
         # Check that the data exists.
         data_zip = os.path.join(
             self.config["file_root"],
-            GLOBAL.neb_directory_name,
+            GLOBAL.NEB_DIRECTORY_NAME,
             uid_to_dir(unique_id),
             GLOBAL.data_zip
         )

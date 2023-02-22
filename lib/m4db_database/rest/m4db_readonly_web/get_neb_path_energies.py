@@ -29,7 +29,7 @@ class GetNEBPathEnergiesCSV:
 
         neb_stdout_file = os.path.join(
             config["file_root"],
-            GLOBAL.neb_directory_name,
+            GLOBAL.NEB_DIRECTORY_NAME,
             uid_to_dir(unique_id),
             GLOBAL.neb_stdout_file_name
         )
