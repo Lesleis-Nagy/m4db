@@ -4,6 +4,7 @@ import yaml
 
 from schematics.models import Model
 from schematics.types import StringType
+from schematics.types import BooleanType
 from schematics.types.compound import ModelType
 
 from m4db_database.decorators import static
@@ -18,6 +19,22 @@ class Database(Model):
     type = StringType(required=True, regex=r"POSTGRES")
     uri = StringType(required=True)
     file_root = StringType(required=True, serialized_name="file-root")
+    working_root = StringType(required=True, serialized_name="working-root")
+
+
+class Logging(Model):
+    r"""
+    Class to hold logging information.
+    """
+    file = StringType(default=None)
+    level = StringType(choices=["critical",
+                                "error",
+                                "warning",
+                                "warn",
+                                "info",
+                                "debug"],
+                       default="error")
+    log_to_stdout = BooleanType(default=False, deserialize_from="log-to-stdout")
 
 
 class Configuration(Model):
@@ -26,6 +43,7 @@ class Configuration(Model):
     """
     password_salt = StringType(required=True, serialized_name="password-salt")
     database = ModelType(Database)
+    logging = ModelType(Logging, default=Logging())
 
 
 def read_config_from_file(file_name: str) -> Configuration:

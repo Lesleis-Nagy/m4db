@@ -58,6 +58,16 @@ class GLOBAL:
     GEOMETRY_SCRIPT_FILE_NAME = "geometry.cubit"
     GEOMETRY_STDOUT_FILE_NAME = "geometry.stdout"
 
+    # The global logger name.
+    LOGGER_NAME = "m4db_database"
+
+    # The format used for logging.
+    LOGGER_FORMAT = "%(asctime)s — %(levelname)s — %(pathname)s:%(funcName)s:%(lineno)d — %(message)s"
+
+    # The temporary name of the cubit script when we're generating meshes.
+    CUBIT_SCRIPT_NAME = "temporary.cubit"
+
+
     energy_log_file_name = "energy"
 
     data_zip = "data.zip"

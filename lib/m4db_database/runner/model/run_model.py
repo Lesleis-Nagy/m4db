@@ -8,14 +8,13 @@ import tempfile
 import random
 import time
 import zipfile
-import uuid
+import json
 
-import simplejson as json
 import numpy as np
 
 from subprocess import Popen, PIPE
 
-from m4db_database.utilities_logging import get_logger
+from m4db_database.utilities.logger import get_logger
 from m4db_database.configuration import read_config_from_environ
 from m4db_database.utilities.unique_id import uid_to_dir
 
@@ -33,6 +32,7 @@ from m4db_database.postprocessing.field_calculations import tec_to_unstructured_
 from m4db_database.postprocessing.field_calculations import net_quantities
 
 from m4db_database.utilities.archive import unarchive_model
+from m4db_database.utilities.directories import model_directory
 
 from m4db_database import GLOBAL
 
@@ -56,27 +56,10 @@ def run_model(unique_id):
     logger.info("activating ...")
 
     # This is the final destination of model data.
-    database_dir = os.path.join(
-        config["file_root"],
-        GLOBAL.MODEL_DIRECTORY_NAME,
-        uid_to_dir(unique_id)
-    )
-    logger.debug(f"model destination: '{database_dir}")
+    destination_dir = model_directory(unique_id)
+    logger.debug(f"model destination: '{destination_dir}")
 
-    # Retrieve the model's start magnetization data
-    start_magnetization = get_model_start_magnetization(unique_id)
-    logger.debug(f"model start magnetization info: {start_magnetization}")
-
-    # This is the working directory.
-    working_dir = config["m4db_serverside"]["working_dir"]
-
-    # These lines are useful for testing
-    #tmpdir = os.path.join(working_dir, str(uuid.uuid4()))
-    #logger.debug(f"working directory: '{tmpdir}'")
-    #os.makedirs(tmpdir, exist_ok=True)
-    #if os.path.isdir(tmpdir):
-
-    with tempfile.TemporaryDirectory(dir=working_dir) as tmpdir:
+    with tempfile.TemporaryDirectory(dir=config.database.working_root) as tmpdir:
         logger.debug(f"working directory: '{tmpdir}'")
 
         # Switch to the working directory.
@@ -206,8 +189,8 @@ def run_model(unique_id):
         zout.close()
 
         # Copy the zipped archive to the final destination
-        os.makedirs(database_dir, exist_ok=True)
-        shutil.copy(src_zip_file, database_dir)
+        os.makedirs(destination_dir, exist_ok=True)
+        shutil.copy(src_zip_file, destination_dir)
 
         # src_files = os.listdir(".")
         # for file_name in src_files:

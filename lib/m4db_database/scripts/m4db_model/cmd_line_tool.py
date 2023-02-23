@@ -1,5 +1,5 @@
 r"""
-Perform various m4db project related actions.
+Perform various m4db model related actions.
 """
 import os
 import sys
@@ -12,6 +12,11 @@ import typer
 import pandas as pd
 
 from tabulate import tabulate
+
+from m4db_database.configuration import read_config_from_environ
+from m4db_database.utilities.logger import setup_logger
+from m4db_database.utilities.logger import get_logger
+
 
 from m4db_database.orm.latest import Project, Material, Model, UniformInitialMagnetization, ModelInitialMagnetization, \
     RandomInitialMagnetization, UniformAppliedField, ModelRunData, ModelReportData, Metadata, Software, RunningStatus, \
@@ -205,9 +210,21 @@ def add_model(model_json_file: str, user_name: str, project_name: str, software_
         session.rollback()
 
 
+@app.command()
+def run(unique_id: str):
+    config = read_config_from_environ()
+    logger = get_logger()
+
+
+
+
+
+
 def entry_point():
+    config = read_config_from_environ()
+    setup_logger(config.logging.file, config.logging.level, config.logging.log_to_stdout)
     app()
 
 
 if __name__ == "__main__":
-    app()
+    entry_point()
