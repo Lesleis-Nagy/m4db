@@ -31,11 +31,8 @@
 #                                        "GeometryClassEnum" that enumerates the geometry classes supported.
 #
 
-import os
-
 from datetime import datetime
 from enum import Enum
-from math import sqrt, sin, cos, acos, atan2, pi
 
 import uuid
 
@@ -44,7 +41,6 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import UniqueConstraint, Index
 from sqlalchemy import event
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 from sqlalchemy.orm import relationship
 
@@ -282,6 +278,14 @@ class AnisotropyForm(Base):
         }
 
 
+class AnisotropyFormEnum(str, Enum):
+    r"""
+    A class to hold acceptable size conventions.
+    """
+    cubic = "cubic"  # cubic anisotropy.
+    uniaxial = "uniaxial" # uniaxial anisotropy.
+
+
 class Geometry(Base):
     """
     The parent class/entity of all geometries. This object should *NOT* be used on its own since it is abstract -
@@ -480,14 +484,21 @@ class Material(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String, nullable=False)
     temperature = Column(Numeric(8,3), nullable=False)
-    k1 = Column(Float, nullable=False)
-    aex = Column(Float, nullable=False)
-    ms = Column(Float, nullable=False)
-    kd = Column(Float, nullable=False)
-    lambda_ex = Column(Float, nullable=True)
-    q_hardness = Column(Float, nullable=True)
-    axis_theta = Column(Float, nullable=True, default=0.0)
-    axis_phi = Column(Float, nullable=True, default=0.0)
+    k1 = Column(Float, nullable=True)
+    k2 = Column(Float, nullable=True)
+    k3 = Column(Float, nullable=True)
+    k4 = Column(Float, nullable=True)
+    k5 = Column(Float, nullable=True)
+    k6 = Column(Float, nullable=True)
+    k7 = Column(Float, nullable=True)
+    k8 = Column(Float, nullable=True)
+    k9 = Column(Float, nullable=True)
+    k10 = Column(Float, nullable=True)
+    aex = Column(Float, nullable=True)
+    ms = Column(Float, nullable=True)
+    dir_x = Column(Float, nullable=True, default=0.0)
+    dir_y = Column(Float, nullable=True, default=0.0)
+    dir_z = Column(Float, nullable=True, default=0.0)
     last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
     created = Column(DateTime, default=now, nullable=False)
 
@@ -495,10 +506,6 @@ class Material(Base):
     anisotropy_form = relationship('AnisotropyForm', uselist=False)
 
     material_id = Column(Integer, ForeignKey("model.id"))
-
-    __table_args__ = (
-        UniqueConstraint('name', 'temperature', name='uniq_material_01'),
-    )
 
     def as_dict(self):
         r"""
@@ -526,23 +533,38 @@ class Material(Base):
         }
 
 
-class Field(Base):
+class UniformAppliedField(Base):
+    r"""
+    A class to hold applied field values (note that field magnitude is always in  micro Tesla).
     """
-    The parent class/entity of all fields. This field object/entity should
+    __tablename__ = 'uniform_applied_field'
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    dir_x = Column(Float, nullable=False)
+    dir_y = Column(Float, nullable=False)
+    dir_z = Column(Float, nullable=False)
+    magnitude = Column(Float, nullable=False)  # Magnitude is always in micro Tesla
+    last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
+    created = Column(DateTime, default=now, nullable=False)
+
+
+class InitialMagnetization(Base):
+    """
+    The parent class/entity of all magnetizations. This field object/entity should
     *NOT* be used on its own since it is abstract - please use one of the
     derived types:
-        1) ModelField - encapsulates a field from an existing micromagnetic model
-        2) RandomField - encapsulates a random field
-        3) UniformField - encapsulates a uniform field in a particular direction
+        1) UniformInitialMagnetization - a uniform initial magnetization field.
+        2) RandomInitialMagnetization - encapsulates a random field
+        3) ModelInitalMagnetization
 
     Attributes:
         id: a unique internal id for the object
-        db_type: a string that reffers to the child db_type (see above)
+        type: a string that refers to the child db_type (see above)
         last_modified: the date/time at which this object/record was modified
         created: the creation date/time of this object/record
 
     """
-    __tablename__ = 'field'
+    __tablename__ = 'initial_magnetization'
 
     id = Column(Integer, primary_key=True, nullable=False)
     type = Column(String, nullable=False)
@@ -550,15 +572,14 @@ class Field(Base):
     created = Column(DateTime, default=now, nullable=False)
 
     __mapper_args__ = {
-        'polymorphic_identity': 'field',
+        'polymorphic_identity': 'initial_magnetization',
         'polymorphic_on': type
     }
 
 
-class ModelField(Field):
+class ModelInitialMagnetization(InitialMagnetization):
     """
-    A model field is a field that that derives its structure from an existing model. Note: it only makes sense
-    to use this class for a micromagnetic structure initial field.
+    A model magnetization is a field that that derives its structure from an existing model.
 
     Attributes:
         last_modified: the date/time at which this object/record was modified.
@@ -566,18 +587,18 @@ class ModelField(Field):
         model: the model to which this field belongs.
 
     """
-    __tablename__ = 'model_field'
+    __tablename__ = 'model_initial_magnetization'
 
-    id = Column(Integer, ForeignKey('field.id'), primary_key=True, nullable=False)
+    id = Column(Integer, ForeignKey('initial_magnetization.id'), primary_key=True, nullable=False)
     last_modified = column_property(Column(DateTime, default=now, onupdate=now, nullable=False),
-                                    Field.last_modified)
-    created = column_property(Column(DateTime, default=now, nullable=False), Field.created)
+                                    InitialMagnetization.last_modified)
+    created = column_property(Column(DateTime, default=now, nullable=False), InitialMagnetization.created)
 
     model_id = Column(Integer, ForeignKey('model.id'), nullable=False)
     model = relationship('Model')
 
     __mapper_args__ = {
-        'polymorphic_identity': 'model_field',
+        'polymorphic_identity': 'model_initial_magnetization',
     }
 
     def as_dict(self):
@@ -597,27 +618,23 @@ class ModelField(Field):
         }
 
 
-class RandomField(Field):
+class RandomInitialMagnetization(InitialMagnetization):
     """
-    A random field is really just a placeholder record to denote a random
-    field.  Actual seeds my be stored if wanting to reproduce specific random
-    fields (but this is not cross platform compatible).
+    A random field is really just a placeholder record to denote a random initial magnetization.
 
     Attributes:
-        seed: the seed used to generate the random number.
         last_modified: the date/time at which this object/record was modified.
         created: the creation date/time of this object/record.
     """
-    __tablename__ = 'random_field'
+    __tablename__ = 'random_initial_magnetization'
 
-    id = Column(Integer, ForeignKey('field.id'), primary_key=True, nullable=False)
-    seed = Column(Integer, nullable=True)
+    id = Column(Integer, ForeignKey('initial_magnetization.id'), primary_key=True, nullable=False)
     last_modified = column_property(Column(DateTime, default=now, onupdate=now, nullable=False),
-                                    Field.last_modified)
-    created = column_property(Column(DateTime, default=now, nullable=False), Field.created)
+                                    InitialMagnetization.last_modified)
+    created = column_property(Column(DateTime, default=now, nullable=False), InitialMagnetization.created)
 
     __mapper_args__ = {
-        'polymorphic_identity': 'random_field',
+        'polymorphic_identity': 'random_initial_magnetization',
     }
 
     def as_dict(self):
@@ -637,7 +654,7 @@ class RandomField(Field):
         }
 
 
-class UniformField(Field):
+class UniformInitialMagnetization(InitialMagnetization):
     """
     A UniformField consists of a vector in spherical polar coordinates using
     using (azimuthal, polar, magnitude) = (theta, phi, magnitude) convention.
@@ -655,18 +672,18 @@ class UniformField(Field):
         created: the creation date/time of this object/record.
 
     """
-    __tablename__ = 'uniform_field'
+    __tablename__ = 'uniform_initial_magnetization'
 
-    id = Column(Integer, ForeignKey('field.id'), primary_key=True, nullable=False)
+    id = Column(Integer, ForeignKey('initial_magnetization.id'), primary_key=True, nullable=False)
     dir_x = Column(Float, nullable=False)
     dir_y = Column(Float, nullable=False)
     dir_z = Column(Float, nullable=False)
     magnitude = Column(Float, nullable=False)  # Magnitude is always in micro Tesla
-    last_modified = column_property(Column(DateTime, default=now, onupdate=now, nullable=False), Field.last_modified)
-    created = column_property(Column(DateTime, default=now, nullable=False), Field.created)
+    last_modified = column_property(Column(DateTime, default=now, onupdate=now, nullable=False), InitialMagnetization.last_modified)
+    created = column_property(Column(DateTime, default=now, nullable=False), InitialMagnetization.created)
 
     __mapper_args__ = {
-        'polymorphic_identity': 'uniform_field',
+        'polymorphic_identity': 'uniform_initial_magnetization',
     }
 
     def as_dict(self):
@@ -1031,7 +1048,6 @@ class Model(Base):
     e_exch3 = Column(Float, nullable=True)
     e_exch4 = Column(Float, nullable=True)
     e_tot = Column(Float, nullable=True)
-    volume = Column(Float, nullable=True)
     max_energy_evaluations = Column(Integer, default=10000, nullable=False)
     last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
     created = Column(DateTime, default=now, nullable=False)
@@ -1041,11 +1057,11 @@ class Model(Base):
 
     materials = relationship("Material")
 
-    start_magnetization_id = Column(Integer, ForeignKey('field.id'), nullable=False)
-    start_magnetization = relationship('Field', uselist=False, foreign_keys=[start_magnetization_id])
+    initial_magnetization_id = Column(Integer, ForeignKey('initial_magnetization.id'), nullable=False)
+    initial_magnetization = relationship('InitialMagnetization', uselist=False, foreign_keys=[initial_magnetization_id])
 
-    external_field_id = Column(Integer, ForeignKey('field.id'), nullable=True)
-    external_field = relationship('Field', uselist=False, foreign_keys=[external_field_id])
+    applied_field_id = Column(Integer, ForeignKey('uniform_applied_field.id'), nullable=True)
+    applied_field = relationship('UniformAppliedField', uselist=False, foreign_keys=[applied_field_id])
 
     running_status_id = Column(Integer, ForeignKey('running_status.id'), nullable=False)
     running_status = relationship('RunningStatus', uselist=False)
@@ -1104,7 +1120,6 @@ class Model(Base):
             "geometry": self.geometry.as_dict(),
             "materials": [mma.as_dict() for mma in self.materials],
             "start_magnetization": self.start_magnetization.as_dict(),
-            "external_field": self.external_field.as_dict() if self.external_field is not None else None,
             "running_status": self.running_status.as_dict(),
             "model_run_data": self.model_run_data.as_dict(),
             "model_report_data": self.model_report_data.as_dict(),
@@ -1271,7 +1286,6 @@ class NEB(Base):
         energy_barrier: the energy barrier in Joules.
         last_modified: the date/time at which this object/record was modified.
         created: the creation date/time of this object/record.
-        external_field: the external field.
         start_model: the start model, i.e. the first model on the NEB path.
         end_model: the end model, i.e. the last model on the NEB path.
         parent_neb: the NEB path that this path is a refinement of (or no path).
@@ -1297,8 +1311,8 @@ class NEB(Base):
     last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
     created = Column(DateTime, default=now, nullable=False)
 
-    external_field_id = Column(Integer, ForeignKey('field.id'), nullable=True)
-    external_field = relationship('Field', uselist=False, foreign_keys=[external_field_id])
+    applied_field_id = Column(Integer, ForeignKey('uniform_applied_field.id'), nullable=True)
+    applied_field = relationship('UniformAppliedField', uselist=False, foreign_keys=[applied_field_id])
 
     start_model_id = Column(Integer, ForeignKey('model.id'), nullable=False)
     start_model = relationship('Model', uselist=False, foreign_keys=[start_model_id])
@@ -1348,7 +1362,6 @@ class NEB(Base):
             "max_path_evaluations": self.max_path_evaluations,
             "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
             "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT),
-            "external_field": self.external_field.as_dict() if self.external_field is not None else None,
             "start_model_unique_id": self.start_model.unique_id,
             "end_model_unique_id": self.end_model.unique_id,
             "parent_neb_unique_id": self.parent_neb.unique_id if self.parent_neb is not None else None,
@@ -1393,7 +1406,6 @@ def validate_neb(mapper, connection, value):
         if start_material_ids != end_material_ids:
             raise ValueError('NEB does not have start/end models with same material.')
 
-        # TODO: add test here to check external_field similar (???)
 
 
 event.listen(NEB, 'before_insert', validate_neb)

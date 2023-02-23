@@ -23,7 +23,8 @@ setup(
         "pandas",
         "tabulate",
         "jinja2",
-        "schematics"
+        "schematics",
+        "aenum"
     ],
     include_package_data=True,
     entry_points="""
@@ -33,5 +34,6 @@ setup(
     m4db-software=m4db_database.scripts.m4db_software.cmd_line_tool:entry_point
     m4db-project=m4db_database.scripts.m4db_project.cmd_line_tool:entry_point
     m4db-geometry=m4db_database.scripts.m4db_geometry.cmd_line_tool:entry_point
+    m4db-model=m4db_database.scripts.m4db_model.cmd_line_tool:entry_point
     """
 )

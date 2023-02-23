@@ -11,6 +11,10 @@ class GLOBAL:
     Dummy class to define some global variables.
     """
 
+    # Unique ids
+    HEX_RE_STR = r'[0-9A-Fa-f]'
+    UID_REGEX = r'{hx:}{{8}}-{hx:}{{4}}-{hx:}{{4}}-{hx:}{{4}}-{hx:}{{12}}'.format(hx=HEX_RE_STR)
+
     # Postgres related global variables.
     POSTGRES_DATABASE_USER_HOST_URI = "postgresql+psycopg2://{user:}@{host:}/{db_name:}"
     POSTGRES_DATABASE_HOST_URI = "postgresql+psycopg2://{host:}/{db_name:}"

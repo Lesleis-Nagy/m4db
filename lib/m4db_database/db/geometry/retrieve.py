@@ -1,85 +1,129 @@
 r"""
 A collection of functions that retrieve geometries from the database.
 """
+from decimal import Decimal
 
-from m4db_database.orm.latest import SizeConvention
-from m4db_database.orm.latest import Unit
-from m4db_database.orm.latest import Geometry
+from m4db_database.orm.latest import SizeConvention, Ellipsoid, TruncatedOctahedron
+from m4db_database.orm.latest import SizeConventionEnum
+
+from m4db_database.orm.model_json_creation_schema import GeometrySchemaTypesEnum
 
 
-def retrieve_geometry(session, json_model_dict):
+def get_geometry(session, **kwargs):
+    if kwargs.get("schema_object") is not None:
+        return get_geometry_by_schema_object(session, kwargs.get("schema_object"))
+    elif kwargs.get("type") is not None:
+        return get_geometry_by_type_and_kwargs(session, kwargs.get("type"), **kwargs)
+    else:
+        raise RuntimeError("Unknown input parameters for 'get_geometry'.")
+
+
+def get_geometry_by_schema_object(session, schema_object):
     r"""
-    Retrieve a geometry from the session given a JSON model dictionary.
-    :param session: a database session.
-    :param json_model_dict: python dictionary (parsed from JSON) holding information about our model, this
-                            function focuses on the JSON part
-                            {
-                                ...
-                                "geometry": {
-                                    "name": <string>,
-                                    "size": <decimal>,
-                                    "size_convention": <string>,
-                                    "size_unit": <string>
-                                }
-                                ...
-                            }
+    Retrieve a geometry from the database using a schema object.
 
-    :return: an existing Geometry object.
+    :param session: the database session.
+    :param schema_object: the schema object.
+
+    :returns: a geometry
+
     """
-    geometry = None
-
-    # If the 'geometry' field is missing ...
-    if "geometry" not in json_model_dict.keys():
-        # ... close session & raise error
-        raise ValueError("New model JSON, 'geometry' field is missing.")
+    if schema_object.type == GeometrySchemaTypesEnum.ellipsoid.value:
+        return get_ellipsoid(session,
+                             Decimal(schema_object.size),
+                             Decimal(schema_object.element_size),
+                             SizeConventionEnum(schema_object.size_convention),
+                             Decimal(schema_object.oblateness),
+                             Decimal(schema_object.prolateness))
+    elif schema_object.type == GeometrySchemaTypesEnum.truncated_octahedron.value:
+        return get_truncated_octahedron(session,
+                                        Decimal(schema_object.size),
+                                        Decimal(schema_object.element_size),
+                                        SizeConventionEnum(schema_object.size_convention),
+                                        Decimal(schema_object.truncation_factor),
+                                        Decimal(schema_object.aspect_ratio))
     else:
-        # ... attempt to retrieve the Geometry from m4db
-        json_geometry = json_model_dict["geometry"]
+        raise RuntimeError("Unknown GeometryEnum type")
 
-        # If the geometry JSON 'name' field is missing ...
-        if "name" not in json_geometry.keys():
-            # ... close session & raise error
-            raise ValueError("New model JSON, 'geometry'.'name' field is missing.")
-        else:
-            # ... retrieve the name
-            name = json_geometry["name"]
 
-        # If the geometry JSON 'size' field is missing ...
-        if "size" not in json_geometry.keys():
-            # ... close session & raise error
-            raise ValueError("New model JSON, 'geometry'.'size' field is missing.")
-        else:
-            # ... retrieve the size
-            size = json_geometry["size"]
+def get_geometry_by_type_and_kwargs(session, type: GeometrySchemaTypesEnum, **kwargs):
+    r"""
+    Retrieve a geometry from the database using keyword arguments.
 
-        # If the geometry JSON 'size_convention' is missing ...
-        if "size_convention" not in json_geometry.keys():
-            # ... set default to 'ESVD'
-            size_convention = 'ESVD'
-        else:
-            # ... set the size_convention
-            size_convention = json_geometry["size_convention"]
+    :param session: the database session.
+    :param type: the database type.
+    "param **kwargs: arguments for the geometry.
 
-        # If the geometry JSON 'size_unit' is missing ...
-        if "size_unit" not in json_geometry.keys():
-            # ... set default to 'um'
-            size_unit = 'um'
-        else:
-            # ... set the size_unit
-            size_unit = json_geometry["size_unit"]
+    :return: a geometry.
 
-        geometry = session.query(Geometry). \
-            join(SizeConvention, Geometry.size_convention_id == SizeConvention.id). \
-            join(Unit, Geometry.size_unit_id == Unit.id). \
-            filter(Geometry.name == name). \
-            filter(Geometry.size == size). \
-            filter(SizeConvention.symbol == size_convention). \
-            filter(Unit.symbol == size_unit). \
-            one_or_none()
-
-    # If the geometry could not be found ...
-    if geometry is None:
-        # ... close session & raise error
-        raise ValueError("Model geometries could not be found.")
+    """
+    if type == GeometrySchemaTypesEnum.ellipsoid:
+        return get_ellipsoid(
+            session,
+            Decimal(kwargs.get("size")),
+            Decimal(kwargs.get("element_size")),
+            SizeConventionEnum(kwargs.get("size_convention")),
+            Decimal(kwargs.get("oblateness")),
+            Decimal(kwargs.get("prolateness"))
+        )
+    elif type == GeometrySchemaTypesEnum.truncated_octahedron:
+        return get_truncated_octahedron(
+            session,
+            Decimal(kwargs.get("size")),
+            Decimal(kwargs.get("element_size")),
+            SizeConventionEnum(kwargs.get("size_convention")),
+            Decimal(kwargs.get("truncation_factor")),
+            Decimal(kwargs.get("aspect_ratio"))
+        )
     else:
-        return geometry
+        raise RuntimeError("Unknown GeometryEnum type")
+
+
+def get_ellipsoid(session, size: Decimal, element_size: Decimal, size_convention: SizeConventionEnum,
+                  oblateness: Decimal, prolateness: Decimal):
+    r"""
+    Retrieve an ellipsoid from the database.
+
+    :param session:
+    :param size:
+    :param element_size:
+    :param size_convention:
+    :param oblateness:
+    :param prolateness:
+
+    :return: an existing ellipsoid object from the database.
+
+    """
+    return session.query(Ellipsoid).\
+        join(SizeConvention, SizeConvention.id == Ellipsoid.size_convention_id). \
+        filter(Ellipsoid.size == size). \
+        filter(Ellipsoid.element_size == element_size). \
+        filter(SizeConvention.symbol == size_convention.value). \
+        filter(Ellipsoid.prolateness == prolateness). \
+        filter(Ellipsoid.oblateness == oblateness). \
+        one_or_none()
+
+
+def get_truncated_octahedron(session, size: Decimal, element_size: Decimal, size_convention: SizeConventionEnum,
+                             truncation_factor: Decimal, aspect_ratio: Decimal):
+    r"""
+    Retrieve a truncated octahedron from the database.
+
+    :param session:
+    :param size:
+    :param element_size:
+    :param size_convention:
+    :param truncation_factor:
+    :param aspect_ratio:
+
+    :return: an existing truncated octahedron object from the database.
+
+    """
+    return session.query(TruncatedOctahedron). \
+        join(SizeConvention, SizeConvention.id == TruncatedOctahedron.size_convention_id). \
+        filter(TruncatedOctahedron.size == size). \
+        filter(TruncatedOctahedron.element_size == element_size). \
+        filter(SizeConvention.symbol == size_convention.value). \
+        filter(TruncatedOctahedron.truncation_factor == truncation_factor). \
+        filter(TruncatedOctahedron.aspect_ratio == aspect_ratio). \
+        one_or_none()

@@ -8,11 +8,9 @@ from m4db_database.orm.latest import Geometry
 from m4db_database.orm.latest import Material
 from m4db_database.orm.latest import Metadata
 from m4db_database.orm.latest import Model
-from m4db_database.orm.latest import ModelMaterialAssociation
 from m4db_database.orm.latest import RunningStatus
 from m4db_database.orm.latest import SizeConvention
 from m4db_database.orm.latest import Software
-from m4db_database.orm.latest import Unit
 
 
 def get_models(session, **kwargs):
@@ -25,7 +23,6 @@ def get_models(session, **kwargs):
     models_query = session.query(Model). \
         join(RunningStatus, Model.running_status_id == RunningStatus.id). \
         join(Geometry, Geometry.id == Model.geometry_id). \
-        join(Unit, Unit.id == Geometry.size_unit_id). \
         join(SizeConvention, SizeConvention.id == Geometry.size_convention_id). \
         join(Metadata, Metadata.id == Model.mdata_id). \
         join(DBUser, DBUser.id == Metadata.db_user_id). \
