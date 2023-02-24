@@ -161,7 +161,7 @@ def run_neb(unique_id):
         # Compress each file in the directory.
         logger.debug("Zipping files")
         src_files = os.listdir(".")
-        src_zip_file = GLOBAL.data_zip
+        src_zip_file = GLOBAL.DATA_ZIP
         zout = zipfile.ZipFile(src_zip_file, "w", zipfile.ZIP_DEFLATED)
         for src_file in src_files:
             logger.debug(f"{src_file} --> {src_zip_file}")

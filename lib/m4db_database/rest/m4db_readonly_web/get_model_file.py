@@ -39,7 +39,7 @@ class GetAllModelDataZip:
             self.config["file_root"],
             GLOBAL.MODEL_DIRECTORY_NAME,
             uid_to_dir(unique_id),
-            GLOBAL.data_zip
+            GLOBAL.DATA_ZIP
         )
 
         if not os.path.isfile(data_zip):
@@ -63,8 +63,8 @@ class GetModelJSONZip:
         try:
             unarchive_model(unique_id, req.temp_dir)
 
-            model_json = os.path.join(req.temp_dir, GLOBAL.magnetization_json_file_name)
-            model_json_zip = os.path.join(req.temp_dir, GLOBAL.magnetization_json_zip_file_name)
+            model_json = os.path.join(req.temp_dir, GLOBAL.MAGNETIZATION_JSON_FILE_NAME)
+            model_json_zip = os.path.join(req.temp_dir, GLOBAL.MAGNETIZATION_JSON_ZIP_FILE_NAME)
 
             if not os.path.isfile(model_json):
                 self.logger.debug(f"Could not find '{model_json}' in unarchived data set.")
@@ -96,8 +96,8 @@ class GetModelTecplotZip:
         try:
             unarchive_model(unique_id, req.temp_dir)
 
-            model_tecplot = os.path.join(req.temp_dir, GLOBAL.magnetization_tecplot_file_name)
-            model_tecplot_zip = os.path.join(req.temp_dir, GLOBAL.magnetization_tecplot_zip_file_name)
+            model_tecplot = os.path.join(req.temp_dir, GLOBAL.MAGNETIZATION_TECPLOT_FILE_NAME)
+            model_tecplot_zip = os.path.join(req.temp_dir, GLOBAL.MAGNETIZATION_TECPLOT_ZIP_FILE_NAME)
 
             if not os.path.isfile(model_tecplot):
                 self.logger.debug(f"Could not find '{model_tecplot}' in unarchived data set.")

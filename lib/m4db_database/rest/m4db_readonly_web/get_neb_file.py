@@ -30,7 +30,7 @@ class GetAllNEBDataZip:
             self.config["file_root"],
             GLOBAL.NEB_DIRECTORY_NAME,
             uid_to_dir(unique_id),
-            GLOBAL.data_zip
+            GLOBAL.DATA_ZIP
         )
 
         if not os.path.isfile(data_zip):

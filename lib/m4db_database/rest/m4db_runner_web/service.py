@@ -10,7 +10,7 @@ from m4db_database.rest.m4db_runner_web.get_software_executable import GetSoftwa
 
 # from m4db_database.rest.m4db_runner_web.set_model_running_status import SetModelRunningStatus
 # from m4db_database.rest.m4db_runner_web.set_model_quants import SetModelQuants
-# from m4db_database.rest.m4db_runner_web.get_model_merrill_script import GetModelMerrillScript
+from m4db_database.rest.m4db_runner_web.get_model_merrill_script import GetModelMerrillScript
 # from m4db_database.rest.m4db_runner_web.get_model_running_status import GetModelRunningStatus
 # from m4db_database.rest.m4db_runner_web.get_model_software_executable import GetModelSoftwareExecutable
 # from m4db_database.rest.m4db_runner_web.get_model_start_magnetization import GetModelStartMagnetization
@@ -56,13 +56,13 @@ app.add_route(
 # app.add_route(
 #     "/set_model_quants", set_model_quants
 # )
-#
-# # Model: get merrill model scripts.
-# get_model_merrill_script = GetModelMerrillScript()
-# app.add_route(
-#     "/get_model_merrill_script/{unique_id}", get_model_merrill_script
-# )
-#
+
+# Model: get merrill model scripts.
+get_model_merrill_script = GetModelMerrillScript()
+app.add_route(
+    "/get-model-merrill-script/{unique_id}", get_model_merrill_script
+)
+
 # # Model: get model running status.
 # get_model_running_status = GetModelRunningStatus()
 # app.add_route(

@@ -17,13 +17,12 @@ from m4db_database.configuration import read_config_from_environ
 from m4db_database.utilities.logger import setup_logger
 from m4db_database.utilities.logger import get_logger
 
-
 from m4db_database.orm.schema import Project, Material, Model, UniformInitialMagnetization, ModelInitialMagnetization, \
     RandomInitialMagnetization, UniformAppliedField, ModelRunData, ModelReportData, Metadata, Software, RunningStatus, \
     AnisotropyForm
 from m4db_database.orm.schema import DBUser
 
-from m4db_database.orm.model_json_creation_schema import ModelListSchema, InitialMagnetizationSchemaTypesEnum
+from m4db_database.orm.model_creation_schema import ModelListSchema, InitialMagnetizationSchemaTypesEnum
 
 from m4db_database.sessions import get_session
 
@@ -46,8 +45,8 @@ def print_validation_error_message(e):
 
 
 @app.command()
-def add_model(model_json_file: str, user_name: str, project_name: str, software_name: str, software_version: str,
-              dry_run: bool = True):
+def add(model_json_file: str, user_name: str, project_name: str, software_name: str, software_version: str,
+        dry_run: bool = True):
     r"""
     Adds a new model to the database based on the input json file.
 
@@ -59,7 +58,6 @@ def add_model(model_json_file: str, user_name: str, project_name: str, software_
     :param dry_run: a flag to indicate that we only wish to validate and dry-run the models given in the input JSON file
                     by default this is on (i.e. --dry-run flag is automatically set), set this flag to --no-dry-run
                     to write the data to the database.
-
     :return: None
     """
 
@@ -99,6 +97,7 @@ def add_model(model_json_file: str, user_name: str, project_name: str, software_
 
         # Perform additional checks.
         for index, model in enumerate(models.models):
+
             existing_geometry = get_geometry(session, schema_object=model.geometry)
             if existing_geometry is None:
                 print(f"Could not find geometry for model in position {index}.")
@@ -112,6 +111,20 @@ def add_model(model_json_file: str, user_name: str, project_name: str, software_
                     print(f"Could not find model for initial model magnetization with unique id: "
                           f"{model.initial_magnetization.unique_id}")
                     sys.exit(1)
+
+            if model.unique_id is not None:
+                existing_model = session.query(Model). \
+                    filter(Model.unique_id == model.unique_id). \
+                    one_or_none()
+                if existing_model is not None:
+                    print(f"Attempting to add a model with specified unique id in position {index}, however this "
+                          f"id ({model.unique_id}) is already present.")
+                    sys.exit(1)
+
+            if len(model.materials) != existing_geometry.nsubmeshes:
+                print(f"When attempting to add a model, the chosen geometry has {existing_geometry.nsubmeshes} "
+                      f"however only {len(model.materials)} material elements were given.")
+                sys.exit(1)
 
         # If the user is intent on putting these models in the database, then perform the action.
         if dry_run is False:
@@ -180,9 +193,11 @@ def add_model(model_json_file: str, user_name: str, project_name: str, software_
                                                       dir_x=material.dir_x,
                                                       dir_y=material.dir_y,
                                                       dir_z=material.dir_z,
-                                                      anisotropy_form=existing_anisotropy_form))
+                                                      anisotropy_form=existing_anisotropy_form,
+                                                      submesh_id=material.submesh_id))
 
                     new_model = Model(
+                        unique_id=model.unique_id if model.unique_id is not None else None,
                         max_energy_evaluations=model.max_energy_evaluations,
                         geometry=existing_geometry,
                         materials=new_materials,
@@ -214,10 +229,6 @@ def add_model(model_json_file: str, user_name: str, project_name: str, software_
 def run(unique_id: str):
     config = read_config_from_environ()
     logger = get_logger()
-
-
-
-
 
 
 def entry_point():

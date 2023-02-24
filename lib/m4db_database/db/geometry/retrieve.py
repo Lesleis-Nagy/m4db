@@ -6,7 +6,7 @@ from decimal import Decimal
 from m4db_database.orm.schema import SizeConvention, Ellipsoid, TruncatedOctahedron
 from m4db_database.orm.schema import SizeConventionEnum
 
-from m4db_database.orm.model_json_creation_schema import GeometrySchemaTypesEnum
+from m4db_database.orm.model_creation_schema import GeometrySchemaTypesEnum
 
 
 def get_geometry(session, **kwargs):

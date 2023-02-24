@@ -130,9 +130,9 @@ def run_model(unique_id):
         logger.info(f"merrill completed after {time_taken}s")
 
         # Check whether a file called "magnetization_mult.tec" was created - if so then rename it.
-        if os.path.isfile(GLOBAL.magnetization_mult_tecplot_file_name):
-            logger.debug(fr"renaming {GLOBAL.magnetization_mult_tecplot_file_name} to {GLOBAL.magnetization_tecplot_file_name}")
-            os.rename(GLOBAL.magnetization_mult_tecplot_file_name, GLOBAL.magnetization_tecplot_file_name)
+        if os.path.isfile(GLOBAL.MAGNETIZATION_MULT_TECPLOT_FILE_NAME):
+            logger.debug(fr"renaming {GLOBAL.MAGNETIZATION_MULT_TECPLOT_FILE_NAME} to {GLOBAL.MAGNETIZATION_TECPLOT_FILE_NAME}")
+            os.rename(GLOBAL.MAGNETIZATION_MULT_TECPLOT_FILE_NAME, GLOBAL.MAGNETIZATION_TECPLOT_FILE_NAME)
 
         # Check output.
         logger.debug("Checking output")
@@ -148,12 +148,12 @@ def run_model(unique_id):
 
         # Calculate additional quants.
         logger.debug("Calculating quants")
-        ug, tec_raw = tec_to_unstructured_grid(GLOBAL.magnetization_tecplot_file_name)
+        ug, tec_raw = tec_to_unstructured_grid(GLOBAL.MAGNETIZATION_TECPLOT_FILE_NAME)
         quants2 = net_quantities(ug)
 
         # Save a JSON version of our model.
         logger.debug("Creating quant file")
-        with open(GLOBAL.magnetization_json_file_name, "w") as fout:
+        with open(GLOBAL.MAGNETIZATION_JSON_FILE_NAME, "w") as fout:
             fout.write(json.dumps(tec_raw, cls=NumpyEncoder))
 
         # Update quants.
@@ -181,7 +181,7 @@ def run_model(unique_id):
         # Compress each file in the directory.
         logger.debug("Zipping files")
         src_files = os.listdir(".")
-        src_zip_file = GLOBAL.data_zip
+        src_zip_file = GLOBAL.DATA_ZIP
         zout = zipfile.ZipFile(src_zip_file, "w", zipfile.ZIP_DEFLATED)
         for src_file in src_files:
             logger.debug(f"{src_file} --> {src_zip_file}")

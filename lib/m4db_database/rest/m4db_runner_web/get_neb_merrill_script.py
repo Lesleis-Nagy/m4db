@@ -11,7 +11,7 @@ from m4db_database.utilities.unique_id import uid_to_dir
 from m4db_database.orm.schema import NEB
 
 from m4db_database import GLOBAL
-from m4db_database.templates import template_env
+from m4db_database.template import template_loader
 
 
 def runner_data_with_parent(neb):
@@ -62,7 +62,7 @@ def runner_data_with_parent(neb):
         runner_data["external_field"]["z"] = neb.external_field.dir_z
         runner_data["external_field"]["unit"] = unit_symbol
 
-    runner_data["energy_log_file"] = GLOBAL.energy_log_file_name
+    runner_data["energy_log_file"] = GLOBAL.ENERGY_LOG_FILE_NAME
 
     runner_data["minimizer"] = "ConjugateGradient"
     runner_data["exchange_calculator"] = "1"
@@ -126,14 +126,14 @@ def runner_data_without_parent(neb):
     # Start and end models.
     runner_data["start_magnetization"] = os.path.join(
         neb.start_model.unique_id,
-        GLOBAL.magnetization_dat_file_name
+        GLOBAL.MAGNETIZATION_DAT_FILE_NAME
     )
     runner_data["end_magnetization"] = os.path.join(
         neb.end_model.unique_id,
-        GLOBAL.magnetization_dat_file_name
+        GLOBAL.MAGNETIZATION_DAT_FILE_NAME
     )
 
-    runner_data["energy_log_file"] = GLOBAL.energy_log_file_name
+    runner_data["energy_log_file"] = GLOBAL.ENERGY_LOG_FILE_NAME
     runner_data["neb_path_points"] = neb.no_of_points
 
     runner_data["minimizer"] = "ConjugateGradient"
@@ -162,9 +162,9 @@ class GetNEBMerrillScript:
         # Depending on whether this has a parent, generate a scripts
         if neb.parent_neb:
             runner_data = runner_data_with_parent(neb)
-            merrill_template = template_env("merrill").get_template("merrill_neb_child_path.jinja2")
+            merrill_template = template_loader("merrill").get_template("merrill_neb_child_path.jinja2")
         else:
             runner_data = runner_data_without_parent(neb)
-            merrill_template = template_env("merrill").get_template("merrill_neb_root_path.jinja2")
+            merrill_template = template_loader("merrill").get_template("merrill_neb_root_path.jinja2")
 
         resp.text = json.dumps({"return": merrill_template.render(neb=runner_data)})

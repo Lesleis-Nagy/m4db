@@ -11,6 +11,12 @@ class GLOBAL:
     Dummy class to define some global variables.
     """
 
+    # The global field unit
+    FIELD_UNIT = "mT"
+
+    # The global size unit
+    SIZE_UNIT = "um"
+
     # Unique ids
     HEX_RE_STR = r'[0-9A-Fa-f]'
     UID_REGEX = r'{hx:}{{8}}-{hx:}{{4}}-{hx:}{{4}}-{hx:}{{4}}-{hx:}{{12}}'.format(hx=HEX_RE_STR)
@@ -64,25 +70,53 @@ class GLOBAL:
     # The format used for logging.
     LOGGER_FORMAT = "%(asctime)s — %(levelname)s — %(pathname)s:%(funcName)s:%(lineno)d — %(message)s"
 
-    # The temporary name of the cubit script when we're generating meshes.
-    CUBIT_SCRIPT_NAME = "temporary.cubit"
+    # The default minimizer to use.
+    DEFAULT_ENERGY_MINIMIZER = "ConjugateGradient"
+
+    # The default exchange calculator.
+    DEFAULT_EXCHANGE_CALCULATOR = "1"
+
+    # The energy log files for all runs are all named this.
+    ENERGY_LOG_FILE_NAME = "energy"
+
+    # Data is always archived as
+    DATA_ZIP = "data.zip"
+
+    # The name of a magnetization .dat file.
+    MAGNETIZATION_DAT_FILE_NAME = "magnetization.dat"
+
+    # The name of a magnetization tecplot file.
+    MAGNETIZATION_TECPLOT_FILE_NAME = "magnetization.tec"
+
+    # The name of a magnetization zip file.
+    MAGNETIZATION_TECPLOT_ZIP_FILE_NAME = "magnetization.zip"
+
+    # The name of a magnetization JSON file.
+    MAGNETIZATION_JSON_FILE_NAME = "magnetization.json"
+
+    # The name of a zipped magnetization JSON file.
+    MAGNETIZATION_JSON_ZIP_FILE_NAME = "magnetization_json.zip"
+
+    # The name of a magnetization_mult.tec file (these are produced by merrill).
+    MAGNETIZATION_MULT_TECPLOT_FILE_NAME = "magnetization_mult.tec"
+
+    # The magnetization output name used in merrill (to produce magnetization_mult.tec) files.
+    MAGNETIZATION_OUTPUT_FILE_NAME = "magnetization"
+
+    # When running models that have parent models, the parent tecplot file is copied to the working dir with this name
+    INITIAL_MODEL_TECPLOT_FILE_NAME = "initial_model.tec"
 
 
-    energy_log_file_name = "energy"
 
-    data_zip = "data.zip"
-
-    magnetization_dat_file_name = "magnetization.dat"
-    magnetization_tecplot_file_name = "magnetization.tec"
-    magnetization_tecplot_zip_file_name = "magnetization.zip"
-    magnetization_json_file_name = "magnetization.json"
-    magnetization_json_zip_file_name = "magnetization_json.zip"
-    magnetization_mult_tecplot_file_name = "magnetization_mult.tec"
-    magnetization_output_file_name = "magnetization"
 
     model_merrill_script_file_name = "model_script.merrill"
     model_stdout_file_name = "model_stdout.txt"
     model_stderr_file_name = "model_stderr.txt"
+
+
+
+
+
 
     neb_merrill_script_file_name = "neb_script.merrill"
     neb_stdout_file_name = "neb_stdout.txt"

@@ -10,7 +10,7 @@ from tempfile import NamedTemporaryFile
 from m4db_database.sessions import get_session
 from m4db_database.configuration import read_config_from_environ
 
-from m4db_database.templates import template_env
+from m4db_database.template import template_loader
 from m4db_database.db.model.retrieve import get_models
 from m4db_database.rest_api.m4db_runner_web.set_model_running_status import set_model_running_status
 
@@ -22,7 +22,7 @@ def schedule_model(unique_id):
     :return: None
     """
     config = read_config_from_environ()
-    slurm_template = template_env("slurm").get_template("slurm_model.jinja2")
+    slurm_template = template_loader("slurm").get_template("slurm_model.jinja2")
 
     sdata = {
         "unique_id": unique_id,

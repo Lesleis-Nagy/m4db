@@ -28,6 +28,7 @@ setup(
         "msgpack"
     ],
     include_package_data=True,
+    package_data={"": ["*.jinja2"]},
     entry_points="""
     [console_scripts]
     m4db-setup-database=m4db_database.scripts.m4db_setup_database.cmd_line_tool:entry_point

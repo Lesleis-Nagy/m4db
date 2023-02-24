@@ -202,6 +202,7 @@ class ModelSchema(schematics.models.Model):
     r"""
     Schema object for validating new model schemas.
     """
+    unique_id = schematics.types.StringType(regex=GLOBAL.UID_REGEX, required=False, serialized_name="unique-id")
 
     max_energy_evaluations = schematics.types.IntType(min_value=0, default="10000",
                                                       serialized_name="max-energy-evaluations")

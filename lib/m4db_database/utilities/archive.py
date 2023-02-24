@@ -22,11 +22,11 @@ def archive_dir(directory):
 
         # Check that the data archive is present.
         src_files = os.listdir(".")
-        if global_vars.data_zip in src_files:
+        if global_vars.DATA_ZIP in src_files:
             return
         else:
             # If the data archive is *not* present, create it.
-            with zipfile.ZipFile(global_vars.data_zip, "w", zipfile.ZIP_DEFLATED) as zout:
+            with zipfile.ZipFile(global_vars.DATA_ZIP, "w", zipfile.ZIP_DEFLATED) as zout:
                 for src_file in src_files:
                     zout.write(src_file)
                 zout.close()
@@ -95,7 +95,7 @@ def unarchive_model(unique_id, destination):
         config["file_root"],
         global_vars.model_directory_name,
         uid_to_dir(unique_id),
-        global_vars.data_zip
+        global_vars.DATA_ZIP
     )
 
     unarchive_to_dir(model_archive, destination)
@@ -114,7 +114,7 @@ def unarchive_neb(unique_id, destination):
         config["file_root"],
         global_vars.NEB_DIRECTORY_NAME,
         uid_to_dir(unique_id),
-        global_vars.data_zip
+        global_vars.DATA_ZIP
     )
 
     unarchive_to_dir(model_archive, destination)

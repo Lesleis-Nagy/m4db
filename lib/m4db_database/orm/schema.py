@@ -31,6 +31,8 @@
 #                                        "GeometryClassEnum" that enumerates the geometry classes supported.
 #
 
+import os
+
 from datetime import datetime
 from enum import Enum
 
@@ -482,6 +484,7 @@ class Material(Base):
     __tablename__ = 'material'
 
     id = Column(Integer, primary_key=True, nullable=False)
+    submesh_id = Column(Integer, nullable=False)
     name = Column(String, nullable=False)
     temperature = Column(Numeric(8,3), nullable=False)
     k1 = Column(Float, nullable=True)
@@ -496,7 +499,7 @@ class Material(Base):
     k10 = Column(Float, nullable=True)
     aex = Column(Float, nullable=True)
     ms = Column(Float, nullable=True)
-    dir_x = Column(Float, nullable=True, default=0.0)
+    dir_x = Column(Float, nullable=True, default=1.0)
     dir_y = Column(Float, nullable=True, default=0.0)
     dir_z = Column(Float, nullable=True, default=0.0)
     last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
@@ -505,7 +508,7 @@ class Material(Base):
     anisotropy_form_id = Column(Integer, ForeignKey('anisotropy_form.id'), nullable=False)
     anisotropy_form = relationship('AnisotropyForm', uselist=False)
 
-    material_id = Column(Integer, ForeignKey("model.id"))
+    model_id = Column(Integer, ForeignKey("model.id"))
 
     def as_dict(self):
         r"""
