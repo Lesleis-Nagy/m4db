@@ -8,10 +8,10 @@ import os
 from m4db_database.configuration import read_config_from_environ
 from m4db_database.utilities.unique_id import uid_to_dir
 
-from m4db_database.orm.latest import Model
-from m4db_database.orm.latest import RandomField
-from m4db_database.orm.latest import UniformField
-from m4db_database.orm.latest import ModelField
+from m4db_database.orm.schema import Model
+from m4db_database.orm.schema import RandomField
+from m4db_database.orm.schema import UniformField
+from m4db_database.orm.schema import ModelField
 
 from m4db_database import GLOBAL
 from m4db_database.templates import template_env

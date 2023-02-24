@@ -83,7 +83,8 @@ class MaterialSchemaTestCase(unittest.TestCase):
             "dir-x": 123.55,
             "dir-y": 123.66,
             "dir-z": 123.77,
-            "submesh-id": 123
+            "submesh-id": 123,
+            "anisotropy-form": "cubic"
         }"""))
 
         self.assertEqual(material.name, "magnetite")
@@ -95,6 +96,7 @@ class MaterialSchemaTestCase(unittest.TestCase):
         self.assertEqual(material.dir_y, 123.66)
         self.assertEqual(material.dir_z, 123.77)
         self.assertEqual(material.submesh_id, 123)
+        self.assertEqual(material.anisotropy_form, "cubic")
 
         material.validate()
 
@@ -103,7 +105,8 @@ class MaterialSchemaTestCase(unittest.TestCase):
         material = MaterialSchema(json.loads(r"""
         {
             "name": "magnetite",
-            "temperature": 123.11
+            "temperature": 123.11,
+            "anisotropy-form": "cubic"
         }"""))
 
         self.assertEqual(material.name, "magnetite")
@@ -287,8 +290,8 @@ class TestModelSchema(unittest.TestCase):
                             "truncation-factor": 0.700
                         },
                         "materials": [
-                            {"name": "magnetite", "temperature": 20.0, "submesh-id": 1},
-                            {"name": "maghemite", "temperature": 20.0, "submesh-id": 2}
+                            {"name": "magnetite", "temperature": 20.0, "submesh-id": 1, "anisotropy-form": "cubic"},
+                            {"name": "maghemite", "temperature": 20.0, "submesh-id": 2, "anisotropy-form": "cubic"}
                         ],
                         "initial-magnetization": {
                             "type": "random"
@@ -306,8 +309,8 @@ class TestModelSchema(unittest.TestCase):
                             "truncation-factor": 0.700
                         },
                         "materials": [
-                            {"name": "magnetite", "temperature": 20.0, "submesh-id": 1},
-                            {"name": "maghemite", "temperature": 20.0, "submesh-id": 2}
+                            {"name": "magnetite", "temperature": 20.0, "submesh-id": 1, "anisotropy-form": "cubic"},
+                            {"name": "maghemite", "temperature": 20.0, "submesh-id": 2, "anisotropy-form": "cubic"}
                         ],
                         "initial-magnetization": {
                             "type": "random"

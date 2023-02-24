@@ -15,14 +15,14 @@ app = typer.Typer()
 @app.command()
 def update(schema_name: str):
     r"""
-    Update the 'latest.py' schema with this schema.
+    Update the 'schema.py' schema with this schema.
 
-    :param schema_name: the name of the schema with which to update 'latest.py'.
+    :param schema_name: the name of the schema with which to update 'schema.py'.
     """
     match_schema_name = regex_schema_name.match(schema_name)
     if match_schema_name:
         src_file = os.path.join(ORM_SCHEMA_DIR, f"{schema_name}.py")
-        dst_file = os.path.join(ORM_SCHEMA_DIR, "latest.py")
+        dst_file = os.path.join(ORM_SCHEMA_DIR, "schema.py")
         if os.path.isfile(src_file):
             shutil.copy(src_file, dst_file)
         else:

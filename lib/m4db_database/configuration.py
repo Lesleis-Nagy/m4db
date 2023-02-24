@@ -3,13 +3,24 @@ import os
 import yaml
 
 from schematics.models import Model
-from schematics.types import StringType
+from schematics.types import StringType, IntType
 from schematics.types import BooleanType
 from schematics.types.compound import ModelType
 
 from m4db_database.decorators import static
 
 from m4db_database import GLOBAL
+
+
+class RunnerWeb(Model):
+    r"""
+    Class to hold configuration information about the runner web service.
+    """
+    host = StringType(regex=r"((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w\-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)",
+                      required=True)
+    port = IntType(required=True)
+    no_of_retries = IntType(required=True, serialized_name="no-of-retries")
+    backoff_factor = IntType(required=True, serialized_name="backoff-factor")
 
 
 class Database(Model):
@@ -34,7 +45,7 @@ class Logging(Model):
                                 "info",
                                 "debug"],
                        default="error")
-    log_to_stdout = BooleanType(default=False, deserialize_from="log-to-stdout")
+    log_to_stdout = BooleanType(default=False, serialized_name="log-to-stdout")
 
 
 class Configuration(Model):
@@ -42,8 +53,9 @@ class Configuration(Model):
     Class to hold configuration information for M4DB_DATABASE.
     """
     password_salt = StringType(required=True, serialized_name="password-salt")
-    database = ModelType(Database)
+    database = ModelType(Database, required=True)
     logging = ModelType(Logging, default=Logging())
+    runner_web = ModelType(RunnerWeb, required=True, serialized_name="runner-web")
 
 
 def read_config_from_file(file_name: str) -> Configuration:
@@ -58,6 +70,7 @@ def read_config_from_file(file_name: str) -> Configuration:
     with open(file_name, "r") as fin:
         config_dict = yaml.load(fin, Loader=yaml.FullLoader)
         config = Configuration(config_dict)
+        config.validate()
 
     return config
 

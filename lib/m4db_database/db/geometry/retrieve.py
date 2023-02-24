@@ -3,8 +3,8 @@ A collection of functions that retrieve geometries from the database.
 """
 from decimal import Decimal
 
-from m4db_database.orm.latest import SizeConvention, Ellipsoid, TruncatedOctahedron
-from m4db_database.orm.latest import SizeConventionEnum
+from m4db_database.orm.schema import SizeConvention, Ellipsoid, TruncatedOctahedron
+from m4db_database.orm.schema import SizeConventionEnum
 
 from m4db_database.orm.model_json_creation_schema import GeometrySchemaTypesEnum
 

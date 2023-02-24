@@ -4,7 +4,7 @@ import pandas as pd
 
 from tabulate import tabulate
 
-from m4db_database.orm.latest import DBUser
+from m4db_database.orm.schema import DBUser
 
 from m4db_database.sessions import get_session
 

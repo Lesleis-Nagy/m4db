@@ -17,12 +17,12 @@ from tabulate import tabulate
 
 from sqlalchemy.exc import IntegrityError
 
-from m4db_database.orm.latest import Ellipsoid
-from m4db_database.orm.latest import TruncatedOctahedron
-from m4db_database.orm.latest import SizeConvention
-from m4db_database.orm.latest import SizeConventionEnum
+from m4db_database.orm.schema import Ellipsoid
+from m4db_database.orm.schema import TruncatedOctahedron
+from m4db_database.orm.schema import SizeConvention
+from m4db_database.orm.schema import SizeConventionEnum
 
-from m4db_database.orm.latest import new_unique_id
+from m4db_database.orm.schema import new_unique_id
 
 from m4db_database.sessions import get_session
 from m4db_database.utilities.directories import geometry_directory

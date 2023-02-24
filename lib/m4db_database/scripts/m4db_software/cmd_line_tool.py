@@ -9,7 +9,7 @@ import pandas as pd
 
 from tabulate import tabulate
 
-from m4db_database.orm.latest import Software
+from m4db_database.orm.schema import Software
 
 from m4db_database.sessions import get_session
 

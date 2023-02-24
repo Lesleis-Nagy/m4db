@@ -4,7 +4,7 @@ A service to retrieve the software executable associated with an NEB.
 
 import json
 
-from m4db_database.orm.latest import NEB
+from m4db_database.orm.schema import NEB
 
 
 class GetNEBSoftwareExecutable:

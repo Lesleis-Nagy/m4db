@@ -5,7 +5,7 @@ import falcon
 
 import simplejson as json
 
-from m4db_database.orm.latest import Project
+from m4db_database.orm.schema import Project
 
 
 class GetProjects:

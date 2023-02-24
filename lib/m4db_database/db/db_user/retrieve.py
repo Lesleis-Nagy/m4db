@@ -2,7 +2,7 @@ r"""
 A collection of routines to retrieve users from the database.
 """
 
-from m4db_database.orm.latest import DBUser
+from m4db_database.orm.schema import DBUser
 
 
 def retrieve_db_user(user_name, session):

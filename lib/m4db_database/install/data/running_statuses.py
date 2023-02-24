@@ -2,7 +2,7 @@ r"""
 Add supported running statuses to the database.
 """
 
-from m4db_database.orm.latest import RunningStatus
+from m4db_database.orm.schema import RunningStatus
 
 
 def populate_running_statuses(session):

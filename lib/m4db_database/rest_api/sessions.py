@@ -20,8 +20,8 @@ def get_session():
     session = requests.session()
 
     retries = Retry(
-        total=config["m4db_runner_web"]["no_of_retries"],
-        backoff_factor=config["m4db_runner_web"]["backoff_factor"],
+        total=config.runner_web.no_of_retries,
+        backoff_factor=config.runner_web.backoff_factor,
         status_forcelist=[500, 502, 503, 504]
     )
     session.mount("http://", HTTPAdapter(max_retries=retries))

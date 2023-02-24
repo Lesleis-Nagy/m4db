@@ -2,8 +2,8 @@ r"""
 A collection of functions that retrieve material sets from the database.
 """
 
-from m4db_database.orm.latest import Material
-from m4db_database.orm.latest import ModelMaterialAssociation
+from m4db_database.orm.schema import Material
+from m4db_database.orm.schema import ModelMaterialAssociation
 
 
 def create_model_material_associations(session, json_model_dict):

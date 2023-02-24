@@ -2,8 +2,8 @@ r"""
 A service to set a model's running status.
 """
 
-from m4db_database.orm.latest import RunningStatus
-from m4db_database.orm.latest import Model
+from m4db_database.orm.schema import RunningStatus
+from m4db_database.orm.schema import Model
 
 
 class SetModelRunningStatus:

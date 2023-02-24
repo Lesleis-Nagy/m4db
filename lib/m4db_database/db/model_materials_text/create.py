@@ -2,7 +2,7 @@ r"""
 A collection of routines to create ModelMaterialsText objects.
 """
 
-from m4db_database.orm.latest import ModelMaterialsText
+from m4db_database.orm.schema import ModelMaterialsText
 
 
 def create_model_materials_text(json_model_dict, sep=","):

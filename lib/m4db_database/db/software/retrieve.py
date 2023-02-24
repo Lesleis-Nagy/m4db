@@ -2,7 +2,7 @@ r"""
 A collection of routines to retrieve software info from the database.
 """
 
-from m4db_database.orm.latest import Software
+from m4db_database.orm.schema import Software
 
 
 def retrieve_software(session, software_name, software_version: str, allow_none=False):

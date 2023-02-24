@@ -4,7 +4,7 @@ A service to generate a scripts to retrieve a model's running status.
 
 import json
 
-from m4db_database.orm.latest import Model
+from m4db_database.orm.schema import Model
 
 
 class GetModelRunningStatus:

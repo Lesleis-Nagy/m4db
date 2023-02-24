@@ -13,7 +13,7 @@ from m4db_database import GLOBAL
 ######################################################################################################################
 # Geometry schemas                                                                                                   #
 ######################################################################################################################
-from m4db_database.orm.latest import AnisotropyFormEnum, SizeConventionEnum
+from m4db_database.orm.schema import AnisotropyFormEnum, SizeConventionEnum
 
 
 class GeometrySchemaTypesEnum(Enum):

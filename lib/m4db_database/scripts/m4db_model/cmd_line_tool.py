@@ -18,10 +18,10 @@ from m4db_database.utilities.logger import setup_logger
 from m4db_database.utilities.logger import get_logger
 
 
-from m4db_database.orm.latest import Project, Material, Model, UniformInitialMagnetization, ModelInitialMagnetization, \
+from m4db_database.orm.schema import Project, Material, Model, UniformInitialMagnetization, ModelInitialMagnetization, \
     RandomInitialMagnetization, UniformAppliedField, ModelRunData, ModelReportData, Metadata, Software, RunningStatus, \
     AnisotropyForm
-from m4db_database.orm.latest import DBUser
+from m4db_database.orm.schema import DBUser
 
 from m4db_database.orm.model_json_creation_schema import ModelListSchema, InitialMagnetizationSchemaTypesEnum
 

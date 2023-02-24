@@ -2,7 +2,7 @@ r"""
 Add supported NEB calculation types to the database.
 """
 
-from m4db_database.orm.latest import NEBCalculationType
+from m4db_database.orm.schema import NEBCalculationType
 
 
 def populate_neb_calculation_types(session):

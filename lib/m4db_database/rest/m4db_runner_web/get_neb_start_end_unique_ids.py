@@ -4,7 +4,7 @@ A service to retrieve the start/end unique ids associated with an NEB.
 
 import json
 
-from m4db_database.orm.latest import NEB
+from m4db_database.orm.schema import NEB
 
 
 class GetNebStartEndUniqueIds:

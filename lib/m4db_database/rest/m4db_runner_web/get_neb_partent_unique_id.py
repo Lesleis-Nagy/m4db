@@ -4,7 +4,7 @@ A service to check if an NEB path has a parent or not.
 
 import json
 
-from m4db_database.orm.latest import NEB
+from m4db_database.orm.schema import NEB
 
 
 class GetNEBParentUniqueId:

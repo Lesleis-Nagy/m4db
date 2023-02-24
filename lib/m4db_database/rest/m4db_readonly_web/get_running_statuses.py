@@ -5,7 +5,7 @@ import falcon
 
 import simplejson as json
 
-from m4db_database.orm.latest import RunningStatus
+from m4db_database.orm.schema import RunningStatus
 
 
 class GetRunningStatuses:

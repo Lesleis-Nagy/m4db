@@ -7,9 +7,9 @@ from tabulate import tabulate
 
 from m4db_database.sessions import get_session
 
-from m4db_database.orm.latest import RunningStatus
-from m4db_database.orm.latest import Model
-from m4db_database.orm.latest import NEB
+from m4db_database.orm.schema import RunningStatus
+from m4db_database.orm.schema import Model
+from m4db_database.orm.schema import NEB
 
 
 def model_general_action():

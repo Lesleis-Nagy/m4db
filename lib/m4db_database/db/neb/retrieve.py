@@ -4,17 +4,17 @@ A selection of routines to retrieve NEB paths from the database.
 
 from sqlalchemy import tuple_
 
-from m4db_database.orm.latest import DBUser
-from m4db_database.orm.latest import Geometry
-from m4db_database.orm.latest import Material
-from m4db_database.orm.latest import Metadata
-from m4db_database.orm.latest import Model
-from m4db_database.orm.latest import ModelMaterialAssociation
-from m4db_database.orm.latest import RunningStatus
-from m4db_database.orm.latest import SizeConvention
-from m4db_database.orm.latest import Software
-from m4db_database.orm.latest import Unit
-from m4db_database.orm.latest import NEB
+from m4db_database.orm.schema import DBUser
+from m4db_database.orm.schema import Geometry
+from m4db_database.orm.schema import Material
+from m4db_database.orm.schema import Metadata
+from m4db_database.orm.schema import Model
+from m4db_database.orm.schema import ModelMaterialAssociation
+from m4db_database.orm.schema import RunningStatus
+from m4db_database.orm.schema import SizeConvention
+from m4db_database.orm.schema import Software
+from m4db_database.orm.schema import Unit
+from m4db_database.orm.schema import NEB
 
 
 def get_nebs(session, **kwargs):

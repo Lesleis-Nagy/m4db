@@ -4,8 +4,8 @@ A set of utilities that check whether an neb path with the given start/end model
 
 from sqlalchemy.orm import aliased
 
-from m4db_database.orm.latest import Model
-from m4db_database.orm.latest import NEB
+from m4db_database.orm.schema import Model
+from m4db_database.orm.schema import NEB
 
 
 def parent_path_with_models_exists(session, model_unique_id_one, model_unique_id_two):

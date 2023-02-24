@@ -10,7 +10,7 @@ from sqlalchemy.pool import NullPool
 
 from typer import Typer
 
-from m4db_database.orm.latest import Base
+from m4db_database.orm.schema import Base
 
 from m4db_database import GLOBAL
 

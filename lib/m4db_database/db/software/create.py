@@ -2,7 +2,7 @@ r"""
 A selection of routines for creating software objects.
 """
 
-from m4db_database.orm.latest import Software
+from m4db_database.orm.schema import Software
 
 
 def create_software(session, name, version, executable, description, url, citation):

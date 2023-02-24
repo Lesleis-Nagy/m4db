@@ -5,9 +5,9 @@ import falcon
 
 import simplejson as json
 
-from m4db_database.orm.latest import Geometry
-from m4db_database.orm.latest import Unit
-from m4db_database.orm.latest import SizeConvention
+from m4db_database.orm.schema import Geometry
+from m4db_database.orm.schema import Unit
+from m4db_database.orm.schema import SizeConvention
 
 
 class GetAllGeometryNames:

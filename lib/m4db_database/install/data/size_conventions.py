@@ -2,7 +2,7 @@ r"""
 Add supported size conventions to the database.
 """
 
-from m4db_database.orm.latest import SizeConvention
+from m4db_database.orm.schema import SizeConvention
 
 
 def populate_size_conventions(session):

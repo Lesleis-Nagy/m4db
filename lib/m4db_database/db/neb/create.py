@@ -3,18 +3,18 @@ A set of routines to create new NEB paths.
 """
 from m4db_database.configuration import read_config_from_environ
 
-from m4db_database.orm.latest import Software
-from m4db_database.orm.latest import Project
-from m4db_database.orm.latest import DBUser
-from m4db_database.orm.latest import Metadata
-from m4db_database.orm.latest import Model
-from m4db_database.orm.latest import UniformField
-from m4db_database.orm.latest import Unit
-from m4db_database.orm.latest import NEBRunData
-from m4db_database.orm.latest import NEBReportData
-from m4db_database.orm.latest import RunningStatus
-from m4db_database.orm.latest import NEB
-from m4db_database.orm.latest import NEBCalculationType
+from m4db_database.orm.schema import Software
+from m4db_database.orm.schema import Project
+from m4db_database.orm.schema import DBUser
+from m4db_database.orm.schema import Metadata
+from m4db_database.orm.schema import Model
+from m4db_database.orm.schema import UniformField
+from m4db_database.orm.schema import Unit
+from m4db_database.orm.schema import NEBRunData
+from m4db_database.orm.schema import NEBReportData
+from m4db_database.orm.schema import RunningStatus
+from m4db_database.orm.schema import NEB
+from m4db_database.orm.schema import NEBCalculationType
 
 from m4db_database.db.neb.check_endpoint_exists import parent_path_with_models_exists
 

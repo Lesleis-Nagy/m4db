@@ -24,7 +24,8 @@ setup(
         "tabulate",
         "jinja2",
         "schematics",
-        "aenum"
+        "pytest",
+        "msgpack"
     ],
     include_package_data=True,
     entry_points="""

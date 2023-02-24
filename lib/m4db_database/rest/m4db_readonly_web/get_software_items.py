@@ -5,7 +5,7 @@ import falcon
 
 import simplejson as json
 
-from m4db_database.orm.latest import Software
+from m4db_database.orm.schema import Software
 
 
 class GetSoftwareItems:

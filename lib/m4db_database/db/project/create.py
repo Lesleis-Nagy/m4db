@@ -2,7 +2,7 @@ r"""
 A collection of routines for creating m4db projects.
 """
 
-from m4db_database.orm.latest import Project
+from m4db_database.orm.schema import Project
 
 
 def create_project(session, project_name, project_description):

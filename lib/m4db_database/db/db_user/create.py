@@ -3,7 +3,7 @@ A set of routines for creating m4db database users.
 """
 import uuid
 
-from m4db_database.orm.latest import DBUser
+from m4db_database.orm.schema import DBUser
 from m4db_database.utilities.password import password_hash
 
 

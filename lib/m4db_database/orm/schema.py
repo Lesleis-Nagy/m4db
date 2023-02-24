@@ -40,7 +40,7 @@ from sqlalchemy import Column, Integer, Float, String, DateTime, Boolean, Numeri
 from sqlalchemy import ForeignKey
 from sqlalchemy import UniqueConstraint, Index
 from sqlalchemy import event
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import column_property
 from sqlalchemy.orm import relationship
 

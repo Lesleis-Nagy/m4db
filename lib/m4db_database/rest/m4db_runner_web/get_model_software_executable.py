@@ -3,7 +3,7 @@ A service to retrieve the software executable associated with a model.
 """
 import json
 
-from m4db_database.orm.latest import Model
+from m4db_database.orm.schema import Model
 
 
 class GetModelSoftwareExecutable:

@@ -2,7 +2,7 @@ r"""
 A service to set a model's quants.
 """
 
-from m4db_database.orm.latest import Model
+from m4db_database.orm.schema import Model
 
 
 class SetModelQuants:

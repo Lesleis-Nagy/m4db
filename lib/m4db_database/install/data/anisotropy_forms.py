@@ -2,7 +2,7 @@ r"""
 Add supported anisotropy forms to the database.
 """
 
-from m4db_database.orm.latest import AnisotropyForm
+from m4db_database.orm.schema import AnisotropyForm
 
 
 def populate_anisotropy_forms(session):

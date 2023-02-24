@@ -2,7 +2,7 @@ r"""
 A collection of routines to retrieve project info from the database.
 """
 
-from m4db_database.orm.latest import Project
+from m4db_database.orm.schema import Project
 
 
 def retrieve_project(session, project_name):

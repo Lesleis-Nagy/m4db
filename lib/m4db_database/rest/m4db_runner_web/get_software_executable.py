@@ -5,10 +5,10 @@ A service to retrieve a software's executable.
 import json
 import falcon
 
-from m4db_database.orm.latest import Software
+from m4db_database.orm.schema import Software
 
 
-class GetSoftwareExecutable:
+class GetSoftware:
 
     def on_get(self, req, resp, name, version):
         r"""
@@ -19,9 +19,11 @@ class GetSoftwareExecutable:
         """
         software = self.session.query(Software). \
             filter(Software.name == name). \
-            filter(Software.version == version).one()
+            filter(Software.version == version).one_or_none()
 
-        if software.executable is None or software.executable == "":
+        if software is None:
             resp.status = falcon.HTTP_404
+            return
         else:
-            resp.body = json.dumps({"return": software.executable})
+            resp.text = json.dumps({"return": software.executable})
+            return

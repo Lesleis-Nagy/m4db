@@ -8,7 +8,7 @@ import os
 from m4db_database.configuration import read_config_from_environ
 from m4db_database.utilities.unique_id import uid_to_dir
 
-from m4db_database.orm.latest import NEB
+from m4db_database.orm.schema import NEB
 
 from m4db_database import GLOBAL
 from m4db_database.templates import template_env

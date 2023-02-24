@@ -7,29 +7,29 @@ from datetime import datetime
 
 from m4db_database.dependency_importer import DependencyImporter
 
-from m4db_database.orm.latest import DBUser, ModelMaterialsText
-from m4db_database.orm.latest import RandomField
-from m4db_database.orm.latest import UniformField
-from m4db_database.orm.latest import ModelField
-from m4db_database.orm.latest import RunningStatus
-from m4db_database.orm.latest import ModelRunData
-from m4db_database.orm.latest import ModelReportData
-from m4db_database.orm.latest import Project
-from m4db_database.orm.latest import Metadata
-from m4db_database.orm.latest import LegacyModelInfo
-from m4db_database.orm.latest import ModelMaterialAssociation
-from m4db_database.orm.latest import Software
-from m4db_database.orm.latest import Unit
-from m4db_database.orm.latest import PhysicalConstant
-from m4db_database.orm.latest import SizeConvention
-from m4db_database.orm.latest import AnisotropyForm
-from m4db_database.orm.latest import Geometry
-from m4db_database.orm.latest import Material
-from m4db_database.orm.latest import NEBCalculationType
-from m4db_database.orm.latest import NEBRunData
-from m4db_database.orm.latest import NEBReportData
-from m4db_database.orm.latest import Model
-from m4db_database.orm.latest import NEB
+from m4db_database.orm.schema import DBUser, ModelMaterialsText
+from m4db_database.orm.schema import RandomField
+from m4db_database.orm.schema import UniformField
+from m4db_database.orm.schema import ModelField
+from m4db_database.orm.schema import RunningStatus
+from m4db_database.orm.schema import ModelRunData
+from m4db_database.orm.schema import ModelReportData
+from m4db_database.orm.schema import Project
+from m4db_database.orm.schema import Metadata
+from m4db_database.orm.schema import LegacyModelInfo
+from m4db_database.orm.schema import ModelMaterialAssociation
+from m4db_database.orm.schema import Software
+from m4db_database.orm.schema import Unit
+from m4db_database.orm.schema import PhysicalConstant
+from m4db_database.orm.schema import SizeConvention
+from m4db_database.orm.schema import AnisotropyForm
+from m4db_database.orm.schema import Geometry
+from m4db_database.orm.schema import Material
+from m4db_database.orm.schema import NEBCalculationType
+from m4db_database.orm.schema import NEBRunData
+from m4db_database.orm.schema import NEBReportData
+from m4db_database.orm.schema import Model
+from m4db_database.orm.schema import NEB
 
 from m4db_database import GLOBAL
 

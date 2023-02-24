@@ -4,10 +4,10 @@ A service to retrieve the start magnetization information of a model.
 
 import json
 
-from m4db_database.orm.latest import Model
-from m4db_database.orm.latest import UniformField
-from m4db_database.orm.latest import RandomField
-from m4db_database.orm.latest import ModelField
+from m4db_database.orm.schema import Model
+from m4db_database.orm.schema import UniformField
+from m4db_database.orm.schema import RandomField
+from m4db_database.orm.schema import ModelField
 
 
 class GetModelStartMagnetization:
