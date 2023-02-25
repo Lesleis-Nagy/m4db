@@ -9,9 +9,8 @@ from m4db_database.orm.schema import UniformInitialMagnetization
 from m4db_database.orm.schema import RandomInitialMagnetization
 from m4db_database.orm.schema import ModelInitialMagnetization
 
-from m4db_database.utilities.logger import get_logger
 
-class GetModelStartMagnetization:
+class GetModelInitialMagnetization:
 
     def on_get(self, req, resp, unique_id):
         r"""
@@ -23,36 +22,37 @@ class GetModelStartMagnetization:
 
         :return: None
         """
-        logger = get_logger()
 
         model = self.session.query(Model).\
             filter(Model.unique_id == unique_id).one_or_none()
-
         if model is None:
             resp.status = falcon.HTTP_404
             return
 
-        if isinstance(model.start_magnetization, UniformInitialMagnetization):
+        self.logger.debug(f"Model id {unique_id}, checking instance of start magnetization.")
+        if isinstance(model.initial_magnetization, UniformInitialMagnetization):
+            self.logger.debug(f"Model id {unique_id}, starts with a uniformly magnetized state.")
             return_value = {
                 "type": "uniform",
-                "dir-x": model.start_magnetization.dir_x,
-                "dir-y": model.start_magnetization.dir_y,
-                "dir-z": model.start_magnetization.dir_z
+                "dir-x": model.initial_magnetization.dir_x,
+                "dir-y": model.initial_magnetization.dir_y,
+                "dir-z": model.initial_magnetization.dir_z
             }
-        elif isinstance(model.start_magnetization, RandomInitialMagnetization):
+        elif isinstance(model.initial_magnetization, RandomInitialMagnetization):
+            self.logger.debug(f"Model id {unique_id}, starts with a randomly magnetized state.")
             return_value = {
                 "type": "random"
             }
-        elif isinstance(model.start_magnetization, ModelInitialMagnetization):
+        elif isinstance(model.initial_magnetization, ModelInitialMagnetization):
+            self.logger.debug(f"Model id {unique_id}, starts with a magnetized state based on an existing model.")
             return_value = {
                 "type": "model",
-                "unique-id": model.start_magnetization.model.unique_id,
-                "running-status": model.start_magnetization.model.running_status.name
+                "unique-id": model.initial_magnetization.model.unique_id,
+                "running-status": model.initial_magnetization.model.running_status.name
             }
         else:
-            logger.error("Unknown start magnetization type!")
+            self.logger.error(f"Model id {unique_id}, unknown initial magnetization type!")
             falcon.status = falcon.HTTP_500
             return
 
-        print("Returning start magnetization.")
         resp.text = json.dumps({"return": return_value})

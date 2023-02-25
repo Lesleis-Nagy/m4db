@@ -18,7 +18,7 @@ from m4db_database.rest.m4db_runner_web.get_model_merrill_script import GetModel
 from m4db_database.rest.m4db_runner_web.get_model_run_prerequisites import GetModelRunPrerequisites
 from m4db_database.rest.m4db_runner_web.get_model_running_status import GetModelRunningStatus
 from m4db_database.rest.m4db_runner_web.get_model_software_executable import GetModelSoftwareExecutable
-from m4db_database.rest.m4db_runner_web.get_model_start_magnetization import GetModelStartMagnetization
+from m4db_database.rest.m4db_runner_web.get_model_initial_magnetization import GetModelInitialMagnetization
 
 from m4db_database.rest.m4db_runner_web.set_model_running_status import SetModelRunningStatus
 
@@ -64,9 +64,9 @@ app.add_route(
 )
 
 # Model: get model start magnetization.
-get_model_start_magnetization = GetModelStartMagnetization()
+get_model_initial_magnetization = GetModelInitialMagnetization()
 app.add_route(
-    "/get_model_start_magnetization/{unique_id}", get_model_start_magnetization
+    "/get-model-initial-magnetization/{unique_id}",get_model_initial_magnetization
 )
 
 # Model: get model prerequisites.
