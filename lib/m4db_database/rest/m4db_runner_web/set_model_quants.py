@@ -51,7 +51,6 @@ class SetModelQuants:
         try:
             quants = SetModelQuantsJSONSchema(json.loads(parameters))
             quants.validate()
-            self.logger.debug(f"model-quants-data: {quants.to_primitive()}")
         except schematics.exceptions.ValidationError as e:
             self.logger.error(e)
             resp.status = falcon.HTTP_500

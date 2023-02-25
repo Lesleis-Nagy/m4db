@@ -46,7 +46,6 @@ class SetModelRunningStatus:
         try:
             running_status_data = SetModelRunningStatusJSONSchema(json.loads(parameters))
             running_status_data.validate()
-            self.logger.debug(f"running-status-data: {running_status_data.to_primitive()}")
         except schematics.exceptions.ValidationError as e:
             self.logger.error(e)
             resp.status = falcon.HTTP_500
