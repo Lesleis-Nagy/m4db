@@ -77,7 +77,7 @@ class GetModelRunPrerequisites:
                         f"Model id {unique_id}, start magnetization zip file {initial_magnetization_data_zip}."
                     )
 
-                    resp.text = json.dumps({
+                    resp.text = json.dumps({"return": {
                         "merrill-script": merrill_script,
                         "geometry-file-abs-path": geometry_file_abs_path,
                         "model-dir-abs-path": model_dir_abs_path,
@@ -85,7 +85,7 @@ class GetModelRunPrerequisites:
                         "initial-magnetization-type": model.initial_magnetization.type,
                         "initial-magnetization-data-zip": initial_magnetization_data_zip,
                         "initial-magnetization-finished": True
-                    })
+                    }})
 
                     return
 
@@ -106,7 +106,7 @@ class GetModelRunPrerequisites:
             else:
                 self.logger.debug(f"Model id {unique_id}, start magnetization is in a non-finished state.")
 
-                resp.text = json.dumps({
+                resp.text = json.dumps({"return": {
                     "merrill-script": merrill_script,
                     "geometry-file-abs-path": geometry_file_abs_path,
                     "model-dir-abs-path": model_dir_abs_path,
@@ -114,12 +114,12 @@ class GetModelRunPrerequisites:
                     "initial-magnetization-type": model.initial_magnetization.type,
                     "initial-magnetization-data-zip": None,
                     "initial-magnetization-finished": False
-                })
+                }})
                 return
         else:
             self.logger.debug(f"Model id {unique_id}, starts with a random or uniformly magnetized state.")
 
-            resp.text = json.dumps({
+            resp.text = json.dumps({"return": {
                 "merrill-script": merrill_script,
                 "geometry-file-abs-path": geometry_file_abs_path,
                 "model-dir-abs-path": model_dir_abs_path,
@@ -127,5 +127,5 @@ class GetModelRunPrerequisites:
                 "initial-magnetization-type": model.initial_magnetization.type,
                 "initial-magnetization-data-zip": None,
                 "initial-magnetization-finished": None
-            })
+            }})
             return

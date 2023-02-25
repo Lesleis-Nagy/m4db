@@ -1,8 +1,3 @@
-import os
-import textwrap
-
-from tempfile import TemporaryDirectory
-
 import pytest
 
 import requests.exceptions
