@@ -46,8 +46,9 @@ def test_model_run_prerequisites(client):
             ReportEnergy
 
             End""").strip(),
-        "geometry-file-abs-path": "/data/m4dbdev/geometry/42/a7/77/ce/14/ff/42/3e/83/78/1f/49/d6/28/f6/17/geometry.pat",
-        "model-dir-abs-path": "/data/m4dbdev/model/1d/73/da/1c/ea/5f/46/90/a1/70/4f/6e/b4/42/d8/e2"
+        "geometry-file-abs-path": "/data/m4dbdev/geometry/04/c5/e3/62/3c/21/48/5b/89/83/bb/de/33/5d/60/fc/geometry.pat",
+        "model-dir-abs-path": "/data/m4dbdev/model/1d/73/da/1c/ea/5f/46/90/a1/70/4f/6e/b4/42/d8/e2",
+        'merrill-executable': '/home/m4dbdev/Install/merrill/1.8.1/bin/merrill'
     }
 
     response = client.simulate_get("/get-model-run-prerequisites/1d73da1c-ea5f-4690-a170-4f6eb442d8e2")
