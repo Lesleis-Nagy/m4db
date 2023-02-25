@@ -754,6 +754,18 @@ class RunningStatus(Base):
         }
 
 
+class RunningStatusEnum(str, Enum):
+    r"""
+    Class to hold default running statuses.
+    """
+    not_run = "not-run"
+    re_run = "re-run"
+    running = "running"
+    finished = "finished"
+    crashed = "crashed"
+    scheduled = "scheduled"
+
+
 class ModelRunData(Base):
     r"""
     Important metadata regarding a model.
