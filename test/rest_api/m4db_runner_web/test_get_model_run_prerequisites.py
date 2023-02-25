@@ -55,7 +55,7 @@ def test_get_model_run_prerequisites():
     assert expected_dict == result
 
 
-def test_get_model_initial_magnetization_noexist():
+def test_get_model_run_prerequisites_noexist():
 
     unique_id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
 
