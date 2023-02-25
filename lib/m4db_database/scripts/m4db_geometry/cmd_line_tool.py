@@ -17,7 +17,7 @@ from tabulate import tabulate
 
 from sqlalchemy.exc import IntegrityError
 
-from m4db_database.orm.schema import Ellipsoid
+from m4db_database.orm.schema import Ellipsoid, Geometry
 from m4db_database.orm.schema import TruncatedOctahedron
 from m4db_database.orm.schema import SizeConvention
 from m4db_database.orm.schema import SizeConventionEnum
@@ -306,8 +306,9 @@ def save_new_geometry(session, geometry, patran_file, exodus_file, mesh_gen_scri
 
 
 @app.command()
-def ellipsoid(patran_file: str, size: str, element_size: str, size_convention: SizeConventionEnum, prolateness: str,
-              oblateness: str, exodus_file: str = None, mesh_gen_script: str = None, mesh_gen_stdout: str = None):
+def add_ellipsoid(patran_file: str, size: str, element_size: str, size_convention: SizeConventionEnum, prolateness: str,
+                  oblateness: str, exodus_file: str = None, mesh_gen_script: str = None, mesh_gen_stdout: str = None,
+                  unique_id: str = None):
     r"""
     Create a new ellipsoid geometry.
 
@@ -320,6 +321,7 @@ def ellipsoid(patran_file: str, size: str, element_size: str, size_convention: S
     :param exodus_file: the geometry exodusII file.
     :param mesh_gen_script: the geometry mesh generation script.
     :param mesh_gen_stdout: the geometry standard output file.
+    :param unique_id: if supplied, try to use this as the unique_id of the new geometry.
 
     :return: None.
     """
@@ -337,7 +339,16 @@ def ellipsoid(patran_file: str, size: str, element_size: str, size_convention: S
         sys.exit(1)
 
     session = get_session(nullpool=True)
-    unique_id = new_unique_id()
+
+    if unique_id is not None:
+        existing_geometry = session.query(Geometry).filter(Geometry.unique_id == unique_id).one_or_none()
+        if existing_geometry is None:
+            the_unique_id = unique_id
+        else:
+            print(f"A geometry with the unique id '{unique_id}' already exists.")
+            sys.exit(1)
+    else:
+        the_unique_id = new_unique_id()
 
     vertices, elements, submesh_ids = read_patran(patran_file)
 
@@ -351,7 +362,7 @@ def ellipsoid(patran_file: str, size: str, element_size: str, size_convention: S
     db_size_convention = session.query(SizeConvention).filter(SizeConvention.symbol == size_convention.value).one()
 
     geometry = Ellipsoid(
-        unique_id=unique_id,
+        unique_id=the_unique_id,
         nelements=len(elements),
         nvertices=len(vertices),
         nsubmeshes=len(submesh_ids),
@@ -375,9 +386,9 @@ def ellipsoid(patran_file: str, size: str, element_size: str, size_convention: S
 
 
 @app.command()
-def truncated_octahedron(patran_file: str, size: str, element_size: str, size_convention: SizeConventionEnum,
-                         aspect_ratio: str, truncation_factor: str, exodus_file: str = None,
-                         mesh_gen_script: str = None, mesh_gen_stdout: str = None):
+def add_truncated_octahedron(patran_file: str, size: str, element_size: str, size_convention: SizeConventionEnum,
+                             aspect_ratio: str, truncation_factor: str, exodus_file: str = None,
+                             mesh_gen_script: str = None, mesh_gen_stdout: str = None, unique_id: str = None):
     r"""
     Create a new ellipsoid geometry.
 
@@ -390,6 +401,7 @@ def truncated_octahedron(patran_file: str, size: str, element_size: str, size_co
     :param exodus_file: the geometry exodusII file.
     :param mesh_gen_script: the geometry mesh generation script.
     :param mesh_gen_stdout: the geometry standard output file.
+    :param unique_id: if supplied try to use this as the new unique_id.
 
     :return: None.
     """
@@ -408,7 +420,15 @@ def truncated_octahedron(patran_file: str, size: str, element_size: str, size_co
 
     session = get_session(nullpool=True)
 
-    unique_id = new_unique_id()
+    if unique_id is not None:
+        existing_geometry = session.query(Geometry).filter(Geometry.unique_id == unique_id).one_or_none()
+        if existing_geometry is None:
+            the_unique_id = unique_id
+        else:
+            print(f"A geometry with the unique id '{unique_id}' already exists.")
+            sys.exit(1)
+    else:
+        the_unique_id = new_unique_id()
 
     vertices, elements, submesh_ids = read_patran(patran_file)
 
@@ -422,7 +442,7 @@ def truncated_octahedron(patran_file: str, size: str, element_size: str, size_co
     db_size_convention = session.query(SizeConvention).filter(SizeConvention.symbol == size_convention.value).one()
 
     geometry = TruncatedOctahedron(
-        unique_id=unique_id,
+        unique_id=the_unique_id,
         nelements=len(elements),
         nvertices=len(vertices),
         nsubmeshes=len(submesh_ids),
