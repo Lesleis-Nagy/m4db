@@ -2,8 +2,11 @@ r"""
 Perform various m4db model related actions.
 """
 import os
+import shutil
 import sys
 import json
+import tempfile
+
 import yaml
 
 import schematics.exceptions
@@ -13,7 +16,9 @@ import pandas as pd
 
 from tabulate import tabulate
 
+from m4db_database import GLOBAL
 from m4db_database.configuration import read_config_from_environ
+from m4db_database.utilities.directories import geometry_directory
 from m4db_database.utilities.logger import setup_logger
 from m4db_database.utilities.logger import get_logger
 
@@ -227,8 +232,14 @@ def add(model_json_file: str, user_name: str, project_name: str, software_name: 
 
 @app.command()
 def run(unique_id: str):
-    config = read_config_from_environ()
     logger = get_logger()
+    config = read_config_from_environ()
+
+    with tempfile.TemporaryDirectory(dir=config.database.working_root) as tmpdir:
+        os.chdir(tmpdir)
+        logger.debug(f"About to run a merrill script in '{os.getcwd()}'.")
+
+
 
 
 def entry_point():

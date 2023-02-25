@@ -1,6 +1,7 @@
 r"""
 An API call that will retrieve a MERRILL model scripts.
 """
+
 import json
 
 from m4db_database.configuration import read_config_from_environ
@@ -15,16 +16,14 @@ def get_model_merrill_script(unique_id, output_file):
     :param output_file: the destination to which the MERRILL scripts is saved.
     :return: None.
     """
+
     config = read_config_from_environ()
-    service_url = "http://{host:}:{port:}/get_model_merrill_script/{unique_id:}".format(
-        host=config["m4db_runner_web"]["host"],
-        port=config["m4db_runner_web"]["port"],
-        unique_id=unique_id
-    )
     session = get_session()
-    response = session.get(service_url)
+    response = session.get(
+        f"{config.runner_web.host}:{config.runner_web.port}/get-model-merrill-script/{unique_id}")
     response.raise_for_status()
 
     output = json.loads(response.text)
+
     with open(output_file, "w") as fout:
         fout.write(output["return"])
