@@ -1,6 +1,7 @@
 r"""
 A service to generate a scripts to retrieve a model's running status.
 """
+import falcon
 
 import json
 
@@ -19,6 +20,11 @@ class GetModelRunningStatus:
         """
         # Retrieve the model.
         model = self.session.query(Model).\
-            filter(Model.unique_id == unique_id).one()
+            filter(Model.unique_id == unique_id).one_or_none()
 
-        resp.body = json.dumps({"return": model.running_status.name})
+        if model is None:
+            resp.status = falcon.HTTP_404
+            return
+        else:
+            resp.text = json.dumps({"return": model.running_status.name})
+            return

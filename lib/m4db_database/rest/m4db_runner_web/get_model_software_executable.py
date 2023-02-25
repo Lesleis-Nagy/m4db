@@ -1,6 +1,8 @@
 r"""
 A service to retrieve the software executable associated with a model.
 """
+import falcon
+
 import json
 
 from m4db_database.orm.schema import Model
@@ -17,6 +19,11 @@ class GetModelSoftwareExecutable:
         :return: None
         """
         model = self.session.query(Model).\
-            filter(Model.unique_id == unique_id).one()
+            filter(Model.unique_id == unique_id).one_or_none()
 
-        resp.body = json.dumps({"return": model.mdata.software.executable})
+        if model is None:
+            resp.status = falcon.HTTP_404
+            return
+        else:
+            resp.text = json.dumps({"return": model.mdata.software.executable})
+            return

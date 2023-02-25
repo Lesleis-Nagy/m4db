@@ -177,7 +177,8 @@ def add(model_json_file: str, user_name: str, project_name: str, software_name: 
                     new_model_report_data = ModelReportData()
                     new_metadata = Metadata(
                         db_user=existing_user,
-                        project=existing_project
+                        project=existing_project,
+                        software=existing_software
                     )
 
                     # Create new materials.

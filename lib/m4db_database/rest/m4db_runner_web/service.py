@@ -10,9 +10,10 @@ from m4db_database.rest.m4db_runner_web.get_software_executable import GetSoftwa
 
 # from m4db_database.rest.m4db_runner_web.set_model_running_status import SetModelRunningStatus
 # from m4db_database.rest.m4db_runner_web.set_model_quants import SetModelQuants
+
 from m4db_database.rest.m4db_runner_web.get_model_merrill_script import GetModelMerrillScript
-# from m4db_database.rest.m4db_runner_web.get_model_running_status import GetModelRunningStatus
-# from m4db_database.rest.m4db_runner_web.get_model_software_executable import GetModelSoftwareExecutable
+from m4db_database.rest.m4db_runner_web.get_model_running_status import GetModelRunningStatus
+from m4db_database.rest.m4db_runner_web.get_model_software_executable import GetModelSoftwareExecutable
 # from m4db_database.rest.m4db_runner_web.get_model_start_magnetization import GetModelStartMagnetization
 #
 # from m4db_database.rest.m4db_runner_web.set_neb_running_status import SetNEBRunningStatus
@@ -31,6 +32,30 @@ app = falcon.App(
     ]
 )
 
+# Model: get merrill model scripts.
+get_model_merrill_script = GetModelMerrillScript()
+app.add_route(
+    "/get-model-merrill-script/{unique_id}", get_model_merrill_script
+)
+
+# Model: get model running status.
+get_model_running_status = GetModelRunningStatus()
+app.add_route(
+    "/get-model-running-status/{unique_id}", get_model_running_status
+)
+
+# Model: get model software executable.
+get_model_software_executable = GetModelSoftwareExecutable()
+app.add_route(
+    "/get-model-software-executable/{unique_id}",
+    get_model_software_executable
+)
+
+
+
+
+
+
 # Service to verify that the web runner is alive.
 is_alive = IsAlive()
 app.add_route(
@@ -43,6 +68,12 @@ app.add_route(
     "/get-software-executable/{name}/{version}",
     get_software_executable
 )
+
+
+
+
+
+
 
 #
 # # Model: set running status service.
@@ -57,23 +88,8 @@ app.add_route(
 #     "/set_model_quants", set_model_quants
 # )
 
-# Model: get merrill model scripts.
-get_model_merrill_script = GetModelMerrillScript()
-app.add_route(
-    "/get-model-merrill-script/{unique_id}", get_model_merrill_script
-)
 
-# # Model: get model running status.
-# get_model_running_status = GetModelRunningStatus()
-# app.add_route(
-#     "/get_model_running_status/{unique_id}", get_model_running_status
-# )
 #
-# # Model: get model software executable.
-# get_model_software_executable = GetModelSoftwareExecutable()
-# app.add_route(
-#     "/get_model_software_executable/{unique_id}", get_model_software_executable
-# )
 #
 # # Model: get model start magnetization.
 # get_model_start_magnetization = GetModelStartMagnetization()
