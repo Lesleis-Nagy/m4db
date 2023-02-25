@@ -10,10 +10,10 @@ import json
 
 from m4db_database import GLOBAL
 
-from m4db_database.orm.schema import Model
+from m4db_database.orm.schema import Model, UniformInitialMagnetization, RandomInitialMagnetization, \
+    ModelInitialMagnetization, RunningStatusEnum
 
 from m4db_database.template import template_loader
-
 from m4db_database.utilities.directories import geometry_directory, model_directory
 
 
@@ -30,7 +30,7 @@ class GetModelRunPrerequisites:
         :return: None
         """
 
-        model = self.session.query(Model).\
+        model = self.session.query(Model). \
             filter(Model.unique_id == unique_id).one_or_none()
         if model is None:
             resp.status = falcon.HTTP_404
@@ -62,9 +62,70 @@ class GetModelRunPrerequisites:
         merrill_executable = model.mdata.software.executable
         self.logger.debug(f"Model id {unique_id} model executable is {merrill_executable}.")
 
-        resp.text = json.dumps({
-            "merrill-script": merrill_script,
-            "geometry-file-abs-path": geometry_file_abs_path,
-            "model-dir-abs-path": model_dir_abs_path,
-            "merrill-executable": merrill_executable
-        })
+        if isinstance(model.initial_magnetization, ModelInitialMagnetization):
+            self.logger.debug(f"Model id {unique_id}, starts with an exiting model magnetization.")
+
+            if model.initial_magnetization.model.running_status == RunningStatusEnum.finished:
+                self.logger.debug(f"Model id {unique_id}, start magnetization is in finished state.")
+                initial_magnetization_data_zip = os.path.join(
+                    model_directory(model.initial_magnetization.model.unique_id),
+                    GLOBAL.DATA_ZIP
+                )
+
+                if os.path.isfile(initial_magnetization_data_zip):
+                    self.logger.debug(
+                        f"Model id {unique_id}, start magnetization zip file {initial_magnetization_data_zip}."
+                    )
+
+                    resp.text = json.dumps({
+                        "merrill-script": merrill_script,
+                        "geometry-file-abs-path": geometry_file_abs_path,
+                        "model-dir-abs-path": model_dir_abs_path,
+                        "merrill-executable": merrill_executable,
+                        "initial-magnetization-type": model.initial_magnetization.type,
+                        "initial-magnetization-data-zip": initial_magnetization_data_zip,
+                        "initial-magnetization-finished": True
+                    })
+
+                    return
+
+                else:
+                    self.logger.error(
+                        f"Model id {unique_id}, start magnetization zip file {initial_magnetization_data_zip} "
+                        f"is missing.")
+
+                    resp.status = falcon.HTTP_500
+
+                    resp.body = json.dumps({
+                        "error": f"Model id {unique_id}, starts with an initial magnetization from an existing model "
+                                 f"(unique id: {model.initial_magnetization.model.unique_id}) with a 'finished' "
+                                 f"running status, however the expected data file {initial_magnetization_data_zip} "
+                                 f"does not exist on the system!"})
+
+                    return
+            else:
+                self.logger.debug(f"Model id {unique_id}, start magnetization is in a non-finished state.")
+
+                resp.text = json.dumps({
+                    "merrill-script": merrill_script,
+                    "geometry-file-abs-path": geometry_file_abs_path,
+                    "model-dir-abs-path": model_dir_abs_path,
+                    "merrill-executable": merrill_executable,
+                    "initial-magnetization-type": model.initial_magnetization.type,
+                    "initial-magnetization-data-zip": None,
+                    "initial-magnetization-finished": False
+                })
+                return
+        else:
+            self.logger.debug(f"Model id {unique_id}, starts with a random or uniformly magnetized state.")
+
+            resp.text = json.dumps({
+                "merrill-script": merrill_script,
+                "geometry-file-abs-path": geometry_file_abs_path,
+                "model-dir-abs-path": model_dir_abs_path,
+                "merrill-executable": merrill_executable,
+                "initial-magnetization-type": model.initial_magnetization.type,
+                "initial-magnetization-data-zip": None,
+                "initial-magnetization-finished": None
+            })
+            return

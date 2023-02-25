@@ -13,8 +13,6 @@ from m4db_database.orm.schema import Model
 import schematics
 import schematics.exceptions
 
-from m4db_database.utilities.logger import get_logger
-
 
 class SetModelRunningStatusJSONSchema(schematics.models.Model):
     unique_id = schematics.types.StringType(regex=GLOBAL.UID_REGEX,
@@ -43,13 +41,12 @@ class SetModelRunningStatus:
         """
 
         parameters = req.media
-        self.logger.info(parameters)
+        self.logger.debug(parameters)
 
         try:
             running_status_data = SetModelRunningStatusJSONSchema(json.loads(parameters))
             running_status_data.validate()
-            self.logger.info(f"running-status-data: {running_status_data.to_primitive()}")
-
+            self.logger.debug(f"running-status-data: {running_status_data.to_primitive()}")
         except schematics.exceptions.ValidationError as e:
             self.logger.error(e)
             resp.status = falcon.HTTP_500
@@ -62,6 +59,7 @@ class SetModelRunningStatus:
         # Retrieve the running status ID.
         new_running_status = self.session.query(RunningStatus).\
             filter(RunningStatus.name == running_status_data.new_running_status).one()
+        self.logger.debug(f"Retrieved new running status.")
 
         # Retrieve the model and set the running status id.
         model = self.session.query(Model).\
@@ -69,9 +67,12 @@ class SetModelRunningStatus:
         if model is None:
             resp.status = falcon.HTTP_404
             resp.text = json.dumps({
-                "error": f"Missing unique id: '{running_status_data.unique_id}'."
+                "error": f"Missing model with unique id: '{running_status_data.unique_id}'."
             })
             return
+        self.logger.debug(f"Model {model.unique_id}, has been retrieved.")
 
         model.running_status = new_running_status
         self.session.commit()
+        self.logger.debug(f"Model {model.unique_id}, running status changed to {running_status_data.new_running_status}")
+

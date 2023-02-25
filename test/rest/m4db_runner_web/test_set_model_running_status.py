@@ -52,7 +52,7 @@ def test_set_model_running_status_noexist(client):
     unique_id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
 
     expected_response = {
-        "error": f"Missing unique id: '{unique_id}'."
+        "error": f"Missing model with unique id: '{unique_id}'."
     }
 
     response_data = SetModelRunningStatusJSONSchema()

@@ -12,8 +12,6 @@ from m4db_database.rest.m4db_runner_web.is_alive import IsAlive
 
 from m4db_database.rest.m4db_runner_web.get_software_executable import GetSoftware
 
-# from m4db_database.rest.m4db_runner_web.set_model_quants import SetModelQuants
-
 from m4db_database.rest.m4db_runner_web.get_model_merrill_script import GetModelMerrillScript
 from m4db_database.rest.m4db_runner_web.get_model_run_prerequisites import GetModelRunPrerequisites
 from m4db_database.rest.m4db_runner_web.get_model_running_status import GetModelRunningStatus
@@ -21,6 +19,7 @@ from m4db_database.rest.m4db_runner_web.get_model_software_executable import Get
 from m4db_database.rest.m4db_runner_web.get_model_initial_magnetization import GetModelInitialMagnetization
 
 from m4db_database.rest.m4db_runner_web.set_model_running_status import SetModelRunningStatus
+from m4db_database.rest.m4db_runner_web.set_model_quants import SetModelQuants
 
 #
 # from m4db_database.rest.m4db_runner_web.set_neb_running_status import SetNEBRunningStatus
@@ -81,6 +80,12 @@ app.add_route(
     "/set-model-running-status", set_model_running_status
 )
 
+# Model: set quants service.
+set_model_quants = SetModelQuants()
+app.add_route(
+    "/set-model-quants", set_model_quants
+)
+
 
 
 
@@ -106,11 +111,6 @@ app.add_route(
 
 
 
-# # Model: set quants service.
-# set_model_quants = SetModelQuants()
-# app.add_route(
-#     "/set_model_quants", set_model_quants
-# )
 
 
 #
