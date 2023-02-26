@@ -8,6 +8,8 @@ from m4db_database.configuration import read_config_from_environ
 
 from m4db_database.rest_api.sessions import get_session
 
+from m4db_database.rest.m4db_runner_web.set_model_running_status import SetModelRunningStatusJSONSchema
+
 
 def set_model_running_status(unique_id, running_status):
     r"""
@@ -17,13 +19,15 @@ def set_model_running_status(unique_id, running_status):
     :return: None
     """
     config = read_config_from_environ()
-    service_url = "http://{host:}:{port:}/set_model_running_status".format(
-        host=config["m4db_runner_web"]["host"],
-        port=config["m4db_runner_web"]["port"]
-    )
+
+    new_status = SetModelRunningStatusJSONSchema()
+    new_status.unique_id = unique_id
+    new_status.new_running_status = running_status
 
     session = get_session()
-    response = session.post(service_url, data=json.dumps({"unique_id": unique_id, "running_status": running_status}))
+    response = session.post(
+        f"{config.runner_web.host}:{config.runner_web.port}/set-model-running-status",
+        json=json.dumps(new_status.to_primitive())
+    )
+
     response.raise_for_status()
-
-
