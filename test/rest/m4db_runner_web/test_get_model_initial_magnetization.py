@@ -85,7 +85,7 @@ class TestGetModelInitialMagnetization(unittest.TestCase):
         stdout, stderr = proc8.communicate()
 
         proc9 = Popen(
-            "m4db-model add /home/m4dbdev/JSON/new_models_test_specimen_01.json "
+            "m4db-model add /data/datasets/new_models_test_specimen_01.json "
             "testuser testproject merrill 1.8.1 --no-dry-run",
             shell=True, universal_newlines=True)
         stdout, stderr = proc9.communicate()
