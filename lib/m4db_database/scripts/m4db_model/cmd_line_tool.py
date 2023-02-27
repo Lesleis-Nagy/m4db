@@ -12,13 +12,10 @@ import yaml
 import schematics.exceptions
 import typer
 
-import pandas as pd
-
-from tabulate import tabulate
+from subprocess import Popen, PIPE
 
 from m4db_database import GLOBAL
 from m4db_database.configuration import read_config_from_environ
-from m4db_database.utilities.directories import geometry_directory
 from m4db_database.utilities.logger import setup_logger
 from m4db_database.utilities.logger import get_logger
 
@@ -32,6 +29,8 @@ from m4db_database.orm.model_creation_schema import ModelListSchema, InitialMagn
 from m4db_database.sessions import get_session
 
 from m4db_database.db.geometry.retrieve import get_geometry
+
+from m4db_database.rest_api.m4db_runner_web.get_model_run_prerequisites import get_model_run_prerequisites
 
 app = typer.Typer()
 
@@ -232,7 +231,18 @@ def add(model_json_file: str, user_name: str, project_name: str, software_name: 
 
 
 @app.command()
-def run(unique_id: str):
+def run(unique_id: str, log_file: str = None, log_level: str = None, log_to_stdout: bool = False):
+    r"""
+    Run a model.
+
+    :param unique_id: the unique id of the model to run.
+    :param log_file: the file to write logging information to (by default no logging is provided).
+    :param log_level: the logging level at which messages are put in the log file.
+    :parm log_to_stdout: flag to indicate whether logging should also be sent to standard out.
+
+    :return" None.
+    """
+    setup_logger(log_file, log_level, log_to_stdout)
     logger = get_logger()
     config = read_config_from_environ()
 
@@ -240,7 +250,41 @@ def run(unique_id: str):
         os.chdir(tmpdir)
         logger.debug(f"About to run a merrill script in '{os.getcwd()}'.")
 
+        ###############################################################################################################
+        # Run the model.                                                                                              #
+        ###############################################################################################################
 
+        model_run_prereqs = get_model_run_prerequisites(unique_id)
+
+        with open (GLOBAL.MODEL_MERRILL_SCRIPT_FILE_NAME, "w") as fout:
+            fout.write(f"{model_run_prereqs['merrill-script']}\n")
+        logger.debug("Created model merrill script file.")
+
+        shutil.copy(model_run_prereqs['geometry-file-abs-path'], GLOBAL.GEOMETRY_PATRAN_FILE_NAME)
+        logger.debug(f"Copied geometry from {model_run_prereqs['geometry-file-abs-path']} to "
+                     f"{GLOBAL.GEOMETRY_PATRAN_FILE_NAME}.")
+
+        cmd = f"{model_run_prereqs['merrill-executable']} {GLOBAL.MODEL_MERRILL_SCRIPT_FILE_NAME}"
+        logger.debug(f"Running merrill command {cmd}.")
+        proc = Popen(
+            cmd, shell=True, universal_newlines=True
+        )
+        stdout, stderr = proc.communicate()
+        logger.debug(f"Finished running command {cmd}.")
+
+        with open(GLOBAL.model_stdout_file_name, "w") as fout:
+            fout.write(f"{stdout}\n")
+        logger.debug("Written standard output file.")
+
+        with open(GLOBAL.model_stderr_file_name, "w") as fout:
+            fout.write(f"{stderr}\n")
+        logger.debug("Written standard error file.")
+
+        ###############################################################################################################
+        # Post-process the model.                                                                                     #
+        ###############################################################################################################
+        logger.debug(f"Magnetization output file present: {os.path.isdir(GLOBAL.MAGNETIZATION_OUTPUT_FILE_NAME)}.")
+        logger.debug(f"{os.listdir()}")
 
 
 def entry_point():

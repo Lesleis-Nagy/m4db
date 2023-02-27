@@ -91,7 +91,7 @@ def run_model(unique_id):
         executable = get_model_software_executable(unique_id)
 
         # Create a Merrill script.
-        get_model_merrill_script(unique_id, GLOBAL.model_merrill_script_file_name)
+        get_model_merrill_script(unique_id, GLOBAL.MODEL_MERRILL_SCRIPT_FILE_NAME)
 
         # Set the running status to 'running'
         set_model_running_status(unique_id, "running")
@@ -100,7 +100,7 @@ def run_model(unique_id):
         logger.debug(f"executing {executable}")
         merrill_t0 = time.time()
         cmd = "{exe:} {merrill_script:}".format(
-                exe=executable, merrill_script=GLOBAL.model_merrill_script_file_name
+                exe=executable, merrill_script=GLOBAL.MODEL_MERRILL_SCRIPT_FILE_NAME
         )
         proc = Popen(
             cmd,

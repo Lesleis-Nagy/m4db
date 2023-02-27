@@ -109,7 +109,7 @@ class GLOBAL:
 
 
 
-    model_merrill_script_file_name = "model_script.merrill"
+    MODEL_MERRILL_SCRIPT_FILE_NAME = "model_script.merrill"
     model_stdout_file_name = "model_stdout.txt"
     model_stderr_file_name = "model_stderr.txt"
 
