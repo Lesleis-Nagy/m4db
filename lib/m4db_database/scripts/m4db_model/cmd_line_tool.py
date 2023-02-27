@@ -6,6 +6,7 @@ import shutil
 import sys
 import json
 import tempfile
+import zipfile
 
 import yaml
 
@@ -16,6 +17,8 @@ from subprocess import Popen, PIPE
 
 from m4db_database import GLOBAL
 from m4db_database.configuration import read_config_from_environ
+from m4db_database.file_io.merrill_stdio import is_merrill_model_finished, read_merrill_model_stdout
+from m4db_database.postprocessing.field_calculations import tec_to_unstructured_grid, net_quantities
 from m4db_database.utilities.logger import setup_logger
 from m4db_database.utilities.logger import get_logger
 
@@ -31,6 +34,8 @@ from m4db_database.sessions import get_session
 from m4db_database.db.geometry.retrieve import get_geometry
 
 from m4db_database.rest_api.m4db_runner_web.get_model_run_prerequisites import get_model_run_prerequisites
+from m4db_database.rest_api.m4db_runner_web.set_model_running_status import set_model_running_status
+from m4db_database.rest_api.m4db_runner_web.set_model_quants import set_model_quants
 
 app = typer.Typer()
 
@@ -267,24 +272,88 @@ def run(unique_id: str, log_file: str = None, log_level: str = None, log_to_stdo
         cmd = f"{model_run_prereqs['merrill-executable']} {GLOBAL.MODEL_MERRILL_SCRIPT_FILE_NAME}"
         logger.debug(f"Running merrill command {cmd}.")
         proc = Popen(
-            cmd, shell=True, universal_newlines=True
+            cmd, shell=True, stdout=PIPE, stderr=PIPE, universal_newlines=True
         )
         stdout, stderr = proc.communicate()
         logger.debug(f"Finished running command {cmd}.")
 
-        with open(GLOBAL.model_stdout_file_name, "w") as fout:
-            fout.write(f"{stdout}\n")
-        logger.debug("Written standard output file.")
-
-        with open(GLOBAL.model_stderr_file_name, "w") as fout:
-            fout.write(f"{stderr}\n")
-        logger.debug("Written standard error file.")
 
         ###############################################################################################################
         # Post-process the model.                                                                                     #
         ###############################################################################################################
-        logger.debug(f"Magnetization output file present: {os.path.isdir(GLOBAL.MAGNETIZATION_OUTPUT_FILE_NAME)}.")
+
+        with open(GLOBAL.MODEL_STDOUT_FILE_NAME, "w") as fout:
+            fout.write(f"{stdout}\n")
+        logger.debug("Written standard output file.")
+
+        with open(GLOBAL.MODEL_STDERR_FILE_NAME, "w") as fout:
+            fout.write(f"{stderr}\n")
+        logger.debug("Written standard error file.")
+
+        # Check whether a file called "magnetization_mult.tec" was created - if so then rename it.
+        if os.path.isfile(GLOBAL.MAGNETIZATION_MULT_TECPLOT_FILE_NAME):
+            logger.debug(f"renaming "
+                         f"{GLOBAL.MAGNETIZATION_MULT_TECPLOT_FILE_NAME} to "
+                         f"{GLOBAL.MAGNETIZATION_TECPLOT_FILE_NAME}")
+            os.rename(GLOBAL.MAGNETIZATION_MULT_TECPLOT_FILE_NAME, GLOBAL.MAGNETIZATION_TECPLOT_FILE_NAME)
+
+        logger.debug(f"Magnetization output file present: {os.path.isfile(GLOBAL.MAGNETIZATION_TECPLOT_FILE_NAME)}.")
         logger.debug(f"{os.listdir()}")
+
+        # Check output.
+        logger.debug("Checking output")
+        is_finished = is_merrill_model_finished(GLOBAL.MODEL_STDOUT_FILE_NAME)
+        if not is_finished:
+            logger.debug(f"Model unique id {unique_id} is *NOT* in finished state, setting for re-run")
+            set_model_running_status(unique_id, "re-run")
+            return
+
+        with open(GLOBAL.MODEL_STDOUT_FILE_NAME) as fin:
+            stdout_contents = fin.readlines()
+        quants1 = read_merrill_model_stdout(stdout_contents)
+
+        # Calculate additional quants.
+        logger.debug("Calculating quants")
+        ug, tec_raw = tec_to_unstructured_grid(GLOBAL.MAGNETIZATION_TECPLOT_FILE_NAME)
+        quants2 = net_quantities(ug)
+
+        # Update quants.
+        set_model_quants(unique_id,
+                         mx_tot=quants2["total_mx"],
+                         my_tot=quants2["total_my"],
+                         mz_tot=quants2["total_mz"],
+                         vx_tot=quants2["total_vx"],
+                         vy_tot=quants2["total_vy"],
+                         vz_tot=quants2["total_vz"],
+                         h_tot=quants2["total_h"],
+                         rh_tot=quants2["total_rh"],
+                         adm_tot=quants2["total_adm"],
+                         e_typical=quants1["typical_energy_joule"],
+                         e_anis=quants1["anis_energy"],
+                         e_ext=quants1["ext_energy"],
+                         e_demag=quants1["demag_energy"],
+                         e_exch1=quants1["exch1_energy"],
+                         e_exch2=quants1["exch2_energy"],
+                         e_exch3=quants1["exch3_energy"],
+                         e_exch4=quants1["exch4_energy"],
+                         e_tot=quants1["tot_energy"])
+
+        # Compress each file in the directory.
+        logger.debug("Zipping files")
+        src_files = os.listdir(".")
+        src_zip_file = GLOBAL.DATA_ZIP
+        zout = zipfile.ZipFile(src_zip_file, "w", zipfile.ZIP_DEFLATED)
+        for src_file in src_files:
+            logger.debug(f"{src_file} --> {src_zip_file}")
+            zout.write(src_file)
+        zout.close()
+
+        # Copy the zipped archive to the final destination
+        os.makedirs(model_run_prereqs["model-dir-abs-path"], exist_ok=True)
+        shutil.copy(src_zip_file, model_run_prereqs["model-dir-abs-path"])
+
+        # Set to finished.
+        set_model_running_status(unique_id, "finished")
 
 
 def entry_point():

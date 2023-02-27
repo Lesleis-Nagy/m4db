@@ -352,6 +352,10 @@ def is_merrill_model_finished(file_name):
     :param file_name: the merrill model standard output file name.
     :return: True if the model corresponds with a 'finished' state, otherwise False.
     """
+
+    from m4db_database.utilities.logger import get_logger
+    logger = get_logger()
+
     regex_max_energy_evaluations_reached = re.compile(r'MAX Energy Evaluations reached')
     regex_gradient_negligible = re.compile(r'GRADIENT Negligible')
     regex_delta_f_negligible = re.compile(r'Delta F negligible')
@@ -364,25 +368,30 @@ def is_merrill_model_finished(file_name):
             match_max_energy_evaluations_reached = regex_max_energy_evaluations_reached.search(line)
             if match_max_energy_evaluations_reached:
                 # We reached the maximum no. of energy evaluations and so did *not* converge.
+                logger.debug("Max energy evaluations have been reached.")
                 return False
 
             match_gradient_negligible = regex_gradient_negligible.search(line)
             if match_gradient_negligible:
                 # Set flag to indicate that gradient was negligible.
                 contains_gradient_negligible = True
+                logger.debug("Gradient was negligible, setting flag.")
                 continue
 
             match_delta_f_negligible = regex_delta_f_negligible.search(line)
             if match_delta_f_negligible:
                 # Set flag to indicate that delta f was negligible.
                 contains_delta_f_negligible = True
+                logger.debug("Delta f was negligible, setting flag.")
                 continue
 
     # If flow reaches here, then we didn't reach maximum no. of energy evaluations
 
     if contains_gradient_negligible or contains_delta_f_negligible:
         # If we *did* find message telling us that the gradient or delta f were negligible
+        logger.debug("Either gradient or delta f was negligible, so we accept this run as good.")
         return True
     else:
         # We found no message telling us that gradient or delta f was negligible
+        logger.debug("Neither gradient nor delta f were negligible, so this run is bad.")
         return False

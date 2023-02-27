@@ -120,9 +120,9 @@ def run_model(unique_id):
 
         # Write standard output and standard error to files.
         logger.debug("Writing merrill standard output and standard error files.")
-        with open(GLOBAL.model_stdout_file_name, "w") as fout:
+        with open(GLOBAL.MODEL_STDOUT_FILE_NAME, "w") as fout:
             fout.write(stdout)
-        with open(GLOBAL.model_stderr_file_name, "w") as fout:
+        with open(GLOBAL.MODEL_STDERR_FILE_NAME, "w") as fout:
             fout.write(stderr)
 
         merrill_t1 = time.time()
@@ -136,13 +136,13 @@ def run_model(unique_id):
 
         # Check output.
         logger.debug("Checking output")
-        is_finished = is_merrill_model_finished(GLOBAL.model_stdout_file_name)
+        is_finished = is_merrill_model_finished(GLOBAL.MODEL_STDOUT_FILE_NAME)
         if not is_finished:
             logger.debug(f"Model unique id {unique_id} is *NOT* in finished state, setting for re-run")
             set_model_running_status(unique_id, "re-run")
             return
 
-        with open(GLOBAL.model_stdout_file_name) as fin:
+        with open(GLOBAL.MODEL_STDOUT_FILE_NAME) as fin:
             stdout_contents = fin.readlines()
         quants1 = read_merrill_model_stdout(stdout_contents)
 
