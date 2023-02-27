@@ -25,7 +25,8 @@ setup(
         "jinja2",
         "schematics",
         "pytest",
-        "msgpack"
+        "msgpack",
+        "unittest-xml-reporting"
     ],
     include_package_data=True,
     package_data={"": ["*.jinja2"]},

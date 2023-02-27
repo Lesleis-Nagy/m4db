@@ -1,14 +1,19 @@
+import os
 import shutil
 import unittest
 import falcon
-from falcon import testing
 import json
+import xmlrunner
+
 from subprocess import Popen
+from falcon import testing
 
 from urllib.parse import urlparse
 
 from m4db_database.configuration import read_config_from_environ
 from m4db_database.rest.m4db_runner_web.service import app
+
+from m4db_database import GLOBAL
 
 
 class TestGetModelInitialMagnetization(unittest.TestCase):
@@ -120,5 +125,8 @@ class TestGetModelInitialMagnetization(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
-
+    with open("test-result.xml", "wb") as fout:
+        unittest.main(
+            testRunner=xmlrunner.XMLTestRunner(output=fout),
+            failfast=False, buffer=False, catchbreak=False
+        )
