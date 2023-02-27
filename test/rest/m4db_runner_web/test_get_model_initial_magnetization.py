@@ -25,7 +25,7 @@ class TestGetModelInitialMagnetization(unittest.TestCase):
         # create transaction blocks (which prevent us from dropping databases).
 
         # Delete database directories.
-        shutil.rmtree(file_root)
+        shutil.rmtree(file_root, ignore_errors=True)
 
         # Drop database.
         proc1 = Popen(
