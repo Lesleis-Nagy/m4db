@@ -30,7 +30,7 @@ def str_to_log_level(log_level: str):
         raise ValueError(f"Unknown log level '{log_level}'.")
 
 
-def setup_logger(log_file: str = None, log_level: str = "ERROR", log_to_stdout=False):
+def setup_logger(log_file: str = None, log_level: str = None, log_to_stdout=False):
     r"""
     :param log_file: the name of a file to write logging data to.
     :param log_level: the level at which to perform logging.
@@ -39,6 +39,8 @@ def setup_logger(log_file: str = None, log_level: str = "ERROR", log_to_stdout=F
     """
 
     # Set up logging
+    if log_level is None:
+        log_level = "ERROR"
     logger = logging.getLogger(GLOBAL.LOGGER_NAME)
     logger.setLevel(str_to_log_level(log_level))
 

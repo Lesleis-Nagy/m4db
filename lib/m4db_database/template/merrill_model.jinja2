@@ -15,6 +15,9 @@ Uniform Magnetization {{ model.initial_magnetization.dir_x }} {{ model.initial_m
 ReadTecplotZone {{ initial_model_tecplot }} 1
 {% endif %}
 
+{%- if model.materials|length == 1%}
+{{ model.materials[0].name }} {{ model.materials[0].temperature }} C
+{%- else %}
 {%- for material in model.materials %}
 {%- if material.k1 is not none or material.k2 is not none or material.k3 is not none or material.k4 is not none or material.k5 is not none or material.k6 is not none or material.k7 is not none or material.k8 is not none or material.k9 is not none or material.k10 is not none or material.aex is not none or material.ms is not none %}
 {%- if material.k1 is not none %}
@@ -54,9 +57,10 @@ set subdomain {{ material.submesh_id }} aex {{ material.aex }}
 set subdomain {{ material.submesh_id }} ms {{ material.ms }}
 {% endif %}
 {%- else %}
-set subdomain {{ material.submesh_id }} {{ material.name }} {{ material.temperature }}
+set subdomain {{ material.submesh_id }} {{ material.name }} {{ material.temperature }} C
 {% endif %}
 {% endfor %}
+{% endif %}
 
 EnergyLog {{ energy_log_file }}
 {% if model.applied_field is not none %}

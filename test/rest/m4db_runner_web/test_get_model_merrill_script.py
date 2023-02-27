@@ -25,7 +25,7 @@ def test_get_merrill_script(client):
         Set ExchangeCalculator 1
 
 
-        set subdomain 1 magnetite 20.000
+        set subdomain 1 magnetite 20.000 C
 
 
 
