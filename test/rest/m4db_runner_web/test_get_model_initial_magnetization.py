@@ -17,7 +17,7 @@ class TestGetModelInitialMagnetization(unittest.TestCase):
     def setUpClass(cls) -> None:
         config = read_config_from_environ()
 
-        result = urlparse(config.database.file_root)
+        result = urlparse(config.database.uri)
         db_name = result.path.replace("/", "")
         file_root = config.database.file_root
 
