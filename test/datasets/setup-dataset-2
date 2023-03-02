@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TEST_DATA_DIR=/data/m4dbdev
+TEST_DATA_DIR=/data/$USER
 
 #
 # Populate data set 2.
