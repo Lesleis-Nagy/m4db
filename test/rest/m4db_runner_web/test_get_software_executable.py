@@ -1,3 +1,4 @@
+import os
 import unittest
 import json
 import xmlrunner
@@ -19,8 +20,12 @@ class TestGetSoftwareExecutable(unittest.TestCase):
     ###################################################################################################################
 
     def test_get_software_executable(self):
+
+        user = os.getenv("USER", None)
+        assert user is not None
+
         expected_dict = {
-            "return": "/home/m4dbdev/Install/merrill/1.8.1/bin/merrill"
+            "return": f"/home/{user}/Install/merrill/1.8.1/bin/merrill"
         }
 
         response = self.client.simulate_get("/get-software-executable/merrill/1.8.1")
