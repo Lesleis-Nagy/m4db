@@ -1,7 +1,6 @@
 import unittest
 import json
 import xmlrunner
-import textwrap
 
 import falcon
 from falcon import testing
