@@ -8,18 +8,12 @@ from falcon import testing
 
 from m4db_database.rest.m4db_runner_web.service import app
 
-from m4db_database_test.setup_dataset_1 import setup_dataset_1
-
 
 ######################################################################################################################
 # Service to get the running status for a given model.                                                               #
 ######################################################################################################################
 
 class TestGetModelRunningStatus(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        setup_dataset_1()
 
     def setUp(self) -> None:
         self.client = testing.TestClient(app)

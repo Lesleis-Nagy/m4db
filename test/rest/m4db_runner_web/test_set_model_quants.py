@@ -9,16 +9,10 @@ from m4db_database.orm.schema import Model
 from m4db_database.rest.m4db_runner_web.service import app
 from m4db_database.rest.m4db_runner_web.set_model_quants import SetModelQuantsJSONSchema
 
-from m4db_database_test.setup_dataset_1 import setup_dataset_1
-
 from m4db_database.sessions import get_session
 
 
 class TestSetModelQuants(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        setup_dataset_1()
 
     def setUp(self) -> None:
         # Set up the test falcon service.

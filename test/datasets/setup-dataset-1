@@ -1,0 +1,56 @@
+#!/bin/bash
+
+TEST_DATA_DIR=/data/m4dbdev
+
+#
+# Populate data set 1.
+#
+
+# This data set will
+#   1) regenerate the database
+#   2) create a test user
+#   3) create a test project
+#   4) add two software items
+#       4.1) merrill,
+#       4.2) an empty software
+#   5) add two geometries
+#       5.1) a 40nm ellipsoid with prolateness 1.4 and oblateness 1.7
+#       5.2) a 40nm ellipsoid with prolateness 1.4 and oblateness 1.0
+
+echo "***************************************************************************"
+echo "* Cleaning database                                                       *"
+echo "***************************************************************************"
+
+rm -rf $TEST_DATA_DIR/geometry
+rm -rf $TEST_DATA_DIR/model
+rm -rf $TEST_DATA_DIR/neb
+
+sudo -u postgres sh -c 'cd $HOME; echo "drop database if exists m4dbdev" | psql'
+sudo -u postgres sh -c 'cd $HOME; echo "create database m4dbdev" | psql'
+
+echo "***************************************************************************"
+echo "* Regenerating database                                                   *"
+echo "***************************************************************************"
+
+m4db-setup-database m4dbdev /data/m4dbdev --yes-to-all
+
+echo "***************************************************************************"
+echo "* Populating data with set 1                                              *"
+echo "***************************************************************************"
+
+m4db-user add testuser Test User test.user@testurl.com
+
+m4db-project add testproject "A test project"
+
+m4db-software add merrill 1.8.1 --executable="/home/m4dbdev/Install/merrill/1.8.1/bin/merrill"
+m4db-software add emptysw 0.1.0
+
+m4db-geometry add-ellipsoid /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p700.pat 0.040 0.003 ESVD 1.4 1.7 \
+        --exodus-file /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p700.e \
+        --mesh-gen-script /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p700.cubit \
+        --mesh-gen-stdout /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p700.stdout
+
+m4db-geometry add-ellipsoid /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p000.pat 0.040 0.003 ESVD 1.4 1.0 \
+        --exodus-file /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p000.e \
+        --mesh-gen-script /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p000.cubit \
+        --mesh-gen-stdout /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p000.stdout
