@@ -60,9 +60,15 @@ class TestGetModelRunPrerequisites(unittest.TestCase):
             }
         }
 
+        print("expected dict:")
+        print(expected_dict)
+        print()
+
         response = self.client.simulate_get("/get-model-run-prerequisites/1d73da1c-ea5f-4690-a170-4f6eb442d8e2")
 
         response_dict = json.loads(response.text)
+        print("response dict:")
+        print(response_dict)
 
         assert expected_dict == response_dict
 
