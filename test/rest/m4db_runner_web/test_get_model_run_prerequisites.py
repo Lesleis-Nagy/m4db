@@ -39,9 +39,7 @@ class TestGetModelRunPrerequisites(unittest.TestCase):
                     Set ExchangeCalculator 1
 
 
-                    set subdomain 1 magnetite 20.000
-
-
+                    magnetite 20.000 C
 
                     EnergyLog energy
 

@@ -33,9 +33,7 @@ class TestGetModelMerrillScript(unittest.TestCase):
             Set ExchangeCalculator 1
 
 
-            set subdomain 1 magnetite 20.000 C
-
-
+            magnetite 20.000 C
 
             EnergyLog energy
 
@@ -53,6 +51,8 @@ class TestGetModelMerrillScript(unittest.TestCase):
         response_dict = json.loads(response.text)
 
         merrill_script = response_dict["return"]
+
+        print(merrill_script)
 
         assert expected_merrill_script == merrill_script
 
