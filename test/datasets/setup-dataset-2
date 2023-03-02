@@ -60,5 +60,4 @@ m4db-geometry add-ellipsoid /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1
         --mesh-gen-stdout /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p000.stdout \
         --unique-id 77fa4246-2378-4fc1-99de-92bd4479202f
 
-m4db-model add /data/datasets/new_models_test_specimen_01.json testuser testproject merrill 1.8.1 --no-dry-run \
-        --unique-id da09fc40-bfd5-4565-b1b0-fed2fbe5bb99
+m4db-model add /data/datasets/new_models_test_specimen_01.json testuser testproject merrill 1.8.1 --no-dry-run
