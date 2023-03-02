@@ -6,6 +6,7 @@ Test schema associated with the creation of new database objects.
 import unittest
 import schematics
 import schematics.exceptions
+import xmlrunner
 
 import json
 from decimal import Decimal
@@ -330,3 +331,11 @@ class TestModelSchema(unittest.TestCase):
                 for field_id, submessages in messages.items():
                     for submessage in submessages:
                         print(f"\t\t* index: {field_id} field: {submessage}")
+
+
+if __name__ == "__main__":
+    with open("test-model-json-creation-schema.xml", "wb") as fout:
+        unittest.main(
+            testRunner=xmlrunner.XMLTestRunner(output=fout),
+            failfast=False, buffer=False, catchbreak=False
+        )
