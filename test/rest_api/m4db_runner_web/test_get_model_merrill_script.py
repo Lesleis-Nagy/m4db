@@ -19,6 +19,7 @@ from m4db_database.rest_api.m4db_runner_web.get_model_merrill_script import get_
 class TestGetModelMerrillScript(unittest.TestCase):
 
     def test_get_model_merrill_script(self):
+
         expected_merrill_script = textwrap.dedent(r"""
             Set MaxMeshNumber 1
 
@@ -43,7 +44,9 @@ class TestGetModelMerrillScript(unittest.TestCase):
 
             End""").strip()
 
-        with TemporaryDirectory(self) as tmp_dir:
+        origin_cwd = os.getcwd()
+        with TemporaryDirectory() as tmp_dir:
+            print(f"TEMPORARY DIR {tmp_dir}")
             os.chdir(tmp_dir)
 
             result = get_model_merrill_script("1d73da1c-ea5f-4690-a170-4f6eb442d8e2",
@@ -53,6 +56,7 @@ class TestGetModelMerrillScript(unittest.TestCase):
                 merrill_script = fin.read()
 
             assert merrill_script == expected_merrill_script
+        os.chdir(origin_cwd)
 
 
 if __name__ == "__main__":

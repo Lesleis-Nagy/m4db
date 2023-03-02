@@ -108,18 +108,18 @@ def create_file_root(file_root, yes_to_all=False):
 
     if os.path.isdir(file_root):
         if yes_to_all:
-            msg = "WARNING: the directory '{}' already exists, should I delete it (y/n)? y".format(file_root)
+            msg = "WARNING: '{}' already exists, delete (y/n)? y".format(file_root)
             print(msg)
             response = "y"
         else:
-            msg = "WARNING: the directory '{}' already exists, should I delete it (y/n)? ".format(file_root)
+            msg = "WARNING: '{}' already exists, delete (y/n)? ".format(file_root)
             response = input(msg)
 
         if response.lower() == "y":
             shutil.rmtree(file_root)
             mkdir_file_root(file_root)
         elif response.lower() == "n":
-            print("WARNING: The directory '{}' is now managed by multiple databases!".format(file_root))
+            print("WARNING: '{}' is managed by multiple databases!".format(file_root))
         else:
             print("ERROR: unknown option!")
             sys.exit(1)

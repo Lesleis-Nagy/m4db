@@ -1,0 +1,33 @@
+#!/bin/bash
+
+TESTNAME="test_get_model_initial_magnetization"
+TESTPDIR=${1:-/home/$USER/Project/m4db-database}
+TESTVENV=${2:-/home/$USER}
+TESTPORT=8888
+TESTWAIT=2
+
+echo "***************************************************************************"
+echo "* Running $TESTNAME                            *"
+echo "***************************************************************************"
+
+bash $TESTPDIR/test/datasets/setup-dataset-2
+
+source $TESTVENV/bin/activate
+
+export M4DB_CONFIG_FILE=/data/m4dbdev.yaml
+
+gunicorn --bind=0.0.0.0:$TESTPORT \
+         --log-level=debug \
+         --timeout=1024 \
+	       --limit-request-line 0 \
+	       --limit-request-fields 32768 \
+	       --limit-request-field_size 0 \
+         m4db_database.rest.m4db_runner_web.service:app > "$TESTNAME.log" 2>&1 &
+
+echo $! > "$TESTNAME.pid"
+
+sleep $TESTWAIT
+python "$TESTPDIR/test/rest_api/m4db_runner_web/$TESTNAME.py"
+sleep $TESTWAIT
+
+pkill gunicorn
