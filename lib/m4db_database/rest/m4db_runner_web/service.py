@@ -86,12 +86,6 @@ app.add_route(
     "/set-model-quants", set_model_quants
 )
 
-
-
-
-
-
-
 # Service to verify that the web runner is alive.
 is_alive = IsAlive()
 app.add_route(
