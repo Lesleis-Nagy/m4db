@@ -14,9 +14,9 @@ bash $TESTPDIR/test/datasets/setup-dataset-2
 
 source $TESTVENV/bin/activate
 
-export M4DB_CONFIG_FILE=/data/m4dbdev.yaml
+export M4DB_CONFIG_FILE=/data/$USER.yaml
 
-gunicorn --bind=0.0.0.0:$TESTPORT \
+nohup gunicorn --bind=0.0.0.0:$TESTPORT \
          --log-level=debug \
          --timeout=1024 \
 	       --limit-request-line 0 \
