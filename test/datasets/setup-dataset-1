@@ -25,8 +25,8 @@ rm -rf $TEST_DATA_DIR/geometry
 rm -rf $TEST_DATA_DIR/model
 rm -rf $TEST_DATA_DIR/neb
 
-echo "drop database if exists $USER" | psql -u postgres
-echo "create database $USER" | psql -u postgres
+echo "drop database if exists $USER" | psql -U postgres -h localhost
+echo "create database $USER" | psql -U postgres -h localhost
 
 echo "***************************************************************************"
 echo "* Regenerating database                                                   *"
