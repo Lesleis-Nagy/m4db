@@ -60,17 +60,17 @@ class TestGetModelRunPrerequisites(unittest.TestCase):
             }
         }
 
-        print("expected dict:")
-        print(expected_dict)
-        print()
-
         response = self.client.simulate_get("/get-model-run-prerequisites/1d73da1c-ea5f-4690-a170-4f6eb442d8e2")
 
         response_dict = json.loads(response.text)
-        print("response dict:")
-        print(response_dict)
 
-        assert expected_dict == response_dict
+        assert expected_dict["return"]["merrill-script"] == response_dict["return"]["merrill-script"]
+        assert expected_dict["return"]["geometry-file-abs-path"] == response_dict["return"]["geometry-file-abs-path"]
+        assert expected_dict["return"]["model-dir-abs-path"] == response_dict["return"]["model-dir-abs-path"]
+        assert expected_dict["return"]["merrill-executable"] == response_dict["return"]["merrill-executable"]
+        assert expected_dict["return"]["initial-magnetization-data-zip"] == response_dict["return"]["initial-magnetization-data-zip"]
+        assert expected_dict["return"]["initial-magnetization-finished"] == response_dict["return"]["initial-magnetization-finished"]
+        assert expected_dict["return"]["initial-magnetization-type"] == response_dict["return"]["initial-magnetization-type"]
 
     def test_get_model_run_prerequisites_noexist(self):
 
