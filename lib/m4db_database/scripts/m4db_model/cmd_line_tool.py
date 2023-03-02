@@ -55,7 +55,7 @@ def print_validation_error_message(e):
 
 @app.command()
 def add(model_json_file: str, user_name: str, project_name: str, software_name: str, software_version: str,
-        dry_run: bool = True):
+        dry_run: bool = True, unique_id: str = None):
     r"""
     Adds a new model to the database based on the input json file.
 
@@ -67,6 +67,7 @@ def add(model_json_file: str, user_name: str, project_name: str, software_name: 
     :param dry_run: a flag to indicate that we only wish to validate and dry-run the models given in the input JSON file
                     by default this is on (i.e. --dry-run flag is automatically set), set this flag to --no-dry-run
                     to write the data to the database.
+    :param unique_id: attempt to add a model with this unique id.
     :return: None
     """
 
