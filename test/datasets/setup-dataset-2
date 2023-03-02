@@ -51,7 +51,8 @@ m4db-software add emptysw 0.1.0
 m4db-geometry add-ellipsoid /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p700.pat 0.040 0.003 ESVD 1.4 1.7 \
         --exodus-file /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p700.e \
         --mesh-gen-script /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p700.cubit \
-        --mesh-gen-stdout /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p700.stdout
+        --mesh-gen-stdout /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p700.stdout \
+        --unique-id 
 
 m4db-geometry add-ellipsoid /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p000.pat 0.040 0.003 ESVD 1.4 1.0 \
         --exodus-file /data/meshes/all-ellipsoids/ellipsoid_40nm_3nm_pro_1p400_obl_1p000.e \

@@ -1,3 +1,4 @@
+import os
 import unittest
 import json
 import xmlrunner
@@ -22,8 +23,11 @@ class TestGetModelSoftwareExecutable(unittest.TestCase):
 
     def test_get_model_software_executable(self):
 
+        user = os.getenv("USER", None)
+        assert user is not None
+
         expected_dict = {
-            "return": "/home/m4dbdev/Install/merrill/1.8.1/bin/merrill"
+            "return": f"/home/{user}/Install/merrill/1.8.1/bin/merrill"
         }
 
         response = self.client.simulate_get("/get-model-software-executable/1d73da1c-ea5f-4690-a170-4f6eb442d8e2")
