@@ -20,7 +20,7 @@ class TestGetModelMerrillScript(unittest.TestCase):
         # Set up the test falcon service.
         self.client = testing.TestClient(app)
 
-    def test_get_merrill_script(client):
+    def test_get_merrill_script(self):
 
         expected_merrill_script =textwrap.dedent(r"""
             Set MaxMeshNumber 1
@@ -48,7 +48,7 @@ class TestGetModelMerrillScript(unittest.TestCase):
 
             End""").strip()
 
-        response = client.simulate_get("/get-model-merrill-script/1d73da1c-ea5f-4690-a170-4f6eb442d8e2")
+        response = self.client.simulate_get("/get-model-merrill-script/1d73da1c-ea5f-4690-a170-4f6eb442d8e2")
 
         response_dict = json.loads(response.text)
 
