@@ -3,6 +3,7 @@ import json
 import xmlrunner
 import textwrap
 
+import falcon
 from falcon import testing
 
 from m4db_database.rest.m4db_runner_web.service import app

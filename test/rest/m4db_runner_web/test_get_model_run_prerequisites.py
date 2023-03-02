@@ -3,6 +3,7 @@ import json
 import xmlrunner
 import textwrap
 
+import falcon
 from falcon import testing
 
 from m4db_database.rest.m4db_runner_web.service import app
@@ -23,7 +24,7 @@ class TestGetModelRunPrerequisites(unittest.TestCase):
     def setUp(self) -> None:
         self.client = testing.TestClient(app)
 
-    def test_model_run_prerequisites(self):
+    def test_get_model_run_prerequisites(self):
 
         expected_dict = {
             "return": {
@@ -67,7 +68,7 @@ class TestGetModelRunPrerequisites(unittest.TestCase):
 
         assert expected_dict == response_dict
 
-    def test_get_model_run_prerequisites(self):
+    def test_get_model_run_prerequisites_noexist(self):
 
         response = self.client.simulate_get("/get-model-run-prerequisites/noexist")
 
