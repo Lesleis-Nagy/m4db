@@ -46,7 +46,7 @@ class TestGetModelInitialMagnetization(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    with open("test-result.xml", "wb") as fout:
+    with open("test-get-model-initial-magnetization-result.xml", "wb") as fout:
         unittest.main(
             testRunner=xmlrunner.XMLTestRunner(output=fout),
             failfast=False, buffer=False, catchbreak=False
