@@ -12,7 +12,7 @@ class TestIsAlive(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    with open("test-set-model-running-status.xml", "wb") as fout:
+    with open("test-is-alive.xml", "wb") as fout:
         unittest.main(
             testRunner=xmlrunner.XMLTestRunner(output=fout),
             failfast=False, buffer=False, catchbreak=False
