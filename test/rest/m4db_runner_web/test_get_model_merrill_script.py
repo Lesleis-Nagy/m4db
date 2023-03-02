@@ -46,8 +46,6 @@ class TestGetModelMerrillScript(unittest.TestCase):
 
         merrill_script = response_dict["return"]
 
-        print(merrill_script)
-
         assert expected_merrill_script == merrill_script
 
 
