@@ -6,6 +6,7 @@ import textwrap
 import falcon
 from falcon import testing
 
+from m4db_database.configuration import read_config_from_environ
 from m4db_database.rest.m4db_runner_web.service import app
 
 from m4db_database_test.setup_dataset_1 import setup_dataset_1
@@ -25,6 +26,8 @@ class TestGetModelRunPrerequisites(unittest.TestCase):
         self.client = testing.TestClient(app)
 
     def test_get_model_run_prerequisites(self):
+
+        config = read_config_from_environ()
 
         expected_dict = {
             "return": {
@@ -51,8 +54,8 @@ class TestGetModelRunPrerequisites(unittest.TestCase):
                     ReportEnergy
 
                     End""").strip(),
-                "geometry-file-abs-path": "/data/m4dbdev/geometry/04/c5/e3/62/3c/21/48/5b/89/83/bb/de/33/5d/60/fc/geometry.pat",
-                "model-dir-abs-path": "/data/m4dbdev/model/1d/73/da/1c/ea/5f/46/90/a1/70/4f/6e/b4/42/d8/e2",
+                "geometry-file-abs-path": f"{config.database.file_root}/geometry/04/c5/e3/62/3c/21/48/5b/89/83/bb/de/33/5d/60/fc/geometry.pat",
+                "model-dir-abs-path": f"{config.database.file_root}/model/1d/73/da/1c/ea/5f/46/90/a1/70/4f/6e/b4/42/d8/e2",
                 'merrill-executable': '/home/m4dbdev/Install/merrill/1.8.1/bin/merrill',
                 'initial-magnetization-data-zip': None,
                 'initial-magnetization-finished': None,
