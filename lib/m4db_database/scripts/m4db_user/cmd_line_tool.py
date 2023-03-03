@@ -1,4 +1,5 @@
 import typer
+from typer import Option
 
 import pandas as pd
 
@@ -9,8 +10,6 @@ from m4db_database.orm.schema import DBUser
 from m4db_database.sessions import get_session
 
 from m4db_database.db.db_user.create import create_db_user
-
-from m4db_database.utilities.access_levels import string_to_access_level
 
 app = typer.Typer()
 
@@ -23,13 +22,9 @@ TELEPHONE = "Telephone"
 
 
 @app.command()
-def list(csv_file: str = None):
+def list(csv_file: str = Option(None, help="if specified, save the output to this csv file instead.")):
     r"""
     List the users in the system.
-
-    :param csv_file: save output to csv file instead of stdout.
-
-    :return: None.
     """
     session = get_session(nullpool=True)
     try:
@@ -64,15 +59,14 @@ def list(csv_file: str = None):
 
 
 @app.command()
-def add(user_name: str, first_name: str, surname: str, email: str, initials: str = None, telephone: str = None):
+def add(user_name: str = Option(..., help="the username to identify the new user."),
+        first_name: str = Option(..., help="the first name of the new user."),
+        surname: str = Option(..., help="the surname of the new user."),
+        email: str = Option(..., help="the email of the new user."),
+        initials: str = Option(None, help="the initials of the new user."),
+        telephone: str = Option(None, help="the telephone number of the new user")):
     r"""
     Adds a new database user.
-    :param user_name: the username to identify the new user.
-    :param first_name: the first name of the new user.
-    :param surname: the surname of the new user.
-    :param email: the email of the new user.
-    :param initials: initials of the new user.
-    :param telephone: the telephone number of the new user.
     """
     session = get_session(nullpool=True)
 

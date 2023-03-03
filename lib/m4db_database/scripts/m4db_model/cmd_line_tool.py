@@ -356,6 +356,20 @@ def run(unique_id: str, log_file: str = None, log_level: str = None, log_to_stdo
         set_model_running_status(unique_id, "finished")
 
 
+@app.command()
+def schedule(status: str = None, user: str = None, project: str = None, dry_run: bool = True):
+    r"""
+    Schedule a collection of models for running.
+    :param status: the status of the model.
+    :param user: the user that the model belongs to.
+    :param project: the project that the model belongs to.
+    :param dry_run: a flag to indicate whether the models really should be scheduled.
+
+    :return: None
+
+    """
+
+
 def entry_point():
     config = read_config_from_environ()
     setup_logger(config.logging.file, config.logging.level, config.logging.log_to_stdout)

@@ -4,6 +4,7 @@ Perform m4db software related command actions.
 from enum import Enum
 
 import typer
+from typer import Option
 
 import pandas as pd
 
@@ -35,13 +36,9 @@ class SoftwareFieldNames(str, Enum):
 
 
 @app.command()
-def list(csv_file: str = None):
+def list(csv_file: str = Option(None, help="if specified, save output to csv file instead of stdout.")):
     r"""
     List the software in the system.
-
-    :param csv_file: save output to csv file instead of stdout.
-
-    :return: None
     """
     session = get_session(nullpool=True)
     try:
@@ -75,17 +72,14 @@ def list(csv_file: str = None):
 
 
 @app.command()
-def add(name: str, version: str, executable: str = None, description: str = None, url: str = None,
-        citation: str = None):
+def add(name: str = Option(..., help="the new software name."),
+        version: str = Option(..., help="the new software version."),
+        executable: str = Option(None, help="the full path / location for the software."),
+        description: str = Option(None, help="a description for the new software."),
+        url: str = Option(None, help="the URL at which the software can be found."),
+        citation: str = Option(None, help="a citation for the software.")):
     r"""
     Adds a new m4db software item.
-    :param name: the new software name.
-    :param version: the new software version.
-    :param executable: the full path / location for the software.
-    :param description: a description for the new software.
-    :param url: the URL at which the software can be found.
-    :param citation: a citation for the software.
-    :return: None
     """
     session = get_session(nullpool=True)
 
@@ -107,14 +101,12 @@ def add(name: str, version: str, executable: str = None, description: str = None
 
 
 @app.command()
-def update(name: str, version: str, field: SoftwareFieldNames, value: str):
+def update(name: str = Option(..., help="the name of the software to update."),
+           version: str = Option(..., help="the version of the software to update."),
+           field: str = Option(..., help="the field to update."),
+           value: str = Option(..., help="the new value of the required field.")):
     r"""
-    Updates some of a software's data items
-    :param name: the name of the software to update.
-    :param version: the version of the software to update.
-    :param field: the field to update.
-    :param value: the new value of the required field.
-    :return: None
+    Update or change some of a software's data items.
     """
     session = get_session(nullpool=True)
 

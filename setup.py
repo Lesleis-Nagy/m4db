@@ -11,6 +11,9 @@ setup(
     ),
     package_dir={"": "lib"},
     install_requires=[
+        "sphinx",
+        "sphinxcontrib-programoutput",
+        "sphinx-sqlalchemy",
         "typer",
         "psycopg2-binary",
         "sqlalchemy",
@@ -26,7 +29,7 @@ setup(
         "schematics",
         "pytest",
         "msgpack",
-        "unittest-xml-reporting"
+        "unittest-xml-reporting",
     ],
     include_package_data=True,
     package_data={"": ["*.jinja2"]},

@@ -3,6 +3,7 @@ Perform various m4db project related actions.
 """
 
 import typer
+from typer import Option
 
 import pandas as pd
 
@@ -20,13 +21,9 @@ NAME = "Name"
 DESCRIPTION = "Description"
 
 @app.command()
-def list(csv_file: str = None):
+def list(csv_file: str = Option(None, help="if specified, save the output to this csv file instead.")):
     r"""
     Display all projects in m4db.
-
-    :param csv_file save output to this csv file instead of writing to stdout.
-
-    :return: None.
     """
     session = get_session(nullpool=True)
 
@@ -54,12 +51,10 @@ def list(csv_file: str = None):
 
 
 @app.command()
-def add(project_name: str, description: str):
+def add(project_name: str = Option(..., help="name of the new project."),
+        description: str = Option(..., help="description for the new project.")):
     r"""
     Adds a new m4db project.
-    :param project_name: name of the new project.
-    :param description: description for the new project.
-    :return: None
     """
     session = get_session(nullpool=True)
 

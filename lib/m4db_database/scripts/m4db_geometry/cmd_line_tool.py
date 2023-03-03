@@ -10,6 +10,7 @@ from enum import Enum
 from decimal import Decimal
 
 import typer
+from typer import Option
 
 import pandas as pd
 
@@ -174,52 +175,6 @@ def all_truncated_octahedra(session):
     return pd.DataFrame(df_dict)
 
 
-@app.command()
-def list(type: GeometryOrAllEnum = None, csv_file: str = None, json_file: str = None):
-    r"""
-    List the geometries in the system.
-
-    :param type: the type of geometry to list
-
-    :param csv_file: save output to csv file instead of stdout.
-
-    :return: None.
-    """
-    session = get_session()
-
-    dfs = []
-    if type == GeometryOrAllEnum.ellipsoid:
-        df_ellipsoids = all_ellipsoids(session)
-        if not df_ellipsoids.empty:
-            dfs.append(df_ellipsoids)
-
-    elif type == GeometryOrAllEnum.truncated_octahedron:
-        df_truncated_octahedra = all_truncated_octahedra(session)
-        if not df_truncated_octahedra.empty:
-            dfs.append(df_truncated_octahedra)
-
-    elif type is None:
-        df_ellipsoids = all_ellipsoids(session)
-        if not df_ellipsoids.empty:
-            dfs.append(df_ellipsoids)
-        df_truncated_octahedra = all_truncated_octahedra(session)
-        if not df_truncated_octahedra.empty:
-            dfs.append(df_truncated_octahedra)
-
-    if len(dfs) > 1:
-        df = pd.concat(dfs, axis=0, ignore_index=True)
-    elif len(dfs) == 1:
-        df = dfs[0]
-    else:
-        print("There were not results in the database.")
-        sys.exit()
-
-    if csv_file:
-        df.to_csv(csv_file, index=False)
-    else:
-        print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
-
-
 def copy_geometry_files(unique_id: str, patran_file: str, exodus_file: str, script_file: str, stdout_file: str,
                         create_destination: bool = False):
     r"""
@@ -272,15 +227,15 @@ def copy_geometry_files(unique_id: str, patran_file: str, exodus_file: str, scri
 def save_new_geometry(session, geometry, patran_file, exodus_file, mesh_gen_script, mesh_gen_stdout):
     r"""
     Save the new geometry to the database.
-    Args:
-        session: the database session.
-        geometry: the geometry object to save.
-        patran_file: the patran file path.
-        exodus_file: the exodus file path.
-        mesh_gen_script: the mesh generation script file path.
-        mesh_gen_stdout: the mesh generation routine standard output file path.
-    Returns:
-        None.
+
+    :param session: the database session.
+    :param geometry: the geometry object to save.
+    :param patran_file: the patran file path.
+    :param exodus_file: the exodus file path.
+    :param mesh_gen_script: the mesh generation script file path.
+    :param mesh_gen_stdout: the mesh generation routine standard output file path.
+
+    :return: None.
     """
 
     try:
@@ -306,24 +261,60 @@ def save_new_geometry(session, geometry, patran_file, exodus_file, mesh_gen_scri
 
 
 @app.command()
-def add_ellipsoid(patran_file: str, size: str, element_size: str, size_convention: SizeConventionEnum, prolateness: str,
-                  oblateness: str, exodus_file: str = None, mesh_gen_script: str = None, mesh_gen_stdout: str = None,
-                  unique_id: str = None):
+def list(type: GeometryOrAllEnum = Option(None, help="the type of geometry to list."),
+         csv_file: str = Option(None, help="if specified, save the output to this csv file instead.")):
+    r"""
+    List the geometries in the system.
+    """
+    session = get_session()
+
+    dfs = []
+    if type == GeometryOrAllEnum.ellipsoid:
+        df_ellipsoids = all_ellipsoids(session)
+        if not df_ellipsoids.empty:
+            dfs.append(df_ellipsoids)
+
+    elif type == GeometryOrAllEnum.truncated_octahedron:
+        df_truncated_octahedra = all_truncated_octahedra(session)
+        if not df_truncated_octahedra.empty:
+            dfs.append(df_truncated_octahedra)
+
+    elif type is None:
+        df_ellipsoids = all_ellipsoids(session)
+        if not df_ellipsoids.empty:
+            dfs.append(df_ellipsoids)
+        df_truncated_octahedra = all_truncated_octahedra(session)
+        if not df_truncated_octahedra.empty:
+            dfs.append(df_truncated_octahedra)
+
+    if len(dfs) > 1:
+        df = pd.concat(dfs, axis=0, ignore_index=True)
+    elif len(dfs) == 1:
+        df = dfs[0]
+    else:
+        print("There were not results in the database.")
+        sys.exit()
+
+    if csv_file:
+        df.to_csv(csv_file, index=False)
+    else:
+        print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
+
+
+@app.command()
+def add_ellipsoid(
+        patran_file: str = Option(..., help="the geometry patran file."),
+          size: str = Option(..., help="the geometry size (in micron)."),
+          element_size: str = Option(..., help="the mesh size (in micron)."),
+          size_convention: SizeConventionEnum = Option(..., help="the size convention of the 'size' parameter."),
+          prolateness: str = Option(..., help="the prolateness of the geometry (x-length / y-length)."),
+          oblateness: str = Option(..., help="the oblateness of the geometry (y-length / z-length)."),
+          exodus_file: str = Option(None, help="the geometry exodusII file."),
+          mesh_gen_script: str = Option(None, help="the geometry mesh generation script."),
+          mesh_gen_stdout: str = Option(None, help="the geometry standard output file.") ,
+          unique_id: str = Option(None, help="if supplied, try to use this as the unique_id of the new geometry.")):
     r"""
     Create a new ellipsoid geometry.
-
-    :param patran_file: the geometry patran file.
-    :param size: the geometry size to which we refer to this geometry as.
-    :param element_size: the size at which the mesh was meshed at.
-    :param size_convention: the size convention of the 'size' parameter.
-    :param prolateness: the prolateness of the geometry (x-length / y-length).
-    :param oblateness: the oblateness of the geometry (y-length / z-length).
-    :param exodus_file: the geometry exodusII file.
-    :param mesh_gen_script: the geometry mesh generation script.
-    :param mesh_gen_stdout: the geometry standard output file.
-    :param unique_id: if supplied, try to use this as the unique_id of the new geometry.
-
-    :return: None.
     """
     if not (is_str_decimal(size)):
         print("Size parameter has incorrect number format.")
@@ -386,24 +377,19 @@ def add_ellipsoid(patran_file: str, size: str, element_size: str, size_conventio
 
 
 @app.command()
-def add_truncated_octahedron(patran_file: str, size: str, element_size: str, size_convention: SizeConventionEnum,
-                             aspect_ratio: str, truncation_factor: str, exodus_file: str = None,
-                             mesh_gen_script: str = None, mesh_gen_stdout: str = None, unique_id: str = None):
+def add_truncated_octahedron(
+        patran_file: str = Option(..., help="the geometry patran file."),
+        size: str = Option(..., help="the geometry size (in micron)."),
+        element_size: str = Option(..., help="the mesh size (in micron)."),
+        size_convention: SizeConventionEnum = Option(..., help="the size convention of the 'size' parameter."),
+        aspect_ratio: str = Option(..., help="the aspect ratio of the geometry."),
+        truncation_factor: str = Option(..., help="truncation factor."),
+        exodus_file: str = Option(None, help="the geometry exodusII file."),
+        mesh_gen_script: str = Option(None, help="the geometry mesh generation script."),
+        mesh_gen_stdout: str = Option(None, help="the geometry standard output file.") ,
+        unique_id: str = Option(None, help="if supplied, try to use this as the unique_id of the new geometry.")):
     r"""
-    Create a new ellipsoid geometry.
-
-    :param patran_file: the geometry patran file.
-    :param size: the geometry size to which we refer to this geometry as.
-    :param element_size: the size at which the mesh was meshed at.
-    :param size_convention: the size convention of the 'size' parameter.
-    :param aspect_ratio: the aspect ratio of the geometry..
-    :param truncation_factor: the truncation factor of the geometry.
-    :param exodus_file: the geometry exodusII file.
-    :param mesh_gen_script: the geometry mesh generation script.
-    :param mesh_gen_stdout: the geometry standard output file.
-    :param unique_id: if supplied try to use this as the new unique_id.
-
-    :return: None.
+    Create a new truncated octahedron geometry.
     """
     if not (is_str_decimal(size)):
         print("Size parameter has incorrect number format.")

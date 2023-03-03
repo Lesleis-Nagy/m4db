@@ -1,34 +1,8 @@
 #
 # Created on Aug, 2018
 #
-# file: v3_schema.py
+# file: schema.py
 # author: Nagy, Lesleis
-#
-# Version 2 - August 2021
-# Version 3 - Feb 2022
-#
-# Changes from Version 1
-#      1) Function to generate random passwords.
-#      2) DBUser has support for ticket information.
-#      3) Geometry size is now a numeric.
-#      4) Material temperature is now a numeric.
-#      5) Added new ModelMaterialsText class to.
-#      6) More extensive commenting for all classes.
-#      7) Each class now has an 'as_dict' function that produces a python native dictionary version of the object.
-#      8) Updated last_modified and created fields to use the 'now' function correctly.
-#      9) NEB class now has an energy_barrier field.
-#     10) Model has a volume and relative helicity field.
-#     11) Software contains the executable used to run a model.
-# Changes from Version 2
-#      1) The Geometry class is now abstract and a parent class of (currently) two new geometry
-#         types: i) ellipsoids, ii) truncated octahedra
-#      2) Ellipsoids are unique on size, element size, prolateness, oblateness and size convention
-#      3) TrunctedOctahedra are unique on size, element size, aspect ratio, truncation factor and size convention
-#      4) Note: Ellipsoids and TruncatedOctahedra objects repeat the size, element size and size convention fields
-#         (instead of having these in the parent Geometry class) because it is the simplest way to enforce the
-#         required unique constraint.
-#      5) Two new enumerations are added "GeometryEnum" that enumerates the geometries supported and
-#                                        "GeometryClassEnum" that enumerates the geometry classes supported.
 #
 
 import os
@@ -59,8 +33,7 @@ def new_unique_id():
     r"""
     Generates a universal unique identifier.
 
-    Returns:
-        a global unique id.
+    :return: a global unique id.
     """
     return str(uuid.uuid4())
 
@@ -69,44 +42,28 @@ def new_random_pass():
     r"""
     Generates some random password.
 
-    Returns:
-        a random (difficult to guess) password.
+    :return: a random (difficult to guess) password.
     """
     return password_hash(new_unique_id())
 
 
 class DBUser(Base):
     """
-    Holds information about who a model belongs to.
-
-    NOTE: this is not ownership in the sense of permissions but it gives us a useful dimension to
-    differentiate different models.
-
-    Attributes:
-        id (int): a unique internal id for the object.
-        user_name (str): a unique name for the user.
-        first_name (str): the user's first name.
-        initials (str): the user's middle initials.
-        surname (str): the user's surname.
-        email (str): the user's surname.
-        telephone (str): the user's telephone.
-        last_modified (datetime): the date/time at which this object/record was modified.
-        created (datetime): the creation date/time of this object/record.
-
+    Holds information about whom a model belongs to. Note: this is not ownership in the sense of permissions, but it
+    gives us a useful dimension to differentiate different models.
     """
 
     __tablename__ = 'db_user'
 
-    id = Column(Integer, primary_key=True)
-    user_name = Column(String, nullable=False)
-    password = Column(String, default=new_random_pass, nullable=False)
-    first_name = Column(String, nullable=False)
-    initials = Column(String, nullable=True)
-    surname = Column(String, nullable=False)
-    email = Column(String, nullable=False)
-    telephone = Column(String, nullable=True)
-    last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
-    created = Column(DateTime, default=now, nullable=False)
+    id = Column(Integer, primary_key=True, doc="a unique internal id for the object.")
+    user_name = Column(String, nullable=False, doc="a unique name for the user.")
+    first_name = Column(String, nullable=False, doc="the user's first name.")
+    initials = Column(String, nullable=True, doc="the user's middle initial.")
+    surname = Column(String, nullable=False, doc="the user's surname.")
+    email = Column(String, nullable=False, doc="the user's email")
+    telephone = Column(String, nullable=True, doc="the user's telephone number.")
+    last_modified = Column(DateTime, default=now, onupdate=now, nullable=False, doc="the date/time at which this object/record was modified.")
+    created = Column(DateTime, default=now, nullable=False, doc="the creation date/time of this object/record.")
 
     __table_args__ = (
         UniqueConstraint('first_name', 'surname', 'email', 'telephone', name='uniq_db_user_01'),
@@ -117,10 +74,9 @@ class DBUser(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :return: A dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "user_name": self.user_name,
@@ -137,31 +93,20 @@ class DBUser(Base):
 
 class Software(Base):
     """
-    Holds information about the software used to run models.
-
-    Attributes:
-        id: a unique internal id for the object
-        name: the name of the software package
-        version: the version of the software package
-        executable: the executable (if present) on the system that may be called
-        description: a description of the software package
-        url: a URL for the software package
-        citation: a citation for the software package
-        last_modified: the date/time at which this object/record was modified
-        created: the creation date/time of this object/record
-
+    This object holds information about the software used to run models.
     """
+
     __tablename__ = 'software'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    version = Column(String, nullable=False)
-    executable = Column(String, nullable=True)
-    description = Column(String, nullable=True)
-    url = Column(String, nullable=True)
-    citation = Column(String, nullable=True)
-    last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
-    created = Column(DateTime, default=now, nullable=False)
+    id = Column(Integer, primary_key=True, doc="a unique internal id for a software object.")
+    name = Column(String, nullable=False, doc="the name of the software object.")
+    version = Column(String, nullable=False, doc="the version of the software object.")
+    executable = Column(String, nullable=True, doc="the path to the executable of the software object.")
+    description = Column(String, nullable=True, doc="the description of the software object.")
+    url = Column(String, nullable=True, doc="the url of the software object.")
+    citation = Column(String, nullable=True, doc="a citation for the software object.")
+    last_modified = Column(DateTime, default=now, onupdate=now, nullable=False, doc="the date/time at which this object/record was modified.")
+    created = Column(DateTime, default=now, nullable=False, doc="the creation date/time of this object/record.")
 
     __table_args__ = (
         UniqueConstraint('name', 'version', name='uniq_software_01'),
@@ -171,10 +116,9 @@ class Software(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :return: a dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "name": self.name,
@@ -190,17 +134,15 @@ class Software(Base):
 
 class SizeConvention(Base):
     """
-    Holds a size convention, size conventions are useful since we use them as
-    a short hand to refer to volumetric sizes. For example: what do we mean by
-    "100nm grain"?, if we're using equivalent spherical volume diameter (ESVD)
+    Holds a size convention, size conventions are useful since we use them as a short-hand to refer to volumetric sizes.
+    For example: what do we mean by "100nm grain"?, if we're using equivalent spherical volume diameter (ESVD)
     then the grain has a volume equivalent to a sphere of diameter 100nm.
 
-    Attributes:
-        id: a unique internal id for the object
-        symbol: the symbol associated with the size convention
-        description: a description for the size convention
-        last_modified: the date/time at which this object/record was modified
-        created: the creation date/time of this object/record
+    :param id: a unique internal id for the object
+    :param symbol: the symbol associated with the size convention
+    :param description: a description for the size convention
+    :param last_modified: the date/time at which this object/record was modified
+    :param created: the creation date/time of this object/record
     """
     __tablename__ = 'size_convention'
 
@@ -218,9 +160,7 @@ class SizeConvention(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :returns: a dictionary representing this object.
         """
         return {
             "id": self.id,
@@ -243,14 +183,13 @@ class AnisotropyForm(Base):
     """
     Hold different anisotropy forms for example 'cubic' and 'uniaxial'.
 
-    Attributes:
-        id (int): a unique internal id for the object.
-        name (str): anisotropy form's name.
-        description (str): a description for the anisotropy form convention.
-        last_modified (datetime): the date/time at which this object/record was modified.
-        created (datetime): the creation date/time of this object/record.
-
+    :param id: a unique internal id for the object.
+    :param name: anisotropy form's name.
+    :param description: a description for the anisotropy form convention.
+    :param last_modified: the date/time at which this object/record was modified.
+    :param created: the creation date/time of this object/record.
     """
+
     __tablename__ = 'anisotropy_form'
 
     id = Column(Integer, primary_key=True)
@@ -267,10 +206,9 @@ class AnisotropyForm(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :returns: a dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "name": self.name,
@@ -291,26 +229,30 @@ class AnisotropyFormEnum(str, Enum):
 class Geometry(Base):
     """
     The parent class/entity of all geometries. This object should *NOT* be used on its own since it is abstract -
-    please use one of the derived types:
-        Ellipsoid,
-        TruncatedOctahedron
+    please use one of the derived types: Ellipsoid, TruncatedOctahedron
 
-    Attributes:
-        id: a unique internal id for the object
-        unique_id: a unique identifier for the geometry that may be used outside the database.
-        type: type the geometry.
-        nelements: the number of elements that comprise the geometry.
-        nvertices: the number of vertices that comprise the geometry.
-        nsubmeshes: the number of submeshes that comprise the geometry.
-        volume_total: the total volume of the geometry.
-        has_patran: flag indicates that a patran file is available for the geometry
-        has_exodus: flag indicates that an exodus file is available for the geometry
-        has_mesh_gen_script: flag indicates that a script to generate the mesh is available for the geometry
-        has_mesh_gen_output: flag indicates that output from meshing program, in addition to the mesh, is available.
-        last_modified: the date/time at which this object/record was modified
-        created: the creation date/time of this object/record
-
+    :param id: a unique internal id for the object
+    :param unique_id: unique identifier for the geometry that may be used outside the database.
+    :param type: type the geometry.
+    :param nelements: the number of elements that comprise the geometry.
+    :param nvertices: the number of vertices that comprise the geometry.
+    :param nsubmeshes the number of submeshes that comprise the geometry.:
+    :param computed_volume: the total calculated volume of the geometry.
+    :param computed_element_length_average: the calculated average element edge length of the geometry.
+    :param computed_element_length_standard_deviation: the calculated standard deviation in element edge lengths.
+    :param computed_element_length_minimum: the calculated minimum edge length.
+    :param computed_element_length_maximum: the calculated maximum edge length.
+    :param has_patran: flag indicates that a patran file is available for the geometry.
+    :param has_exodus: flag indicates that an exodus file is available for the geometry.
+    :param has_mesh_gen_script: flag indicates that a script to generate the mesh is available for the geometry.
+    :param has_mesh_gen_output: flag indicates that output from meshing program, in addition to the mesh, is available.
+    :param last_modified: the date/time at which this object/record was modified.
+    :param created: the creation date/time of this object/record.
     """
+
+    # The software id used to generate the geometry
+    software_id = Column(Integer, ForeignKey('software.id'), nullable=True)
+    software = relationship('Software')
     __tablename__ = 'geometry'
 
     id = Column(Integer, primary_key=True, nullable=False)
@@ -366,13 +308,11 @@ class Ellipsoid(Geometry):
     r"""
     An ellipsoid geometry that derives its structure from an existing Geometry object.
 
-    Attributes:
-        size: the size of the geometry upon creation (in micron).
-        element_size: element size at which this geometry was meshed (i.e. the element size specified to the mesher).
-        prolateness: a measurement of the prolateness of the ellipsoid (x-length / y-length)
-        oblateness: a measurement of the oblateness of the ellipsoid (y-length / z-length)
-        size_convention: the convention in which the size is named.
-
+    :param size: the size of the geometry upon creation (in micron).
+    :param element_size: element size at which this geometry was meshed (i.e. the element size specified to the mesher).
+    :param prolateness: a measurement of the prolateness of the ellipsoid (x-length / y-length)
+    :param oblateness: a measurement of the oblateness of the ellipsoid (y-length / z-length)
+    :param size_convention: the convention in which the size is named.
     """
     __tablename__ = "ellipsoid"
 
@@ -409,15 +349,14 @@ class Ellipsoid(Geometry):
 
 class TruncatedOctahedron(Geometry):
     r"""
-    An truncated octahedral geometry that derives its structure from an existing Geometry object.
+    A truncated octahedral geometry that derives its structure from an existing Geometry object.
 
-    Attributes:
-        size: the size of the geometry upon creation (in micron).
-        element_size: element size at which this geometry was meshed (i.e. the element size specified to the mesher).
-        truncation_factor: a measurement of the prolateness of the ellipsoid (x-length / y-length)
-        aspect_ratio: a measurement of the oblateness of the ellipsoid (y-length / z-length)
+    :param size: the size of the geometry upon creation (in micron).
+    :param element_size: element size at which this geometry was meshed (i.e. the element size specified to the mesher).
+    :param truncation_factor: a measurement of the prolateness of the ellipsoid (x-length / y-length)
+    :param aspect_ratio: a measurement of the oblateness of the ellipsoid (y-length / z-length)
+    :param size_convention: the convention in which the size is named.
 
-        size_convention: the convention in which the size is named.
     """
     __tablename__ = "truncated_octahedron"
 
@@ -469,22 +408,32 @@ class Material(Base):
     temperature is an integer). Note: temperature is *ALWAYS* assumed to be in
     degrees Celsius.
 
-    Attributes:
-        id: a unique internal id for the object
-        name: the name of the material (e.g. magnetite)
-        temperature: the temperature at which material constants are calculated
-        k1: the first magneto-crystalline anisotropy constant
-        a: the exchange constant
-        ms: the saturation magnetization constant
-        lambda_ex: the exchange length
-        q_hardness: the micromagnetic magnetic hardness
-        last_modified: the data/time at which the object/record was modified
-        created: the creation date/time of this object/record
+    :param id: a unique internal id for the object
+    :param submesh_id: the sub-mesh id number to which this material belongs.
+    :param name: the name of the material (e.g. magnetite).
+    :param temperature: the temperature at which material constants are calculated
+    :param k1: the first magneto-crystalline anisotropy constant
+    :param k1: the first magneto-crystalline anisotropy constant
+    :param k1: the first magneto-crystalline anisotropy constant
+    :param k1: the first magneto-crystalline anisotropy constant
+    :param k1: the first magneto-crystalline anisotropy constant
+    :param k1: the first magneto-crystalline anisotropy constant
+    :param k1: the first magneto-crystalline anisotropy constant
+    :param k1: the first magneto-crystalline anisotropy constant
+    :param k1: the first magneto-crystalline anisotropy constant
+    :param k1: the first magneto-crystalline anisotropy constant
+    :param aex: the exchange constant
+    :param ms: the saturation magnetization constant
+    :param dir_x: the x direction of the orientation of the anisotropy axes.
+    :param dir_y: the y direction of the orientation of the anisotropy axes.
+    :param dir_z: the z direction of the orientation of the anisotropy axes.
+    :param last_modified: the data/time at which the object/record was modified
+    :param created: the creation date/time of this object/record
     """
     __tablename__ = 'material'
 
     id = Column(Integer, primary_key=True, nullable=False)
-    submesh_id = Column(Integer, nullable=False)
+    submesh_id = Column(Integer, default=1, nullable=False)
     name = Column(String, nullable=False)
     temperature = Column(Numeric(8,3), nullable=False)
     k1 = Column(Float, nullable=True)
@@ -514,10 +463,9 @@ class Material(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :eturns: a dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "name": self.name,
@@ -539,6 +487,12 @@ class Material(Base):
 class UniformAppliedField(Base):
     r"""
     A class to hold applied field values (note that field magnitude is always in  micro Tesla).
+
+    :param id: a unique internal id for the object.
+    :param dir_x: the x-direction in which the field is applied.
+    :param dir_y: the y-direction in which the field is applied.
+    :param dir_z: the z-direction in which the field is applied.
+    :param magnitude: the magnitude of the applied field in micro Tesla.
     """
     __tablename__ = 'uniform_applied_field'
 
@@ -555,18 +509,15 @@ class InitialMagnetization(Base):
     """
     The parent class/entity of all magnetizations. This field object/entity should
     *NOT* be used on its own since it is abstract - please use one of the
-    derived types:
-        1) UniformInitialMagnetization - a uniform initial magnetization field.
-        2) RandomInitialMagnetization - encapsulates a random field
-        3) ModelInitalMagnetization
+    derived types: 1) UniformInitialMagnetization - a uniform initial magnetization field;
+    2) RandomInitialMagnetization - encapsulates a random field; 3) ModelInitalMagnetization.
 
-    Attributes:
-        id: a unique internal id for the object
-        type: a string that refers to the child db_type (see above)
-        last_modified: the date/time at which this object/record was modified
-        created: the creation date/time of this object/record
-
+    :param id: a unique internal id for the object
+    :param type: a string that refers to the child db_type (see above)
+    :param last_modified: the date/time at which this object/record was modified
+    :param created: the creation date/time of this object/record
     """
+
     __tablename__ = 'initial_magnetization'
 
     id = Column(Integer, primary_key=True, nullable=False)
@@ -584,12 +535,11 @@ class ModelInitialMagnetization(InitialMagnetization):
     """
     A model magnetization is a field that that derives its structure from an existing model.
 
-    Attributes:
-        last_modified: the date/time at which this object/record was modified.
-        created: the creation date/time of this object/record.
-        model: the model to which this field belongs.
-
+    :param last_modified: the date/time at which this object/record was modified.
+    :param created: the creation date/time of this object/record.
+    :param model: the model to which this field belongs.
     """
+
     __tablename__ = 'model_initial_magnetization'
 
     id = Column(Integer, ForeignKey('initial_magnetization.id'), primary_key=True, nullable=False)
@@ -608,10 +558,9 @@ class ModelInitialMagnetization(InitialMagnetization):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :return: a dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "db_type": self.type,
@@ -625,10 +574,10 @@ class RandomInitialMagnetization(InitialMagnetization):
     """
     A random field is really just a placeholder record to denote a random initial magnetization.
 
-    Attributes:
-        last_modified: the date/time at which this object/record was modified.
-        created: the creation date/time of this object/record.
+    :param last_modified: the date/time at which this object/record was modified.
+    :param created: the creation date/time of this object/record.
     """
+
     __tablename__ = 'random_initial_magnetization'
 
     id = Column(Integer, ForeignKey('initial_magnetization.id'), primary_key=True, nullable=False)
@@ -644,9 +593,7 @@ class RandomInitialMagnetization(InitialMagnetization):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :returns: a dictionary representing this object.
         """
         return {
             "id": self.id,
@@ -659,22 +606,17 @@ class RandomInitialMagnetization(InitialMagnetization):
 
 class UniformInitialMagnetization(InitialMagnetization):
     """
-    A UniformField consists of a vector in spherical polar coordinates using
-    using (azimuthal, polar, magnitude) = (theta, phi, magnitude) convention.
-    Internally theta and phi are stored in radians, but helper functions are
-    provided that convert between Cartesian/spherical-polar and degrees and
-    radians.
+    A uniform initial magnetization in a given direction with some defined magnitude (in micro Tesla).
 
-    Attributes:
-        id: a unique internal id for the object.
-        dir_x: the x component of the field direction.
-        dir_y: the y component of the field direction.
-        dir_z: the z component of the field direction.
-        magnitude: the magnitude of the field (in micro Tesla).
-        last_modified: the date/time at which this object/record was modified.
-        created: the creation date/time of this object/record.
-
+    :param id: a unique internal id for the object.
+    :param dir_x: the x component of the field direction.
+    :param dir_y: the y component of the field direction.
+    :param dir_z: the z component of the field direction.
+    :param magnitude: the magnitude of the field (in micro Tesla).
+    :param last_modified: the date/time at which this object/record was modified.
+    :param created: the creation date/time of this object/record.
     """
+
     __tablename__ = 'uniform_initial_magnetization'
 
     id = Column(Integer, ForeignKey('initial_magnetization.id'), primary_key=True, nullable=False)
@@ -693,10 +635,9 @@ class UniformInitialMagnetization(InitialMagnetization):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :returns: a dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "db_type": self.type,
@@ -713,11 +654,8 @@ class UniformInitialMagnetization(InitialMagnetization):
 
 class RunningStatus(Base):
     r"""
-    The running status of a model. Models can be in one of the following states
-        I)   not-run
-        II)  re-run
-        III) running
-        IV)  finnished
+    The running status of a model. Models can be in one of the following states: 1) not-run, 2) re-run, 3) running
+    and 4) finished.
 
     :param id: the primary key id of a RunningStatus object.
     :param name: the name of the running status.
@@ -741,8 +679,7 @@ class RunningStatus(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
+        :returns: a dictionary representing this object.
 
         """
         return {
@@ -770,25 +707,21 @@ class ModelRunData(Base):
     r"""
     Important metadata regarding a model.
 
-    Attributes:
-        id: a unique internal id for the object.
-        has_script: a flag to indicate whether the model has a script (which generated the model) associated with it.
-        has_stdout: a flag to indicate whether the model has a standard output file associated with it.
-        has_stderr: a flag to indicate whether the model has a standard error file associated with it.
-        has_energy_log: a flag to indicate whether the model has an energy log associated with it.
-        has_tecplot: a flag to indicate whether the model has a tecplot representation associated with it.
-        has_json: a flag to indicate whether the model has a json representation associated with it.
-        has_dat: a flag to indicate whether the model has a dat representation associated with it.
-        has_helicity_dat: a flag to indicate whether the model has a dat representation of its helicity scalar field
-                          associated with it.
-        has_vorticity_dat: a flag to indicate whether the model has a dat representation of its vorticity vector field
-                           associated with it.
-        has_adm_dat: a flag to indicate whether the model has a dat representation of its adm scalar field associated
-                     with it.
-        last_modified: the date/time at which this object/record was modified.
-        created: the creation date/time of this object/record.
-
+    :param id: a unique internal id for the object.
+    :param has_script: a flag to indicate whether the model has a script (which generated the model) associated with it.
+    :param has_stdout: a flag to indicate whether the model has a standard output file associated with it.
+    :param has_stderr: a flag to indicate whether the model has a standard error file associated with it.
+    :param has_energy_log: a flag to indicate whether the model has an energy log associated with it.
+    :param has_tecplot: a flag to indicate whether the model has a tecplot representation associated with it.
+    :param has_json: a flag to indicate whether the model has a json representation associated with it.
+    :param has_dat: a flag to indicate whether the model has a dat representation associated with it.
+    :param has_helicity_dat: a flag to indicate whether the model has a dat representation of its helicity scalar field associated with it.
+    :param has_vorticity_dat: a flag to indicate whether the model has a dat representation of its vorticity vector field associated with it.
+    :param has_adm_dat: a flag to indicate whether the model has a dat representation of its adm scalar field associated with it.
+    :param last_modified: the date/time at which this object/record was modified.
+    :param created: the creation date/time of this object/record.
     """
+
     __tablename__ = 'model_run_data'
 
     id = Column(Integer, primary_key=True, nullable=False)
@@ -809,10 +742,9 @@ class ModelRunData(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :return: a dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "has_script": self.has_script,
@@ -835,23 +767,17 @@ class ModelReportData(Base):
     Some metadata to track whether some data items used for generating a Model
     report have been created.
 
-    Attributes:
-        id: the primary key.
-        has_xy_thumb_png: a boolean set to true if there is a thumbnail image of the model with the x-y axis
-                          corresponding to the user's screen/monitor.
-        has_yz_thumb_png: a boolean set to true if there is a thumbnail image of the model with the y-z axis
-                          corresponding to the user's screen/monitor.
-        has_xz_thumb_png: a boolean set to true if there is a thumbnail image of the model with the x-z axis
-                          corresponding to the user's screen/monitor.
-        has_xy_png: a boolean set to true if there is an image of the model with the x-y axis corresponding to the
-                    user's screen/monitor.
-        has_yz_png: a boolean set to true if there is an image of the model with the y-z axis corresponding to the
-                    user's screen/monitor.
-        has_xz_png: a boolean set to true if there is an image of the model with the x-z axis corresponding to the
-                    user's screen/monitor.
-        last_modified: the date/time at which this object/record was modified.
-        created: the creation date/time of this object/record.
+    :param id: the primary key.
+    :param has_xy_thumb_png: a boolean set to true if there is a thumbnail image of the model with the x-y axis corresponding to the user's screen/monitor.
+    :param has_yz_thumb_png: a boolean set to true if there is a thumbnail image of the model with the y-z axis corresponding to the user's screen/monitor.
+    :param has_xz_thumb_png: a boolean set to true if there is a thumbnail image of the model with the x-z axis corresponding to the user's screen/monitor.
+    :param has_xy_png: a boolean set to true if there is an image of the model with the x-y axis corresponding to the user's screen/monitor.
+    :param has_yz_png: a boolean set to true if there is an image of the model with the y-z axis corresponding to the user's screen/monitor.
+    :param has_xz_png: a boolean set to true if there is an image of the model with the x-z axis corresponding to the user's screen/monitor.
+    :param last_modified: the date/time at which this object/record was modified.
+    :param created: the creation date/time of this object/record.
     """
+
     __tablename__ = 'model_report_data'
 
     id = Column(Integer, primary_key=True, nullable=False)
@@ -866,10 +792,9 @@ class ModelReportData(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :return: dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "has_xy_thumb_png": self.has_xy_thumb_png,
@@ -885,12 +810,11 @@ class Project(Base):
     r"""
     Some metadata regarding a project.
 
-    Attributes:
-        id: the primary key.
-        name: the name of the project.
-        description: a description of the project.
-
+    :param id: the primary key.
+    :param name: the name of the project.
+    :param description: a description of the project.
     """
+
     __tablename__ = 'project'
 
     id = Column(Integer, primary_key=True, nullable=False)
@@ -905,10 +829,9 @@ class Project(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :returns: a dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "name": self.name,
@@ -917,42 +840,20 @@ class Project(Base):
             "created": self.created.strftime(GLOBAL.DATE_TIME_FORMAT)
         }
 
-    @staticmethod
-    def new_from_dict(project_dict, original_dates=True):
-        r"""
-        Create a new Project object from a dict.
-        Args:
-            project_dict: the dict to create the new Project object from.
-            original_dates: set to True if original dates are to be used, otherwise False.
-        Returns:
-            a new Project object based on the data in model_field_dict.
-
-        """
-        project = Project(
-            name=project_dict["name"],
-            description=project_dict["description"]
-        )
-        if original_dates:
-            project.last_modified = datetime.strptime(project_dict["last_modified"], GLOBAL.DATE_TIME_FORMAT)
-            project.created = datetime.strptime(project_dict["created"], GLOBAL.DATE_TIME_FORMAT)
-
-        return project
-
 
 class Metadata(Base):
     r"""
     Metadata associated with a model. Each model has a user that created it,
     a project to which it belongs and a peice of software that generated it.
 
-    Attributes:
-        id: the primary key.
-        project: the Project object associated with this piece of metadata.
-        db_user: the DBUser object associated with this piece of metadata.
-        software: the Software object associated with this piece of metadata.
-        created: the time when the object was created.
-        last_modified: the time when the object was last modified.
-
+    :param id: the primary key.
+    :param project: the Project object associated with this piece of metadata.
+    :param db_user: the DBUser object associated with this piece of metadata.
+    :param software: the Software object associated with this piece of metadata.
+    :param created: the time when the object was created.
+    :param last_modified: the time when the object was last modified.
     """
+
     __tablename__ = 'metadata'
 
     id = Column(Integer, primary_key=True, nullable=False)
@@ -972,10 +873,9 @@ class Metadata(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :returns: a dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "last_modified": self.last_modified.strftime(GLOBAL.DATE_TIME_FORMAT),
@@ -992,13 +892,12 @@ class LegacyModelInfo(Base):
     Some models have some legacy information associated with them, these are
     stored in this object.
 
-    Attributes:
-        id: the primary key.
-        index: the index referring to the the model index from the legacy data structure.
-        created: the time when the object was created.
-        last_modified: the time when the object was last modified.
-
+    :param id: the primary key.
+    :param index: the index referring to the the model index from the legacy data structure.
+    :param created: the time when the object was created.
+    :param last_modified: the time when the object was last modified.
     """
+
     __tablename__ = 'legacy_model_info'
 
     id = Column(Integer, primary_key=True, nullable=False)
@@ -1010,10 +909,9 @@ class LegacyModelInfo(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :return: a dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "legacy_model_id": self.legacy_model_id,
@@ -1024,23 +922,51 @@ class LegacyModelInfo(Base):
 
 class Model(Base):
     r"""
-    Holds information about a single micromagnetic model. A micromagnetic
-    model, fundamentally consists of a Geometry, one or more Materials and
-    a solution. The data in this object is used both to populate a
-    micromagnetic calculation (prior to a solution) and to track the parameters
-    used to generate a solution (after the solution has been computed).
+    Class to hold model LEM data.
 
-    Attributes:
-        id: the primary key.
-        unique_id: a universal unique identifier string that identifies the object.
-        mx_tot: the x-component of the total remanence vector (over the volume).
-        my_tot: the y-component of the total remanence vector (over the volume).
-        mz_tot: the z-component of the total remanence vector (over the volume).
-
-        created: the time when the object was created.
-        last_modified: the time when the object was last modified.
-
+    :param id: a unique internal id.
+    :param unique_id: a unique id that is used to identify a model.
+    :param mx_tot: the x direction of the total magnetization field (this is populated on a successful run).
+    :param my_tot: the y direction of the total magnetization field (this is populated on a successful run).
+    :param mz_tot: the y direction of the total magnetization field (this is populated on a successful run).
+    :param vx_tot: the x direction of the total vorticity field (this field is populated on a successful run).
+    :param vy_tot: the y direction of the total vorticity field (this field is populated on a successful run).
+    :param vz_tot: the z direction of the total vorticity field (this field is populated on a successful run).
+    :param h_tot: the total helicity (this field is populated on a successful run).
+    :param rh_tot: the total relative helicity (this field is populated on a successful run).
+    :param adm_tot: the total anisotropy direction of moments metric (this field is populated on a successful run).
+    :param e_typical: the typical system energy (this field is populated on a successful run).
+    :param e_anis: the anisotropy energy (this field is populated on a successful run).
+    :param e_ext: the external field energy (this field is populated on a successful run).
+    :param e_demag: the demagnetizing energy (this field is populated on a successful run).
+    :param e_exch1: the exchange energy, calculated using method 1 (this field is populated on a successful run).
+    :param e_exch2: the exchange energy, calculated using method 2 (this field is populated on a successful run).
+    :param e_exch3: the exchange energy, calculated using method 3 (this field is populated on a successful run).
+    :param e_exch4: the exchange energy, calculated using method 4 (this field is populated on a successful run).
+    :param e_tot: the total energy (this field is populated on a successful run).
+    :param max_energy_evaluations: the maximum number of energy evaluation steps.
+    :param created: the time when the object was created.
+    :param last_modified: the time when the object was last modified.
+    :param geometry_id: the id of the geometry that belongs to this model.
+    :param geometry: the object reference to the geometry that belongs to this model.
+    :param materials: the material objects references that belong to this model.
+    :param initial_magnetization_id: the id of the initial magetization that belongs to this model.
+    :param initial_magnetization: the object reference to the magnetization that belongs to this model.
+    :param applied_field_id: the id of the applied field database record that belongs to this model.
+    :param applied_field: the object reference to the applied field of this model.
+    :param running_status_id: the id of the running status database record that belongs to this model.
+    :param running_status:  the object reference to the running status of this model.
+    :param model_run_data_id: the id of the run data database record that belongs to this model.
+    :param model_run_data: the object reference to the run data of this model.
+    :param model_report_data_id: the id of the report data database record that belongs to this model.
+    :param model_report_data: the object reference to the report data of this model.
+    :param mdata_id: the id of the metadata database record that belongs to this model.
+    :param mdata: the object reference to the metadata of this model.
+    :param legacy_model_info_id: the id of the legacy model info record that belongs to this model.
+    :param legacy_model_info: the object reference to the legacy model info of this model.
+    :param nebs: a list of neb objects that this model is a part of.
     """
+
     __tablename__ = 'model'
 
     id = Column(Integer, primary_key=True, nullable=False)
@@ -1103,10 +1029,9 @@ class Model(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :returns: a dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "unique_id": self.unique_id,
@@ -1145,19 +1070,17 @@ class Model(Base):
 
 class NEBCalculationType(Base):
     r"""
-    The db_type of neb calculation used to calculate the data associated with a
-    NEB. For example:
-       neb - NEB calculation based on the Nudged Elastic Band (NEB).
-       fs_heuristic - NEB calculation based on Fabian & Shcherbakov (arXiv:1702.00070v1).
+    The db_type of neb calculation used to calculate the data associated with an NEB. For example: neb - NEB calculation
+    based on the Nudged Elastic Band (NEB); or fs_heuristic - NEB calculation based on Fabian & Shcherbakov
+    (arXiv:1702.00070v1).
 
-    Attributes:
-        id: the primary key.
-        name: the name of the NEB calculation db_type, 1) 'neb', 2) 'fs_heuristic'.
-        description: a description of the NEB calculation db_type.
-        created: the time when the object was created.
-        last_modified: the time when the object was last modified.
-
+    :param id: the primary key.
+    :param name: the name of the NEB calculation db_type, 1) 'neb', 2) 'fs_heuristic'.
+    :param description: a description of the NEB calculation db_type.
+    :param created: the time when the object was created.
+    :param last_modified: the time when the object was last modified.
     """
+
     __tablename__ = 'neb_calculation_type'
 
     id = Column(Integer, primary_key=True)
@@ -1170,8 +1093,7 @@ class NEBCalculationType(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
+        :return: a dictionary representing this object.
 
         """
         return {
@@ -1187,18 +1109,17 @@ class NEBRunData(Base):
     r"""
     Stores run data, i.e. flags regarding what is produced when NEBs are run.
 
-    Attributes:
-        id: the primary key.
-        has_script: boolean flag indicating whether an NEB script is present.
-        has_stdout: boolean flag indicating whether a standard output file is present.
-        has_stderr: boolean flag indicating whether a standard error output file is present.
-        has_energy_log: boolean flag indicating whether an energy log is present.
-        has_tecplot: boolean flag indicating whether a tecplot file is present.
-        has_neb_energies: boolean flag indicating whether neb energies file (path energies) is present.
-        created: the time when the object was created.
-        last_modified: the time when the object was last modified.
-
+    :param id: the primary key.
+    :param has_script: boolean flag indicating whether an NEB script is present.
+    :param has_stdout: boolean flag indicating whether a standard output file is present.
+    :param has_stderr: boolean flag indicating whether a standard error output file is present.
+    :param has_energy_log: boolean flag indicating whether an energy log is present.
+    :param has_tecplot: boolean flag indicating whether a tecplot file is present.
+    :param has_neb_energies: boolean flag indicating whether neb energies file (path energies) is present.
+    :param created: the time when the object was created.
+    :param last_modified: the time when the object was last modified.
     """
+
     __tablename__ = 'neb_run_data'
 
     id = Column(Integer, primary_key=True, nullable=False)
@@ -1215,10 +1136,9 @@ class NEBRunData(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :return: a dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "has_script": self.has_script,
@@ -1236,23 +1156,17 @@ class NEBReportData(Base):
     r"""
     Stores NEB report data.
 
-    Attributes:
-        id: the primary key.
-        has_x_thumb_png: a boolean set to true if there is a thumbnail image of the model with the x-y axis
-                         corresponding to the user's screen/monitor.
-        has_y_thumb_png: a boolean set to true if there is a thumbnail image of the model with the y-z axis
-                         corresponding to the user's screen/monitor.
-        has_z_thumb_png: a boolean set to true if there is a thumbnail image of the model with the x-z axis
-                         corresponding to the user's screen/monitor.
-        has_x_png: a boolean set to true if there is an image of the model with the x-y axis corresponding to the
-                    user's screen/monitor.
-        has_y_png: a boolean set to true if there is an image of the model with the y-z axis corresponding to the
-                   user's screen/monitor.
-        has_z_png: a boolean set to true if there is an image of the model with the x-z axis corresponding to the
-                   user's screen/monitor.
-        last_modified: the date/time at which this object/record was modified.
-        created: the creation date/time of this object/record.
+    :param id: the primary key.
+    :param has_x_thumb_png: a boolean set to true if there is a thumbnail image of the model with the x-y axis corresponding to the user's screen/monitor.
+    :param has_y_thumb_png: a boolean set to true if there is a thumbnail image of the model with the y-z axis corresponding to the user's screen/monitor.
+    :param has_z_thumb_png: a boolean set to true if there is a thumbnail image of the model with the x-z axis corresponding to the user's screen/monitor.
+    :param has_x_png: a boolean set to true if there is an image of the model with the x-y axis corresponding to the user's screen/monitor.
+    :param has_y_png: a boolean set to true if there is an image of the model with the y-z axis corresponding to the user's screen/monitor.
+    :param has_z_png: a boolean set to true if there is an image of the model with the x-z axis corresponding to the user's screen/monitor.
+    :param last_modified: the date/time at which this object/record was modified.
+    :param created: the creation date/time of this object/record.
     """
+
     __tablename__ = 'neb_report_data'
 
     id = Column(Integer, primary_key=True, nullable=False)
@@ -1269,10 +1183,9 @@ class NEBReportData(Base):
         r"""
         Get a python dictionary representation of this object.
 
-        Returns:
-            A dictionary representing this object.
-
+        :return: a dictionary representing this object.
         """
+
         return {
             "id": self.id,
             "has_x_thumb_png": self.has_x_thumb_png,
@@ -1290,27 +1203,24 @@ class NEB(Base):
     r"""
     Information about Nudged Elastic Band (NEB) paths.
 
-    Attributes:
-        id: the primary key.
-        unique_id: the unique id of the model.
-        spring_constant: the NEB calculation spring constant.
-        curvature_weight: the NEB calculation curvature weight.
-        no_of_points: the number of points that comprise the NEB path.
-        max_energy_evaluations: the number of energy evaluations for each path point.
-        max_path_evaluations: the number of evaluations for the complete path.
-        energy_barrier: the energy barrier in Joules.
-        last_modified: the date/time at which this object/record was modified.
-        created: the creation date/time of this object/record.
-        start_model: the start model, i.e. the first model on the NEB path.
-        end_model: the end model, i.e. the last model on the NEB path.
-        parent_neb: the NEB path that this path is a refinement of (or no path).
-        neb_calculation_type: the db_type of calculation used for the computation of the path.
-        neb_run_data: the data produced as part of the computation.
-        neb_report_data: information indicating the artifacts that can be used to generate a report (also useful
-                         for the web).
-        running_status: the running status of the NEB path.
-        mdata: the metadata associated with the NEB path.
-
+    :param id: the primary key.
+    :param unique_id: the unique id of the model.
+    :param spring_constant: the NEB calculation spring constant.
+    :param curvature_weight: the NEB calculation curvature weight.
+    :param no_of_points: the number of points that comprise the NEB path.
+    :param max_energy_evaluations: the number of energy evaluations for each path point.
+    :param max_path_evaluations: the number of evaluations for the complete path.
+    :param energy_barrier: the energy barrier in Joules.
+    :param last_modified: the date/time at which this object/record was modified.
+    :param created: the creation date/time of this object/record.
+    :param start_model: the start model, i.e. the first model on the NEB path.
+    :param end_model: the end model, i.e. the last model on the NEB path.
+    :param parent_neb: the NEB path that this path is a refinement of (or no path).
+    :param neb_calculation_type: the db_type of calculation used for the computation of the path.
+    :param neb_run_data: the data produced as part of the computation.
+    :param neb_report_data: information indicating the artifacts that can be used to generate a report (also useful for the web).
+    :param running_status: the running status of the NEB path.
+    :param mdata: the metadata associated with the NEB path.
     """
 
     __tablename__ = 'neb'
@@ -1420,7 +1330,6 @@ def validate_neb(mapper, connection, value):
 
         if start_material_ids != end_material_ids:
             raise ValueError('NEB does not have start/end models with same material.')
-
 
 
 event.listen(NEB, 'before_insert', validate_neb)
