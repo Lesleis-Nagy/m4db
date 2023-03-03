@@ -379,12 +379,12 @@ def add_ellipsoid(
 
 @app.command()
 def add_truncated_octahedron(
-        patran_file: str = Argument(help="the geometry patran file."),
-        size: str = Argument(help="the geometry size (in micron)."),
-        element_size: str = Argument(help="the mesh size (in micron)."),
-        size_convention: SizeConventionEnum = Argument(help="the size convention of the 'size' parameter."),
-        aspect_ratio: str = Argument(help="the aspect ratio of the geometry."),
-        truncation_factor: str = Argument(help="truncation factor."),
+        patran_file: str = Argument(..., help="the geometry patran file."),
+        size: str = Argument(..., help="the geometry size (in micron)."),
+        element_size: str = Argument(..., help="the mesh size (in micron)."),
+        size_convention: SizeConventionEnum = Argument(..., help="the size convention of the 'size' parameter."),
+        aspect_ratio: str = Argument(..., help="the aspect ratio of the geometry."),
+        truncation_factor: str = Argument(..., help="truncation factor."),
         exodus_file: str = Option(None, help="the geometry exodusII file."),
         mesh_gen_script: str = Option(None, help="the geometry mesh generation script."),
         mesh_gen_stdout: str = Option(None, help="the geometry standard output file.") ,
