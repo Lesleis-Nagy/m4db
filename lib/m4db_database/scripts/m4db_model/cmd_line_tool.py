@@ -12,6 +12,8 @@ import yaml
 
 import schematics.exceptions
 import typer
+from typer import Option
+from typer import Argument
 
 from subprocess import Popen, PIPE
 
@@ -54,20 +56,14 @@ def print_validation_error_message(e):
 
 
 @app.command()
-def add(model_json_file: str, user_name: str, project_name: str, software_name: str, software_version: str,
-        dry_run: bool = True):
+def add(model_json_file: str = Argument(..., help="a file containing new model JSON data."),
+        user_name: str = Argument(..., help="the user that will own these objects."),
+        project_name: str = Argument(..., help="the project that will own these objects."),
+        software_name: str = Argument(..., help="the name of the software that will be used to run this model."),
+        software_version: str = Argument(..., help="the version of the software that will be used to run this model."),
+        dry_run: bool = Option(True, help="if this flag is set, data will be written to m4db.")):
     r"""
     Adds a new model to the database based on the input json file.
-
-    :param model_json_file: a file containing new model JSON data.
-    :param user_name: the user that will own these objects.
-    :param project_name: the project that will own these objects.
-    :param software_name: the name of the software that will be used to run this model.
-    :param software_version: the version of the software that will be used to run this model.
-    :param dry_run: a flag to indicate that we only wish to validate and dry-run the models given in the input JSON file
-                    by default this is on (i.e. --dry-run flag is automatically set), set this flag to --no-dry-run
-                    to write the data to the database.
-    :return: None
     """
 
     if not os.path.isfile(model_json_file):
@@ -230,22 +226,18 @@ def add(model_json_file: str, user_name: str, project_name: str, software_name: 
         print_validation_error_message(e)
 
     except Exception as e:
-        print("An unknown error occured while attempting to write models to the database - rolling back.")
+        print("An unknown error occurred while attempting to write models to the database - rolling back.")
         print(e)
         session.rollback()
 
 
 @app.command()
-def run(unique_id: str, log_file: str = None, log_level: str = None, log_to_stdout: bool = False):
+def run(unique_id: str = Argument(..., help="the unique id of the model to run."),
+        log_file: str = Option(None, help="if supplied, logging data is saved to this file."),
+        log_level: str = Option(None, help="if supplied, the level at which logging data is produced."),
+        log_to_stdout: bool = Option(False, help="if set, write logging data to standard output.")):
     r"""
     Run a model.
-
-    :param unique_id: the unique id of the model to run.
-    :param log_file: the file to write logging information to (by default no logging is provided).
-    :param log_level: the logging level at which messages are put in the log file.
-    :parm log_to_stdout: flag to indicate whether logging should also be sent to standard out.
-
-    :return" None.
     """
     setup_logger(log_file, log_level, log_to_stdout)
     logger = get_logger()
@@ -357,17 +349,14 @@ def run(unique_id: str, log_file: str = None, log_level: str = None, log_to_stdo
 
 
 @app.command()
-def schedule(status: str = None, user: str = None, project: str = None, dry_run: bool = True):
+def schedule(status: str = Option(None, help="the status of the models that should be scheduled."),
+             user: str = Option(None, help="the user that scheduled models belong to."),
+             project: str = Option(None, help="the project that scheduled models belong to."),
+             dry_run: bool = Option(True, help="a flag to indicate whether the models really should be scheduled.")):
     r"""
     Schedule a collection of models for running.
-    :param status: the status of the model.
-    :param user: the user that the model belongs to.
-    :param project: the project that the model belongs to.
-    :param dry_run: a flag to indicate whether the models really should be scheduled.
-
-    :return: None
-
     """
+    pass
 
 
 def entry_point():

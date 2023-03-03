@@ -5,6 +5,7 @@ from enum import Enum
 
 import typer
 from typer import Option
+from typer import Argument
 
 import pandas as pd
 
@@ -72,8 +73,8 @@ def list(csv_file: str = Option(None, help="if specified, save output to csv fil
 
 
 @app.command()
-def add(name: str = Option(..., help="the new software name."),
-        version: str = Option(..., help="the new software version."),
+def add(name: str = Argument(..., help="the new software name."),
+        version: str = Argument(..., help="the new software version."),
         executable: str = Option(None, help="the full path / location for the software."),
         description: str = Option(None, help="a description for the new software."),
         url: str = Option(None, help="the URL at which the software can be found."),
@@ -101,10 +102,10 @@ def add(name: str = Option(..., help="the new software name."),
 
 
 @app.command()
-def update(name: str = Option(..., help="the name of the software to update."),
-           version: str = Option(..., help="the version of the software to update."),
-           field: str = Option(..., help="the field to update."),
-           value: str = Option(..., help="the new value of the required field.")):
+def update(name: str = Argument(..., help="the name of the software to update."),
+           version: str = Argument(..., help="the version of the software to update."),
+           field: str = Argument(..., help="the field to update."),
+           value: str = Argument(..., help="the new value of the required field.")):
     r"""
     Update or change some of a software's data items.
     """

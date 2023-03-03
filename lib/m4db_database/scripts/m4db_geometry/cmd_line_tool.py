@@ -11,6 +11,7 @@ from decimal import Decimal
 
 import typer
 from typer import Option
+from typer import Argument
 
 import pandas as pd
 
@@ -303,16 +304,16 @@ def list(type: GeometryOrAllEnum = Option(None, help="the type of geometry to li
 
 @app.command()
 def add_ellipsoid(
-        patran_file: str = Option(..., help="the geometry patran file."),
-          size: str = Option(..., help="the geometry size (in micron)."),
-          element_size: str = Option(..., help="the mesh size (in micron)."),
-          size_convention: SizeConventionEnum = Option(..., help="the size convention of the 'size' parameter."),
-          prolateness: str = Option(..., help="the prolateness of the geometry (x-length / y-length)."),
-          oblateness: str = Option(..., help="the oblateness of the geometry (y-length / z-length)."),
-          exodus_file: str = Option(None, help="the geometry exodusII file."),
-          mesh_gen_script: str = Option(None, help="the geometry mesh generation script."),
-          mesh_gen_stdout: str = Option(None, help="the geometry standard output file.") ,
-          unique_id: str = Option(None, help="if supplied, try to use this as the unique_id of the new geometry.")):
+    patran_file: str = Argument(..., help="the geometry patran file."),
+    size: str = Argument(..., help="the geometry size (in micron)."),
+    element_size: str = Argument(..., help="the mesh size (in micron)."),
+    size_convention: SizeConventionEnum = Argument(..., help="the size convention of the 'size' parameter."),
+    prolateness: str = Argument(..., help="the prolateness of the geometry (x-length / y-length)."),
+    oblateness: str = Argument(..., help="the oblateness of the geometry (y-length / z-length)."),
+    exodus_file: str = Option(None, help="the geometry exodusII file."),
+    mesh_gen_script: str = Option(None, help="the geometry mesh generation script."),
+    mesh_gen_stdout: str = Option(None, help="the geometry standard output file.") ,
+    unique_id: str = Option(None, help="if supplied, try to use this as the unique_id of the new geometry.")):
     r"""
     Create a new ellipsoid geometry.
     """
@@ -378,12 +379,12 @@ def add_ellipsoid(
 
 @app.command()
 def add_truncated_octahedron(
-        patran_file: str = Option(..., help="the geometry patran file."),
-        size: str = Option(..., help="the geometry size (in micron)."),
-        element_size: str = Option(..., help="the mesh size (in micron)."),
-        size_convention: SizeConventionEnum = Option(..., help="the size convention of the 'size' parameter."),
-        aspect_ratio: str = Option(..., help="the aspect ratio of the geometry."),
-        truncation_factor: str = Option(..., help="truncation factor."),
+        patran_file: str = Argument(help="the geometry patran file."),
+        size: str = Argument(help="the geometry size (in micron)."),
+        element_size: str = Argument(help="the mesh size (in micron)."),
+        size_convention: SizeConventionEnum = Argument(help="the size convention of the 'size' parameter."),
+        aspect_ratio: str = Argument(help="the aspect ratio of the geometry."),
+        truncation_factor: str = Argument(help="truncation factor."),
         exodus_file: str = Option(None, help="the geometry exodusII file."),
         mesh_gen_script: str = Option(None, help="the geometry mesh generation script."),
         mesh_gen_stdout: str = Option(None, help="the geometry standard output file.") ,

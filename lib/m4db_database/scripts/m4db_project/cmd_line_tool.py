@@ -4,6 +4,7 @@ Perform various m4db project related actions.
 
 import typer
 from typer import Option
+from typer import Argument
 
 import pandas as pd
 
@@ -19,6 +20,7 @@ app = typer.Typer()
 
 NAME = "Name"
 DESCRIPTION = "Description"
+
 
 @app.command()
 def list(csv_file: str = Option(None, help="if specified, save the output to this csv file instead.")):
@@ -51,8 +53,8 @@ def list(csv_file: str = Option(None, help="if specified, save the output to thi
 
 
 @app.command()
-def add(project_name: str = Option(..., help="name of the new project."),
-        description: str = Option(..., help="description for the new project.")):
+def add(project_name: str = Argument(..., help="name of the new project."),
+        description: str = Argument(..., help="description for the new project.")):
     r"""
     Adds a new m4db project.
     """

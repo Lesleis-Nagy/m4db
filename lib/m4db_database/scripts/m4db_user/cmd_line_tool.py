@@ -1,5 +1,6 @@
 import typer
 from typer import Option
+from typer import Argument
 
 import pandas as pd
 
@@ -59,10 +60,10 @@ def list(csv_file: str = Option(None, help="if specified, save the output to thi
 
 
 @app.command()
-def add(user_name: str = Option(..., help="the username to identify the new user."),
-        first_name: str = Option(..., help="the first name of the new user."),
-        surname: str = Option(..., help="the surname of the new user."),
-        email: str = Option(..., help="the email of the new user."),
+def add(user_name: str = Argument(..., help="the username to identify the new user."),
+        first_name: str = Argument(..., help="the first name of the new user."),
+        surname: str = Argument(..., help="the surname of the new user."),
+        email: str = Argument(..., help="the email of the new user."),
         initials: str = Option(None, help="the initials of the new user."),
         telephone: str = Option(None, help="the telephone number of the new user")):
     r"""
