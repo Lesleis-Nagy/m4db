@@ -26,7 +26,6 @@ def create_db_user(session, user_name, first_name, surname, email, initials=None
     # Create a new DBUser object
     db_user = DBUser(
         user_name=user_name,
-        password=password_hash(uuid.uuid4()),  # For new user make up any old password
         first_name=first_name,
         surname=surname,
         email=email,
