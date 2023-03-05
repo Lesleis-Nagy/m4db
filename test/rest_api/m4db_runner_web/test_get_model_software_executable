@@ -22,7 +22,7 @@ nohup gunicorn --bind=0.0.0.0:$TESTPORT \
 	       --limit-request-line 0 \
 	       --limit-request-fields 32768 \
 	       --limit-request-field_size 0 \
-         m4db_database.rest.m4db_runner_web.service:app > "$TESTNAME.log" 2>&1 &
+         m4db.rest.m4db_runner_web.service:app > "$TESTNAME.log" 2>&1 &
 
 echo $! > "$TESTNAME.pid"
 
