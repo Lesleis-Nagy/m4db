@@ -6,7 +6,7 @@ import xmlrunner
 
 import requests.exceptions
 
-from m4db_database.rest_api.m4db_runner_web.get_software_executable import get_software_executable
+from m4db.rest_api.m4db_runner_web.get_software_executable import get_software_executable
 
 
 ######################################################################################################################

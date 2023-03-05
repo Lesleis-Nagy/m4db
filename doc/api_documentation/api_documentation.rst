@@ -9,17 +9,62 @@ Object relational mapping
 
 The m4db uses SQLAlchemy. The current ORM documented as follows
 
-The database user object (DBUser)
-.................................
+.. autoclass:: m4db.orm.schema.DBUser
 
-The database user object refers to a user in m4db. Model LEMs, NEBs and other data managed by m4db
-belongs to a user and is a useful way of grouping simulation results.
+.. autoclass:: m4db.orm.schema.Software
 
-.. sqla-model:: m4db_database.orm.schema.DBUser
+.. autoclass:: m4db.orm.schema.SizeConvention
 
-The Software object
-...................
-The software object holds information about a piece of software or software package. Micromagnetic packages
-such as Merrill have an optional executable member value that should refer to an executable on the system.
+.. autoclass:: m4db.orm.schema.AnisotropyForm
 
-.. sqla-model:: m4db_database.orm.schema.Software
+.. autoclass:: m4db.orm.schema.SizeConvention
+
+.. autoclass:: m4db.orm.schema.Geometry
+
+.. autoclass:: m4db.orm.schema.Ellipsoid
+
+.. autoclass:: m4db.orm.schema.TruncatedOctahedron
+
+.. autoclass:: m4db.orm.schema.UniformAppliedField
+
+.. autoclass:: m4db.orm.schema.InitialMagnetization
+
+.. autoclass:: m4db.orm.schema.ModelInitialMagnetization
+
+.. autoclass:: m4db.orm.schema.RandomInitialMagnetization
+
+.. autoclass:: m4db.orm.schema.UniformInitialMagnetization
+
+.. autoclass:: m4db.orm.schema.RunningStatus
+
+.. autoclass:: m4db.orm.schema.Material
+
+.. autoclass:: m4db.orm.schema.Project
+
+.. autoclass:: m4db.orm.schema.Metadata
+
+.. autoclass:: m4db.orm.schema.LegacyModelInfo
+
+.. autoclass:: m4db.orm.schema.ModelRunData
+
+.. autoclass:: m4db.orm.schema.ModelReportData
+
+.. autoclass:: m4db.orm.schema.Model
+
+.. autoclass:: m4db.orm.schema.NEBCalculationType
+
+.. autoclass:: m4db.orm.schema.NEBRunData
+
+.. autoclass:: m4db.orm.schema.NEBReportData
+
+.. autoclass:: m4db.orm.schema.NEB
+
+.. autoclass:: m4db.orm.schema.NEBModelSplit
+
+.. autoclass:: m4db.orm.schema.SizeConventionEnum
+
+.. autoclass:: m4db.orm.schema.AnisotropyFormEnum
+
+.. autoclass:: m4db.orm.schema.GeometryEnum
+
+.. autoclass:: m4db.orm.schema.RunningStatusEnum

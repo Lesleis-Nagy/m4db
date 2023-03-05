@@ -7,13 +7,12 @@ setup(
     version="0.1.0",
     packages=find_packages(
         where="lib",
-        include="m4db_database/*"
+        include="m4db/*"
     ),
     package_dir={"": "lib"},
     install_requires=[
         "sphinx",
-        "sphinxcontrib-programoutput",
-        "sphinx-sqlalchemy",
+        "docutils",
         "typer",
         "psycopg2-binary",
         "sqlalchemy",
@@ -35,11 +34,11 @@ setup(
     package_data={"": ["*.jinja2"]},
     entry_points="""
     [console_scripts]
-    m4db-setup-database=m4db_database.scripts.m4db_setup_database.cmd_line_tool:entry_point
-    m4db-user=m4db_database.scripts.m4db_user.cmd_line_tool:entry_point
-    m4db-software=m4db_database.scripts.m4db_software.cmd_line_tool:entry_point
-    m4db-project=m4db_database.scripts.m4db_project.cmd_line_tool:entry_point
-    m4db-geometry=m4db_database.scripts.m4db_geometry.cmd_line_tool:entry_point
-    m4db-model=m4db_database.scripts.m4db_model.cmd_line_tool:entry_point
+    m4db-setup-database=m4db.scripts.m4db_setup_database.cmd_line_tool:entry_point
+    m4db-user=m4db.scripts.m4db_user.cmd_line_tool:entry_point
+    m4db-software=m4db.scripts.m4db_software.cmd_line_tool:entry_point
+    m4db-project=m4db.scripts.m4db_project.cmd_line_tool:entry_point
+    m4db-geometry=m4db.scripts.m4db_geometry.cmd_line_tool:entry_point
+    m4db-model=m4db.scripts.m4db_model.cmd_line_tool:entry_point
     """
 )

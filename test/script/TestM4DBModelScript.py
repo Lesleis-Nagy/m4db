@@ -2,4 +2,9 @@ import unittest
 
 
 class TestM4DBRunCommand(unittest.TestCase):
-    pass
+
+    def test_run_case_1(self):
+        r"""
+        This test case checks to see if
+        """
+

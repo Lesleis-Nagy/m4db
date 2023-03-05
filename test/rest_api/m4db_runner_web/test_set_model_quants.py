@@ -4,11 +4,11 @@ import xmlrunner
 
 import requests.exceptions
 
-from m4db_database.rest_api.m4db_runner_web.set_model_quants import set_model_quants
+from m4db.rest_api.m4db_runner_web.set_model_quants import set_model_quants
 
-from m4db_database.orm.schema import Model
+from m4db.orm.schema import Model
 
-from m4db_database.sessions import get_session
+from m4db.sessions import get_session
 
 
 ######################################################################################################################

@@ -112,6 +112,8 @@ run the model (either directly or by scheduling the model to run via slurm) and 
 about models from m4db. Its commands are listed as follows
 
 The add subcommand
-------------------
+..................
 
 .. program-output:: m4db-model add --help
+
+.. helloworld::

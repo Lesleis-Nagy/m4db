@@ -4,7 +4,7 @@ import pytest
 
 import requests.exceptions
 
-from m4db_database.rest_api.m4db_runner_web.get_model_running_status import get_model_running_status
+from m4db.rest_api.m4db_runner_web.get_model_running_status import get_model_running_status
 
 
 ######################################################################################################################

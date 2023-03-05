@@ -10,12 +10,12 @@ from sqlalchemy.sql import text
 
 from tqdm import tqdm
 
-from m4db_database.m4db_utilities_utilities import password_hash
-from m4db_database.m4db_utilities_utilities import random_password
+from m4db.m4db_utilities_utilities import password_hash
+from m4db.m4db_utilities_utilities import random_password
 
-from m4db_database.sessions import get_session_from_args
+from m4db.sessions import get_session_from_args
 
-from m4db_database import GLOBAL
+from m4db import GLOBAL
 
 
 def drop_unique_constraints(new_session):

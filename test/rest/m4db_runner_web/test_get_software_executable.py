@@ -6,7 +6,7 @@ import xmlrunner
 import falcon
 from falcon import testing
 
-from m4db_database.rest.m4db_runner_web.service import app
+from m4db.rest.m4db_runner_web.service import app
 
 
 class TestGetSoftwareExecutable(unittest.TestCase):

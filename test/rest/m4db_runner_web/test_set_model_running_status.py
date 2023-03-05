@@ -4,11 +4,11 @@ from falcon import testing
 import xmlrunner
 import json
 
-from m4db_database.orm.schema import Model
-from m4db_database.rest.m4db_runner_web.service import app
+from m4db.orm.schema import Model
+from m4db.rest.m4db_runner_web.service import app
 
-from m4db_database.rest.m4db_runner_web.set_model_running_status import SetModelRunningStatusJSONSchema
-from m4db_database.sessions import get_session
+from m4db.rest.m4db_runner_web.set_model_running_status import SetModelRunningStatusJSONSchema
+from m4db.sessions import get_session
 
 
 class TestSetModelRunningStatus(unittest.TestCase):

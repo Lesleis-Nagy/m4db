@@ -1,7 +1,7 @@
 import unittest
 import xmlrunner
 
-from m4db_database.rest_api.m4db_runner_web.is_alive import is_alive
+from m4db.rest_api.m4db_runner_web.is_alive import is_alive
 
 
 class TestIsAlive(unittest.TestCase):

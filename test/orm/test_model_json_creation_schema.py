@@ -11,15 +11,15 @@ import xmlrunner
 import json
 from decimal import Decimal
 
-from m4db_database.orm.model_creation_schema import EllipsoidSchema
-from m4db_database.orm.model_creation_schema import TruncatedOctahedronSchema
-from m4db_database.orm.model_creation_schema import MaterialSchema
-from m4db_database.orm.model_creation_schema import AppliedFieldSchema
-from m4db_database.orm.model_creation_schema import UniformInitialMagnetizationSchema
-from m4db_database.orm.model_creation_schema import ModelInitialMagnetizationSchema
-from m4db_database.orm.model_creation_schema import RandomInitialMagnetizationSchema
-from m4db_database.orm.model_creation_schema import ModelSchema
-from m4db_database.orm.model_creation_schema import ModelListSchema
+from m4db.orm.model_creation_schema import EllipsoidSchema
+from m4db.orm.model_creation_schema import TruncatedOctahedronSchema
+from m4db.orm.model_creation_schema import MaterialSchema
+from m4db.orm.model_creation_schema import AppliedFieldSchema
+from m4db.orm.model_creation_schema import UniformInitialMagnetizationSchema
+from m4db.orm.model_creation_schema import ModelInitialMagnetizationSchema
+from m4db.orm.model_creation_schema import RandomInitialMagnetizationSchema
+from m4db.orm.model_creation_schema import ModelSchema
+from m4db.orm.model_creation_schema import ModelListSchema
 
 
 class EllipsoidSchemaTestCase(unittest.TestCase):
