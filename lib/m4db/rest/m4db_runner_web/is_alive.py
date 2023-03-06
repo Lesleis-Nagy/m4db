@@ -4,6 +4,7 @@ A very simple service that can be used to check that m4db_runner_web is 'is_aliv
 
 import falcon
 
+from m4db.utilities.logger import get_logger
 
 class IsAlive:
     r"""
@@ -14,5 +15,7 @@ class IsAlive:
         r"""
         The 'get' http request handler.
         """
+        logger = get_logger()
+        logger.debug("This is the /is-alive service.")
         resp.status = falcon.HTTP_200
         return

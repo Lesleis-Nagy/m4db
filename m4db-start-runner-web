@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Run the service on port 8081
 gunicorn --bind=0.0.0.0:8888 \
@@ -7,7 +7,4 @@ gunicorn --bind=0.0.0.0:8888 \
 	       --limit-request-line 0 \
 	       --limit-request-fields 32768 \
 	       --limit-request-field_size 0 \
-	       --daemon \
          m4db.rest.m4db_runner_web.service:app
-
-

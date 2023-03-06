@@ -289,6 +289,12 @@ def run(unique_id: str = Argument(..., help="the unique id of the model to run."
                          f"{GLOBAL.MAGNETIZATION_TECPLOT_FILE_NAME}")
             os.rename(GLOBAL.MAGNETIZATION_MULT_TECPLOT_FILE_NAME, GLOBAL.MAGNETIZATION_TECPLOT_FILE_NAME)
 
+        # Delete the geometry file.
+        logger.debug(f"Removing geometry file {GLOBAL.GEOMETRY_PATRAN_FILE_NAME}.")
+        if os.path.isfile(GLOBAL.GEOMETRY_PATRAN_FILE_NAME):
+            os.remove(GLOBAL.GEOMETRY_PATRAN_FILE_NAME)
+        logger.debug(f"File {GLOBAL.GEOMETRY_PATRAN_FILE_NAME} removed.")
+
         logger.debug(f"Magnetization output file present: {os.path.isfile(GLOBAL.MAGNETIZATION_TECPLOT_FILE_NAME)}.")
         logger.debug(f"{os.listdir()}")
 
