@@ -12,6 +12,7 @@ import yaml
 
 import schematics.exceptions
 import typer
+from sqlalchemy import func
 from typer import Option
 from typer import Argument
 
@@ -26,7 +27,7 @@ from m4db.utilities.logger import get_logger
 
 from m4db.orm.schema import Project, Material, Model, UniformInitialMagnetization, ModelInitialMagnetization, \
     RandomInitialMagnetization, UniformAppliedField, ModelRunData, ModelReportData, Metadata, Software, RunningStatus, \
-    AnisotropyForm
+    AnisotropyForm, RunningStatusEnum
 from m4db.orm.schema import DBUser
 
 from m4db.orm.model_creation_schema import ModelListSchema, InitialMagnetizationSchemaTypesEnum
@@ -38,6 +39,8 @@ from m4db.db.geometry.retrieve import get_geometry
 from m4db.rest_api.m4db_runner_web.get_model_run_prerequisites import get_model_run_prerequisites
 from m4db.rest_api.m4db_runner_web.set_model_running_status import set_model_running_status
 from m4db.rest_api.m4db_runner_web.set_model_quants import set_model_quants
+
+from m4db.template import model_slurm_script
 
 app = typer.Typer()
 
@@ -61,16 +64,22 @@ def add(model_json_file: str = Argument(..., help="a file containing new model J
         project_name: str = Argument(..., help="the project that will own these objects."),
         software_name: str = Argument(..., help="the name of the software that will be used to run this model."),
         software_version: str = Argument(..., help="the version of the software that will be used to run this model."),
-        dry_run: bool = Option(True, help="if this flag is set, data will be written to m4db.")):
+        dry_run: bool = Option(True, help="if this flag is set, data will be written to m4db."),
+        log_file: str = Option(None, help="if supplied, logging data is saved to this file."),
+        log_level: str = Option(None, help="if supplied, the level at which logging data is produced."),
+        log_to_stdout: bool = Option(False, help="if set, write logging data to standard output.")):
     r"""
     Adds a new model to the database based on the input json file.
     """
+    setup_logger(log_file, log_level, log_to_stdout)
+    logger = get_logger()
 
     if not os.path.isfile(model_json_file):
         print(f"The file: '{model_json_file}' could not be found.")
         sys.exit(1)
 
     session = get_session()
+    logger.debug("Successfully acquired session.")
 
     try:
 
@@ -78,6 +87,7 @@ def add(model_json_file: str = Argument(..., help="a file containing new model J
             models = ModelListSchema(json.load(fin))
 
         models.validate()
+        logger.debug("Successfully validated models.")
 
         # Get user.
         existing_user = session.query(DBUser).filter(DBUser.user_name == user_name).one_or_none()
@@ -101,6 +111,7 @@ def add(model_json_file: str = Argument(..., help="a file containing new model J
             sys.exit()
 
         # Perform additional checks.
+        logger.debug
         for index, model in enumerate(models.models):
 
             existing_geometry = get_geometry(session, schema_object=model.geometry)
@@ -253,7 +264,7 @@ def run(unique_id: str = Argument(..., help="the unique id of the model to run."
 
         model_run_prereqs = get_model_run_prerequisites(unique_id)
 
-        with open (GLOBAL.MODEL_MERRILL_SCRIPT_FILE_NAME, "w") as fout:
+        with open(GLOBAL.MODEL_MERRILL_SCRIPT_FILE_NAME, "w") as fout:
             fout.write(f"{model_run_prereqs['merrill-script']}\n")
         logger.debug("Created model merrill script file.")
 
@@ -268,7 +279,6 @@ def run(unique_id: str = Argument(..., help="the unique id of the model to run."
         )
         stdout, stderr = proc.communicate()
         logger.debug(f"Finished running command {cmd}.")
-
 
         ###############################################################################################################
         # Post-process the model.                                                                                     #
@@ -362,7 +372,113 @@ def schedule(status: str = Option(None, help="the status of the models that shou
     r"""
     Schedule a collection of models for running.
     """
-    pass
+    logger = get_logger()
+    config = read_config_from_environ()
+
+    with get_session() as session:
+
+        logger.debug("Opened database session.")
+        models_qry = session.query(Model)
+        logger.debug("Building query.")
+
+        if status is not None:
+            logger.debug(f"The 'status' parameter is {status}, adding to query.")
+            models_qry = models_qry.join(RunningStatus, Model.running_status_id == RunningStatus.id) \
+                .filter(RunningStatus.name == status)
+        else:
+            logger.debug(f"The 'status' parameter is not supplied, only schedule 'not-run' jobs.")
+            models_qry = models_qry.join(RunningStatus, Model.running_status_id == RunningStatus.id) \
+                .filter(RunningStatus.name == RunningStatusEnum.not_run.value)
+
+        if user is not None or project is not None:
+            logger.debug(f"Metadata required, adding to query.")
+            models_qry = models_qry.join(Metadata, Model.mdata_id == Metadata.id)
+            if user is not None:
+                logger.debug(f"User metadata required, adding to query.")
+                models_qry = models_qry.join(Metadata.db_user_id == DBUser.id) \
+                    .filter(DBUser.user_name == user)
+            if project is not None:
+                logger.debug(f"Project metadata required, adding to query.")
+                models_qry = models_qry.join(Metadata.project_id == Project.id) \
+                    .filter(Project.name == project)
+
+        logger.debug("Retrieving models.")
+        models = models_qry.all()
+        logger.debug(f"Retrieved {len(models)} models.")
+
+        if len(models) == 0:
+            print("There are no models to schedule.")
+        else:
+            if dry_run is True:
+                if len(models) == 1:
+                    print(f"There is 1 model to schedule, use --no-dry-run to schedule it.")
+                else:
+                    print(f"There are {len(models)} models to schedule, use --no-dry-run to schedule them.")
+            else:
+                for model in models:
+                    logger.debug(f"Scheduling model {model.unique_id}.")
+                    with tempfile.NamedTemporaryFile("w") as fout:
+                        fout.write(model_slurm_script(model.unique_id))
+                        fout.flush()
+                        logger.debug(f"Temporary slurm script written for {model.unique_id}.")
+
+                        with open("/home/m4dbdev/script.slurm", "w") as fff:
+                            fff.write(model_slurm_script(model.unique_id))
+                            fff.flush()
+
+                        cmd = f"{config.scheduler.command} {fout.name}"
+                        logger.debug(f"Calling scheduler with command '{cmd}'.")
+
+                        proc = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True, universal_newlines=True)
+                        stdout, stderr = proc.communicate()
+
+                        logger.debug(f"stdout:\n{stdout}")
+                        logger.debug(f"stderr:\n{stderr}")
+
+                        if stderr != "":
+                            print(f"An error occurred when attempting to schedule {model.unique_id}.")
+                            print(stderr)
+                            sys.exit(1)
+                        else:
+                            print(f"Scheduled {model.unique_id}.")
+
+
+@app.command()
+def summary():
+    r"""
+    Print a summary of how many models are in each system running state.
+    """
+    logger = get_logger()
+    config = read_config_from_environ()
+
+    with get_session() as session:
+        n_not_run = session.query(func.count(Model.id)) \
+            .join(RunningStatus, Model.running_status_id == RunningStatus.id) \
+            .filter(RunningStatus.name == RunningStatusEnum.not_run.value) \
+            .scalar()
+        n_running = session.query(func.count(Model.id)) \
+            .join(RunningStatus, Model.running_status_id == RunningStatus.id) \
+            .filter(RunningStatus.name == RunningStatusEnum.running.value) \
+            .scalar()
+        n_re_run = session.query(func.count(Model.id)) \
+            .join(RunningStatus, Model.running_status_id == RunningStatus.id) \
+            .filter(RunningStatus.name == RunningStatusEnum.re_run.value) \
+            .scalar()
+        n_crashed = session.query(func.count(Model.id)) \
+            .join(RunningStatus, Model.running_status_id == RunningStatus.id) \
+            .filter(RunningStatus.name == RunningStatusEnum.crashed.value) \
+            .scalar()
+        n_finished = session.query(func.count(Model.id)) \
+            .join(RunningStatus, Model.running_status_id == RunningStatus.id) \
+            .filter(RunningStatus.name == RunningStatusEnum.finished.value) \
+            .scalar()
+
+        print(f"Models summary")
+        print(f"Not run: {n_not_run}")
+        print(f"running: {n_running}")
+        print(f"re-run: {n_re_run}")
+        print(f"crashed: {n_crashed}")
+        print(f"finished: {n_finished}")
 
 
 def entry_point():

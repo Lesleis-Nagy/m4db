@@ -107,7 +107,7 @@ If ``type`` is omitted, all geometries are listed.
 The m4db-model command
 ----------------------
 
-The ``m4db-model`` command is on of the workhorses of m4db. It is used to add a model to the database,
+The ``m4db-model`` command is one of the workhorses of m4db. It's used to add a model to the database,
 run the model (either directly or by scheduling the model to run via slurm) and to retrieve some information
 about models from m4db. Its commands are listed as follows
 
@@ -116,4 +116,17 @@ The add subcommand
 
 .. program-output:: m4db-model add --help
 
-.. helloworld::
+The run subcommand
+..................
+
+.. program-output:: m4db-model run --help
+
+The schedule subcommand
+.......................
+
+.. program-output:: m4db-model run --help
+
+The summary subcommand
+......................
+
+.. program-output:: m4db-model summary --help

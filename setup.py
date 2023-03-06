@@ -12,6 +12,7 @@ setup(
     package_dir={"": "lib"},
     install_requires=[
         "sphinx",
+        "sphinxcontrib-programoutput",
         "docutils",
         "typer",
         "psycopg2-binary",

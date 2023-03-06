@@ -1,19 +1,24 @@
 #!/bin/bash
 
-#SBATCH --job-name={{sdata.unique_id}}
+#SBATCH --job-name={{unique_id}}
 
-#SBATCH -N {{sdata.N}} # No. of nodes
-#SBATCH -n {{sdata.n}} # No. of tasks 
-#SBATCH -c {{sdata.c}} # No. of cores per task
+#SBATCH -N {{nodes}} # No. of nodes
+#SBATCH -n {{ntasks}} # No. of tasks
+#SBATCH -c {{cpus_per_task}} # No. of cores per task
 
-#SBATCH --time={{sdata.time}}
-#SBATCH --chdir={{sdata.working_directory}}
+#SBATCH --time={{time}}
+#SBATCH --chdir={{working_directory}}
 
+{% if module_source is not none %}
+# Source modules
+source {{ module_source }}
+{% endif %}
 # Load modules
-export MODULEPATH={{sdata.module_dir}}
-{% for module in sdata.modules %}
+export MODULEPATH={{ module_dir }}
+{% for module in modules %}
 module load {{ module }}
 {% endfor %}
 
 # Run model
-srun -N 1 m4db_run_model {{sdata.unique_id}}
+srun -N 1 m4db-model run {{unique_id}}
+

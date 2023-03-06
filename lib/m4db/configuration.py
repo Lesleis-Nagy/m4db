@@ -3,7 +3,7 @@ import os
 import yaml
 
 from schematics.models import Model
-from schematics.types import StringType, IntType
+from schematics.types import StringType, IntType, ListType
 from schematics.types import BooleanType
 from schematics.types.compound import ModelType
 
@@ -21,6 +21,22 @@ class RunnerWeb(Model):
     port = IntType(required=True)
     no_of_retries = IntType(required=True, serialized_name="no-of-retries")
     backoff_factor = IntType(required=True, serialized_name="backoff-factor")
+
+
+class Scheduler(Model):
+    r"""
+    Class to hold information about the scheduler.
+    """
+    command = StringType(required=True)
+
+
+class Modules(Model):
+    r"""
+    Class to hold information about the modules needed when running models.
+    """
+    source = StringType(default=None)
+    path = StringType(required=True)
+    to_load = ListType(StringType, required=True, serialized_name="to-load")
 
 
 class Database(Model):
@@ -56,6 +72,8 @@ class Configuration(Model):
     database = ModelType(Database, required=True)
     logging = ModelType(Logging, default=Logging())
     runner_web = ModelType(RunnerWeb, required=True, serialized_name="runner-web")
+    scheduler = ModelType(Scheduler, required=True)
+    modules = ModelType(Modules, required=True)
 
 
 def read_config_from_file(file_name: str) -> Configuration:
