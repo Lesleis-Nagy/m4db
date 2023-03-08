@@ -422,10 +422,6 @@ def schedule(status: str = Option(None, help="the status of the models that shou
                         fout.flush()
                         logger.debug(f"Temporary slurm script written for {model.unique_id}.")
 
-                        with open("/home/m4dbdev/script.slurm", "w") as fff:
-                            fff.write(model_slurm_script(model.unique_id))
-                            fff.flush()
-
                         cmd = f"{config.scheduler.command} {fout.name}"
                         logger.debug(f"Calling scheduler with command '{cmd}'.")
 
