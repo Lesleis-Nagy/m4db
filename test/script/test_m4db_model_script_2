@@ -29,7 +29,7 @@ echo $! > "$TESTNAME.pid"
 
 sleep $TESTWAIT
 m4db-model schedule --no-dry-run
-sleep 120
+sleep 60
 python "$TESTPDIR/test/script/$TESTNAME.py"
 sleep $TESTWAIT
 
