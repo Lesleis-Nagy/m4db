@@ -18,7 +18,7 @@ TEST_DATA_DIR=/data/$USER
 #       5.2) a 40nm ellipsoid with prolateness 1.4 and oblateness 1.0
 
 echo "***************************************************************************"
-echo "* Cleaning database                                                       *"
+echo "  Cleaning database"
 echo "***************************************************************************"
 
 rm -rf $TEST_DATA_DIR/geometry
@@ -29,13 +29,13 @@ echo "drop database if exists $USER" | psql -U postgres -h localhost
 echo "create database $USER" | psql -U postgres -h localhost
 
 echo "***************************************************************************"
-echo "* Regenerating database                                                   *"
+echo "  Regenerating database"
 echo "***************************************************************************"
 
 m4db-setup-database $USER /data/$USER --yes-to-all
 
 echo "***************************************************************************"
-echo "* Populating data with set 1                                              *"
+echo "  Populating data with set 1"
 echo "***************************************************************************"
 
 m4db-user add testuser Test User test.user@testurl.com

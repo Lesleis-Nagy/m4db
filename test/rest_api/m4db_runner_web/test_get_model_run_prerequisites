@@ -7,7 +7,7 @@ TESTPORT=8888
 TESTWAIT=2
 
 echo "***************************************************************************"
-echo "* Running $TESTNAME                                   *"
+echo "  Running $TESTNAME"
 echo "***************************************************************************"
 
 bash $TESTPDIR/test/datasets/setup-dataset-2

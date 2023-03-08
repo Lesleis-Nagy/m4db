@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TESTNAME="test_m4db_model_script_1"
+TESTNAME="test_m4db_model_script_2"
 TESTPDIR=${1:-/home/$USER/Project/m4db-database}
 TESTVENV=${2:-/home/$USER}
 TESTPORT=8888
@@ -28,7 +28,7 @@ echo $! > "$TESTNAME.pid"
 
 
 sleep $TESTWAIT
-m4db-model run 1d73da1c-ea5f-4690-a170-4f6eb442d8e2
+m4db-model schedule --no-dry-run
 python "$TESTPDIR/test/script/$TESTNAME.py"
 sleep $TESTWAIT
 
