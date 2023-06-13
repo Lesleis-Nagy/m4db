@@ -86,6 +86,9 @@ class MaterialSchema(schematics.models.Model):
     dir_x = schematics.types.FloatType(serialized_name="dir-x")
     dir_y = schematics.types.FloatType(serialized_name="dir-y")
     dir_z = schematics.types.FloatType(serialized_name="dir-z")
+    alpha = schematics.types.FloatType()
+    theta = schematics.types.FloatType()
+    phi = schematics.types.FloatType()
     submesh_id = schematics.types.IntType(default=1, serialized_name="submesh-id")
 
     anisotropy_form = schematics.types.StringType(choices=[AnisotropyFormEnum.cubic.value,
