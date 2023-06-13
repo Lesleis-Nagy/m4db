@@ -457,6 +457,9 @@ class Material(Base):
     :param dir_x: the x direction of the orientation of the anisotropy axes.
     :param dir_y: the y direction of the orientation of the anisotropy axes.
     :param dir_z: the z direction of the orientation of the anisotropy axes.
+    :param alpha: the alpha rotation angle for anisotropy axes.
+    :param theta: the theta rotation angle for anisotropy axes.
+    :param phi: the phi rotation angle of the anisotopy axes.
     :param last_modified: the data/time at which the object/record was modified
     :param created: the creation date/time of this object/record
     """
@@ -481,6 +484,9 @@ class Material(Base):
     dir_x = Column(Float, nullable=True, default=1.0)
     dir_y = Column(Float, nullable=True, default=0.0)
     dir_z = Column(Float, nullable=True, default=0.0)
+    alpha = Column(Float, nullable=True, default=0.0)
+    theta = Column(Float, nullable=True, default=0.0)
+    phi = Column(Float, nullable=True, default=0.0)
     last_modified = Column(DateTime, default=now, onupdate=now, nullable=False)
     created = Column(DateTime, default=now, nullable=False)
 

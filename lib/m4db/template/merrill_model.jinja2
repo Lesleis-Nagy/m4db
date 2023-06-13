@@ -62,6 +62,10 @@ set subdomain {{ material.submesh_id }} {{ material.name }} {{ material.temperat
 {% endfor %}
 {% endif %}
 
+{%- if material.alpha is not none and material.theta is not none and material.phi is not none %}
+CubicRotation {{ material.alpha }} {{ material.theta }} {{ material.phi }}
+{% endif %}
+
 EnergyLog {{ energy_log_file }}
 {% if model.applied_field is not none %}
 External Field Strength {{ model.applied_field.strength }} {{ field_unit }}

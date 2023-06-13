@@ -111,7 +111,6 @@ def add(model_json_file: str = Argument(..., help="a file containing new model J
             sys.exit()
 
         # Perform additional checks.
-        logger.debug
         for index, model in enumerate(models.models):
 
             existing_geometry = get_geometry(session, schema_object=model.geometry)
@@ -210,6 +209,9 @@ def add(model_json_file: str = Argument(..., help="a file containing new model J
                                                       dir_x=material.dir_x,
                                                       dir_y=material.dir_y,
                                                       dir_z=material.dir_z,
+                                                      alpha=material.alpha,
+                                                      theta=material.theta,
+                                                      phi=material.phi,
                                                       anisotropy_form=existing_anisotropy_form,
                                                       submesh_id=material.submesh_id))
 
