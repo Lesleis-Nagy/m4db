@@ -16,8 +16,17 @@ ReadTecplotZone {{ initial_model_tecplot }} 1
 {% endif %}
 
 {%- if model.materials|length == 1%}
+
+{# If there is only one material, use the name/temperature form. #}
 {{ model.materials[0].name }} {{ model.materials[0].temperature }} C
+
+{# Apply the rotation of the anisotropy axes. #}
+{%- if model.materials[0].alpha is not none and model.materials[0].theta is not none and model.materials[0].phi is not none %}
+CubicRotation {{ model.materials[0].alpha }} {{ model.materials[0].theta }} {{ model.materials[0].phi }}
+{% endif %}
+
 {%- else %}
+
 {%- for material in model.materials %}
 
 {%- if material.k1 is not none or material.k2 is not none or material.k3 is not none or material.k4 is not none or material.k5 is not none or material.k6 is not none or material.k7 is not none or material.k8 is not none or material.k9 is not none or material.k10 is not none or material.aex is not none or material.ms is not none %}
@@ -65,7 +74,7 @@ set subdomain {{ material.submesh_id }} {{ material.name }} {{ material.temperat
 {% endif %}
 
 {%- if material.alpha is not none and material.theta is not none and material.phi is not none %}
-    CubicRotation {{ material.alpha }} {{ material.theta }} {{ material.phi }}
+CubicRotation {{ material.alpha }} {{ material.theta }} {{ material.phi }}
 {% endif %}
 
 {% endfor %}
