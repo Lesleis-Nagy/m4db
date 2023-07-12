@@ -397,11 +397,11 @@ def schedule(status: str = Option(None, help="the status of the models that shou
             models_qry = models_qry.join(Metadata, Model.mdata_id == Metadata.id)
             if user is not None:
                 logger.debug(f"User metadata required, adding to query.")
-                models_qry = models_qry.join(Metadata.db_user_id == DBUser.id) \
+                models_qry = models_qry.join(DBUser, Metadata.db_user_id == DBUser.id) \
                     .filter(DBUser.user_name == user)
             if project is not None:
                 logger.debug(f"Project metadata required, adding to query.")
-                models_qry = models_qry.join(Metadata.project_id == Project.id) \
+                models_qry = models_qry.join(Project, Metadata.project_id == Project.id) \
                     .filter(Project.name == project)
 
         logger.debug("Retrieving models.")
