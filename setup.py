@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="m4db",
-    version="0.1.3",
+    version="0.1.4",
     packages=find_packages(
         where="lib",
         include="m4db/*"

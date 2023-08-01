@@ -1,0 +1,2 @@
+include lib/m4db/template/*.jinja2
+
