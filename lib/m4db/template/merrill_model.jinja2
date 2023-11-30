@@ -7,11 +7,11 @@ Set MaxEnergyEvaluations {{ model.max_energy_evaluations }}
 {{ minimizer }}
 Set ExchangeCalculator {{ exchange_calculator }}
 
-{% if model.initial_magnetization.type == "random" %}
+{% if model.initial_magnetization.type == "random_initial_magnetization" %}
 Randomize All Moments
-{% elif model.initial_magnetization.type == "uniform" %}
+{% elif model.initial_magnetization.type == "uniform_initial_magnetization" %}
 Uniform Magnetization {{ model.initial_magnetization.dir_x }} {{ model.initial_magnetization.dir_y }} {{ model.initial_magnetization.dir_z }}
-{% elif model.initial_magnetization.type == "model" %}
+{% elif model.initial_magnetization.type == "model_initial_magnetization" %}
 ReadTecplotZone {{ initial_model_tecplot }} 1
 {% endif %}
 
