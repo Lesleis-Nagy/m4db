@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-# Run the service on port 8081
+# Run the service on port 8888
 gunicorn --bind=0.0.0.0:8888 \
          --log-level=debug \
          --timeout=1024 \
