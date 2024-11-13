@@ -6,6 +6,7 @@
 #SBATCH -n {{ntasks}} # No. of tasks
 #SBATCH -c {{cpus_per_task}} # No. of cores per task
 
+#SBATCH --partition=micromag 
 #SBATCH --time={{time}}
 #SBATCH --chdir={{working_directory}}
 

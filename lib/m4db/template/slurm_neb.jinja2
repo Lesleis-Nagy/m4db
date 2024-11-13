@@ -6,6 +6,7 @@
 #SBATCH -n {{sdata.n}} # No. of tasks 
 #SBATCH -c {{sdata.c}} # No. of cores per task
 
+#SBATCH --partition=micromag 
 #SBATCH --time={{sdata.time}}
 #SBATCH --chdir={{sdata.working_directory}}
 
