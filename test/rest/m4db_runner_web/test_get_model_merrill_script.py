@@ -16,7 +16,7 @@ class TestGetModelMerrillScript(unittest.TestCase):
 
     def test_get_merrill_script(self):
 
-        expected_merrill_script =textwrap.dedent(r"""
+        expected_merrill_script = textwrap.dedent(r"""
             Set MaxMeshNumber 1
 
             ReadMesh 1 geometry.pat
@@ -27,7 +27,13 @@ class TestGetModelMerrillScript(unittest.TestCase):
             Set ExchangeCalculator 1
 
 
+
+
             magnetite 20.000 C
+
+
+            CubicRotation 0.0 0.0 0.0
+
 
             EnergyLog energy
 

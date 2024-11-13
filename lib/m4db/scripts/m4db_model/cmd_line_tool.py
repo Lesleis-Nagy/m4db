@@ -370,7 +370,8 @@ def run(unique_id: str = Argument(..., help="the unique id of the model to run."
 def schedule(status: str = Option(None, help="the status of the models that should be scheduled."),
              user: str = Option(None, help="the user that scheduled models belong to."),
              project: str = Option(None, help="the project that scheduled models belong to."),
-             dry_run: bool = Option(True, help="a flag to indicate whether the models really should be scheduled.")):
+             dry_run: bool = Option(True, help="a flag to indicate whether the models really should be scheduled."),
+             limit: int = Option(1000, help="the number of models to schedule")):
     r"""
     Schedule a collection of models for running.
     """
@@ -397,15 +398,15 @@ def schedule(status: str = Option(None, help="the status of the models that shou
             models_qry = models_qry.join(Metadata, Model.mdata_id == Metadata.id)
             if user is not None:
                 logger.debug(f"User metadata required, adding to query.")
-                models_qry = models_qry.join(Metadata.db_user_id == DBUser.id) \
+                models_qry = models_qry.join(DBUser, Metadata.db_user_id == DBUser.id) \
                     .filter(DBUser.user_name == user)
             if project is not None:
                 logger.debug(f"Project metadata required, adding to query.")
-                models_qry = models_qry.join(Metadata.project_id == Project.id) \
+                models_qry = models_qry.join(Project, Metadata.project_id == Project.id) \
                     .filter(Project.name == project)
 
         logger.debug("Retrieving models.")
-        models = models_qry.all()
+        models = models_qry.limit(limit).all()
         logger.debug(f"Retrieved {len(models)} models.")
 
         if len(models) == 0:

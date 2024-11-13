@@ -31,7 +31,13 @@ class TestGetModelMerrillScript(unittest.TestCase):
             Set ExchangeCalculator 1
 
 
+
+
             magnetite 20.000 C
+
+
+            CubicRotation 0.0 0.0 0.0
+
 
             EnergyLog energy
 

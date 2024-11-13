@@ -13,3 +13,10 @@ MANIFEST
 /lib/*.egg-info/
 
 mytest.py
+
+*.xml
+*.log
+*.pid
+
+/example_config.yaml
+/example_model.json

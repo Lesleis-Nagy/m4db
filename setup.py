@@ -32,7 +32,11 @@ setup(
         "unittest-xml-reporting",
     ],
     include_package_data=True,
-    package_data={"": ["*.jinja2"]},
+    package_data={"m4db.template": ["merrill_model.jinja2",
+                                    "merrill_neb_child_path.jinja2",
+                                    "merrill_neb_root_path.jinja2",
+                                    "slurm_model.jinja2",
+                                    "slurm_neb.jinja2"]},
     entry_points="""
     [console_scripts]
     m4db-setup-database=m4db.scripts.m4db_setup_database.cmd_line_tool:entry_point
